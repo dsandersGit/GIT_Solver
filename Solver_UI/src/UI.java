@@ -659,11 +659,10 @@ public class UI {
 			JOptionPane.showMessageDialog(jF, "<HTML><H3>"+SolverStart.app+"</H3><I>Copyright 2009-2023 Daniel Sanders</I><BR><BR><SMALL>dsanders@gmx.net</SMALL><BR>");
 		}});
 		menuAboutLicense.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
-			int erg = JOptionPane.showConfirmDialog(jF, "<HTML><H3>This is Proprietary Software</H3>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-			if ( erg != JOptionPane.YES_OPTION )System.exit(0);
+			JOptionPane.showConfirmDialog(jF, "<HTML><H3>Licensed under GNU General Public License v3.0</H3>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 		}});
 		menuAboutCredits.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
-			JOptionPane.showMessageDialog(null, "<HTML>Third Party Libraries: <ul><li>FlatLaf: open-source Look and Feel for Java Swing desktop applications</li></ul><BR>", SolverStart.app, JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, "<HTML>No third party</li></ul><BR>", SolverStart.app, JOptionPane.INFORMATION_MESSAGE);
 		}});
 		//-------------------------------------------------------------------------------------------------------------------
 		return mBar;
