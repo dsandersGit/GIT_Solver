@@ -1,5 +1,5 @@
 # GIT_Solver
- The software is a basic machine learning classification tool written in java. During training only samples of one class are set as target. Backprogagation aims at increasing the multidimensional Euclidian distance of non-target samples and increasing the accuracy ('score' in plot).
+ The software is a basic machine learning classification tool written in java. During training only samples of one class are set as target. Backpropagation aims at increasing the multidimensional Euclidian distance of non-target samples and increasing the accuracy ('score' in plot).
  
 ![Solver](https://github.com/dsandersGit/GIT_Solver/assets/140900940/16945d0b-ccca-4f52-b66f-455cec2bd1e2)
 
