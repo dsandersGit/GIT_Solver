@@ -13,7 +13,7 @@ Applying an ensemble to a dataset sample's estimated classification is obtained.
 ![Solver_Classification](https://github.com/dsandersGit/GIT_Solver/assets/140900940/aa770ff8-1fde-4a6d-aaaf-5d8288b57cc4)
 
 Statús of the tool is 'under devlopment', yet capable of running. 
-Datasets in CSV, exhibiting numerical values and one String classification, can be processed. Exemplarily the first data of the IRIS dataset, which is included, are formatted like:
+Datasets in CSV, exhibiting numerical values and one String classification, can be processed. Header is optional. Exemplarily the first data of the IRIS dataset, which is included, are formatted like:
 
 Sepal_Length,Sepal_Width,Petal_Length,Petal_Width,Species
 
@@ -24,3 +24,5 @@ Sepal_Length,Sepal_Width,Petal_Length,Petal_Width,Species
 4.7,3.2,1.3,0.2,Iris-setosa
 
 ....
+
+Datasets with up to approx. 5000 samples and 100 variables are processed within reasonable speed on a general computer. 
