@@ -510,12 +510,12 @@ public class UI {
 		
 		// ---------------------------------------------------------------------
 		JMenu menuAbout = new JMenu( " About");
-		JMenuItem menuAboutAbout = new JMenuItem(" About "+SolverStart.app); 
-		menuAbout.add(menuAboutAbout);
+//		JMenuItem menuAboutAbout = new JMenuItem(" About "+SolverStart.app); 
+//		menuAbout.add(menuAboutAbout);
 		JMenuItem menuAboutLicense = new JMenuItem(" License"); 
 		menuAbout.add(menuAboutLicense);
-		JMenuItem menuAboutCredits = new JMenuItem(" Credits"); 
-		menuAbout.add(menuAboutCredits);
+//		JMenuItem menuAboutCredits = new JMenuItem(" Credits"); 
+//		menuAbout.add(menuAboutCredits);
 		// ---------------------------------------------------------------------
 		// -------------------------------------------------------------------------------------
 		mBar.add(menuFile);
@@ -693,15 +693,15 @@ public class UI {
 		
 		
 		// *******************************
-		menuAboutAbout.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
-			JOptionPane.showMessageDialog(jF, "<HTML><H3>"+SolverStart.app+"</H3><I>Copyright 2009-2023 Daniel Sanders</I><BR><BR><SMALL>dsanders@gmx.net</SMALL><BR>");
-		}});
+//		menuAboutAbout.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
+//			JOptionPane.showMessageDialog(jF, "<HTML><H3>"+SolverStart.app+"</H3><I>Copyright 2009-2023 Daniel Sanders</I><BR><BR><SMALL>dsanders@gmx.net</SMALL><BR>");
+//		}});
 		menuAboutLicense.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			JOptionPane.showConfirmDialog(jF, "<HTML><H3>Licensed under GNU General Public License v3.0</H3>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 		}});
-		menuAboutCredits.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
-			JOptionPane.showMessageDialog(null, "<HTML>No third party</li></ul><BR>", SolverStart.app, JOptionPane.INFORMATION_MESSAGE);
-		}});
+//		menuAboutCredits.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
+//			JOptionPane.showMessageDialog(null, "<HTML>Autho</li></ul><BR>", SolverStart.app, JOptionPane.INFORMATION_MESSAGE);
+//		}});
 		//-------------------------------------------------------------------------------------------------------------------
 		return mBar;
 	}
