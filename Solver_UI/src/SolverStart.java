@@ -169,7 +169,7 @@ public class SolverStart {
 		DS.setEnsemble(main);
 		UI.txtEnsemble.setText(main.toString(3));
 		UI.labTimePerRun.setText("Process: ---");
-		UI.refreshStatus();
+		
 		
 		FileWriter fw = new FileWriter("ensemble.ens", false);
 	    BufferedWriter bw = new BufferedWriter(fw);
@@ -179,7 +179,7 @@ public class SolverStart {
 	    UI.menuFile.setEnabled(true);
 	    isRunning = false;
 	    UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colGreen.png")));
-	    
+	    UI.refreshStatus();
 	}
 	public static void classify() {
 		new Classify();
@@ -341,7 +341,6 @@ public class SolverStart {
 			    if ( hasHeader) {
 			    	test = lines[0].split(",");
 			    	for (int i=0;i<test.length; i++) {
-				    	System.out.println(test[i]);
 		        		 if ( i!= classNamesPos) { DS.AreaNames [c] = test[i];
 			        		 c++;
 		        		 }

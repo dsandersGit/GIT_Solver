@@ -649,8 +649,7 @@ public class UI {
 			out.append("\n");
 			for (int i=0;i<DS.freezs.size();i++) {
 				MC_Freeze mc = DS.freezs.get(i);
-//				System.out.println("mc.tp_fp_tn_fn "+mc.tp_fp_tn_fn.length);
-//				System.out.println("mc.tp_fp_tn_fn[0] "+mc.tp_fp_tn_fn[0].length);
+
 				out.append(i);
 				out.append("\t"+Tools.txtLen(DS.classAllIndNme[Tools.getIndexOfTarget(mc.targetColorIndex)]));
 				out.append("\t"+mc.tp_fp_tn_fn[0][0]);

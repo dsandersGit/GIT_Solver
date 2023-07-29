@@ -51,7 +51,7 @@ public class Runner {
 		for (double i=-10;i<10;i+=0.1) {
 			// (int)((val + 10)*10);
 			mappedSigmoid[(int)((i + 10)*10.)] = getSigmoid(i);	
-//			System.out.println(i+"\t"+mappedSigmoid[(int)((i + 10)*10.)]);
+
 		}
 		targetColorIndex 		= target;
 		if ( tName == null) {
@@ -758,7 +758,6 @@ public class Runner {
     	}
     }
     private double getSigmoid( double val ) {
-    	//System.out.println(val);
     	// TODO: Mapping
         return 1 / ( 1 + Math.exp( val * -1.));
     }
