@@ -94,7 +94,21 @@ public class MC_Freeze {
         }
         out.put("TrainSet", 		tmp.toString());
         
+        tmp = new StringBuffer();
+        for (int i=0;i<tp_fp_tn_fn.length;i++) {
+        	if ( i>0)tmp.append(",");
+        	String val = ""+tp_fp_tn_fn[i][0];
+        	tmp.append( val);
+        }
+        out.put("tp_fp_tn_fn_Train", 		tmp.toString());
         
+        tmp = new StringBuffer();
+        for (int i=0;i<tp_fp_tn_fn.length;i++) {
+        	if ( i>0)tmp.append(",");
+        	String val = ""+tp_fp_tn_fn[i][1];
+        	tmp.append( val);
+        }
+        out.put("tp_fp_tn_fn_Test", 		tmp.toString());
 		return out;
 	}
 }

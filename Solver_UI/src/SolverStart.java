@@ -119,6 +119,8 @@ public class SolverStart {
 		int cycles = Opts.numEnsemble*DS.numClasses;
 		double avgTime = 0;
 		
+		UI.refreshStatus();
+		
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));
 		for (int i=0;i<Opts.numEnsemble;i++) {
 			UI.proStatus.setValue(100*i/Opts.numEnsemble);

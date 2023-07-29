@@ -89,6 +89,7 @@ public class UI {
 	static JMenuItem 	menuActionTrainImmediateStop = new JMenuItem(" Stop Training Now");
 	static JMenuItem 	menuActionTrain = new JMenuItem(" Train"); 
 	static JMenuItem 	menuFileSaveEnsemble = new JMenuItem(" Save Ensemble"); 
+	static JMenuItem 	menuFileLoadEnsemble = new JMenuItem(" Load Ensemble"); 
 	static JMenu 		menuExport = new JMenu( " Export");
 	
 	static int tab_Classify = 0;
@@ -190,7 +191,7 @@ public class UI {
 		txtOpts.setLineWrap(true);
 		txtOpts.setText(Opts.getOptsAsJson().toString(3));
 		
-		jF.add(getControlToolBar(), BorderLayout.NORTH);
+		jF.add(getControlToolBar(), BorderLayout.EAST);
 		
 		jF.add(maintabbed,BorderLayout.CENTER);
 		jF.add(initStatusBar(),BorderLayout.SOUTH);
@@ -255,6 +256,17 @@ public class UI {
 	}
 	public static void refreshStatus() {
 		
+		
+		menuActionClassify.setEnabled(true);
+		menuFileSaveEnsemble.setEnabled(true);
+		menuFileLoadEnsemble.setEnabled(true);
+		menuExport.setEnabled(true);
+		jbSaveEns.setEnabled(true);
+		jbTrain.setEnabled(true);
+		jbClassify.setEnabled(true);
+		menuActionTrain.setEnabled(true);
+		menuActionClassify.setEnabled(true);
+		
 		jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
 		
 		boolean noData 			= false;
@@ -278,20 +290,48 @@ public class UI {
 					if ( !DS.AreaNames[i].equals(ensVarNames[i]))ensMatchData = false;	
 				}
 			}
+			
 		}else {
 			noEns = true;
+			menuActionClassify.setEnabled(false);
+			menuFileSaveEnsemble.setEnabled(false);
+			menuExport.setEnabled(false);
+			jbSaveEns.setEnabled(false);
+			jbClassify.setEnabled(false);
 		}
 		isRunning =  SolverStart.isRunning;
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("col13.png")));
-		if ( noData )	 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
-		if ( isRunning )		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));
+		if ( noData ) {
+			UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
+			jbTrain.setEnabled(false);
+			jbClassify.setEnabled(false);
+			menuActionTrain.setEnabled(false);
+			menuActionClassify.setEnabled(false);
+		}
+		if ( isRunning ) {
+			UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));
+			menuActionClassify.setEnabled(false);
+			jbClassify.setEnabled(false);
+			menuFileLoadEnsemble.setEnabled(false);
+			menuFileSaveEnsemble.setEnabled(false);
+			menuExport.setEnabled(false);
+			jbSaveEns.setEnabled(false);
+			jbTrain.setEnabled(false);
+			menuActionTrain.setEnabled(false);
+
+		}
 		
 		if ( !noEns)
 			if ( !ensMatchData ) {	
 				UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colRed.png")));
+				menuActionClassify.setEnabled(false);
+				jbClassify.setEnabled(false);
 			}else {
 				UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colGreen.png")));
+				menuActionClassify.setEnabled(true);
+				jbClassify.setEnabled(true);
 			}
+		
 		
 	}
 	
@@ -374,8 +414,14 @@ public class UI {
 	private JToolBar getControlToolBar(){
 		JToolBar toolbar = new JToolBar("TOOLBAR"); 
 		toolbar.setFloatable(true);
-		toolbar.setOrientation(JToolBar.HORIZONTAL);
+		toolbar.setOrientation(JToolBar.VERTICAL);
 		toolbar.setBorder( BorderFactory.createRaisedBevelBorder() );
+		
+		jbLoad.setToolTipText("<HTML><B>Select dataset to load</B></HTML>");
+		jbTrain.setToolTipText("<HTML><B>Train dataset</B></HTML>");
+		jbLoadEns.setToolTipText("<HTML><B>Load Model Ensemble</B></HTML>");
+		jbSaveEns.setToolTipText("<HTML><B>Save Model Ensemble</B></HTML>");
+		jbClassify.setToolTipText("<HTML><B>Classify Dataset using Model Ensemble</B></HTML>");
 		
 		jbLoad.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			loadData();
@@ -428,17 +474,17 @@ public class UI {
 		
 
 		JMenuItem menuFileLoadDsFormat = new JMenuItem(" Load Dataset"); 
-		menuFileLoadDsFormat.setToolTipText("TOOLTIP not yet set"); 
+		//menuFileLoadDsFormat.setToolTipText("TOOLTIP not yet set"); 
 		menuFile.add(menuFileLoadDsFormat);
 		JMenuItem menuFileLoadClip = new JMenuItem(" Import from Clipboard"); 
-		menuFileLoadClip.setToolTipText("TOOLTIP not yet set"); 
+		//menuFileLoadClip.setToolTipText("TOOLTIP not yet set"); 
 		//menuFileLoadClip.setEnabled(false);
 		menuFile.add(menuFileLoadClip);
 		menuFile.add(new JSeparator());
-		JMenuItem menuFileLoadEnsemble = new JMenuItem(" Load Ensemble"); 
-		menuFileLoadEnsemble.setToolTipText("TOOLTIP not yet set"); 
+		
+		//menuFileLoadEnsemble.setToolTipText("TOOLTIP not yet set"); 
 		menuFile.add(menuFileLoadEnsemble);
-		menuFileSaveEnsemble.setToolTipText("TOOLTIP not yet set"); 
+		//menuFileSaveEnsemble.setToolTipText("TOOLTIP not yet set"); 
 		menuFile.add(menuFileSaveEnsemble);
 		menuFile.add(new JSeparator());
 		JMenuItem menuFileExit = new JMenuItem(" Quit"); 
@@ -482,17 +528,10 @@ public class UI {
 			loadData();
 		}});
 		menuFileLoadClip.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
-//			 Preferences prefs;
-//		        prefs = Preferences.userRoot().node("Solver");
-//		        String path = prefs.get("path", ".");
-//			File f = getFile("Select dataset file", path,"Comma Separated Values", "CSV", false);
-//			if ( f == null) return;
-//			if ( !f.exists()) return;
-//			prefs.put("path", f.getParent());
 			if ( !SolverStart.importDataFromClipboard()) return;
 			new DS();												// INITS
 			DS.normParas = Tools.doNormData ();				// Daten Normalisieren
-//			SolverStart.dataFileName = f.getName();
+
 			refreshStatus();
 			SolverStart.analyzeRawData("Clipboard");
 			UI.maintabbed.setSelectedIndex(UI.tab_Summary);
@@ -675,13 +714,14 @@ public class UI {
 			JOptionPane.showMessageDialog(jF, "<HTML><H3>Options malformed > set to default</H3>");
 			return;
 		}
-		refreshStatus();
+		
 		SolverStart.immediateStop = false;
 		Runner.cleanRunner ();
 		tmtable.setColumnCount(0);
 		tmtable.setRowCount(0);
 		maintabbed.setSelectedIndex(tab_Statistics);
 		jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
+		refreshStatus();
 		
 			Thread thread = new Thread(new Runnable()
 			{
@@ -697,6 +737,7 @@ public class UI {
 			thread.start();
 	}
 	private static void saveEnsemble() {
+		if ( DS.js_Ensemble == null) return;
 		Preferences prefs;
 	    prefs = Preferences.userRoot().node("Solver");
 	    String path = prefs.get("path", ".");
@@ -706,7 +747,7 @@ public class UI {
 		
 		//File f = getFile("Save ensemble file", SolverStart.app,"DS_Ensemble", "ENS", true);
 		if ( f == null) return;
-		if ( DS.js_Ensemble == null) return;
+		
 		if ( !f.getName().toLowerCase().endsWith(".ens")) {
 			f = new File(f.getAbsolutePath()+".ens");
 		}
