@@ -769,8 +769,8 @@ public class UI {
 		Preferences prefs;
 	    prefs = Preferences.userRoot().node("Solver");
 	    String path = prefs.get("path", ".");
-	    String[] type = {"DS_Data","CSV"};
-	    String[] sht = {"DAT", "CSV"};
+	    String[] type = {"CSV" , "DS_Data"};
+	    String[] sht = {"CSV" , "DAT"};
 		File f = Tools.getFile("Select dataset file", path,type,sht, false);
 		if ( f == null) return;
 		if ( !f.exists()) return;
@@ -779,6 +779,7 @@ public class UI {
 			SolverStart.importData(f.getAbsolutePath());
 		if ( f.getName().toLowerCase().endsWith(".csv"))
 			SolverStart.importDataCSV(f.getAbsolutePath());
+		
 		
 		DS.txtSummary = null;
 		DS.fileName =  f.getName();

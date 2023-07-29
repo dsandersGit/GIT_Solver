@@ -208,7 +208,8 @@ public class SolverStart {
 		
 		double[] ParetoScaleAvg	= new double[DS.numVars];										// AVG and SD
 		double[] ParetoScaleSd	= new double[DS.numVars];
-		double[][] aurocs = Tools.calculateAurocs();
+		double[][] aurocs = null;
+		if ( DS.numVars < 100) aurocs = Tools.calculateAurocs();
 		for(int a = 0;a<DS.numVars;a++){
 			double[] vals = new double[DS.numSamples];
 			double avg = 0;
@@ -226,11 +227,17 @@ public class SolverStart {
 		Tools.sumryAdd (Tools.txtLen("Variable") +"\t"+ Tools.txtLen("Average") + "\t" + Tools.txtLen("Standard Dev.")+ "\t" + Tools.txtLen("AUROC max") + "\n");
 		Tools.sumryAdd ("________________\t________________\t________________\t________________" + "\n");
 		Tools.sumryAdd ("\n");
+		 
 		for (int i=0;i< DS.numVars;i++) {
-			Tools.sumryAdd (Tools.txtLen(DS.AreaNames[i]) + "\t" + Tools.txtLen(""+Tools.myRound(ParetoScaleAvg[i],4))+ "\t" 
-		+ Tools.txtLen(""+Tools.myRound(ParetoScaleSd[i],4)) +"\t" + Tools.txtLen(DS.classAllIndNme[(int)aurocs[i][1]])+" | "+Tools.myRound(aurocs[i][0],4) + "\n");
+			if ( aurocs != null) {
+				Tools.sumryAdd (Tools.txtLen(DS.AreaNames[i]) + "\t" + Tools.txtLen(""+Tools.myRound(ParetoScaleAvg[i],4))+ "\t" 
+			+ Tools.txtLen(""+Tools.myRound(ParetoScaleSd[i],4)) +"\t" + Tools.txtLen(DS.classAllIndNme[(int)aurocs[i][1]])+" | "+Tools.myRound(aurocs[i][0],4) + "\n");
+			}else{
+				Tools.sumryAdd (Tools.txtLen(DS.AreaNames[i]) + "\t" + Tools.txtLen(""+Tools.myRound(ParetoScaleAvg[i],4))+ "\t" 
+						+ Tools.txtLen(""+Tools.myRound(ParetoScaleSd[i],4)) + "\n");
+			}
 		}
-		
+	
 		
 		Tools.sumryAdd ("----------------------------------------------------------------------------" + "\n");
 		if ( min > Opts.minPopulation ) {																		// MindestAnzahl Population / Class
@@ -383,6 +390,7 @@ public class SolverStart {
 	        }
 	        if (fail) JOptionPane.showConfirmDialog(null, "<HTML><H3>Import of (some) data failed</H3>", SolverStart.app, JOptionPane.OK_OPTION, JOptionPane.WARNING_MESSAGE);
 	}
+	
 	
 	public static void importData(String datei){
 		
