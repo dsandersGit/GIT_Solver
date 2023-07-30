@@ -42,11 +42,12 @@ public class SolverStart {
 	 * 36: Validation in Table
 	 * 37: BugFix Estimated runtime
 	 * 38: BugFix AUROC < 0.5
+	 * 39: ImmediateStop > no Freeze
 	 */
  
 	public static String 	app 			= "B-LC-DA";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 38";
+	public static String 	revision 		= " 39";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;

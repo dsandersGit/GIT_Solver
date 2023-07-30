@@ -92,7 +92,7 @@ public class Runner {
         	//doStreamPlot();
         }
         finish();
-        doFreeze();
+        if ( !SolverStart.immediateStop ) doFreeze();
 	}
 	public static void cleanRunner () {
 		accuracyTrain.clear();

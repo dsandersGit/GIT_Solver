@@ -116,6 +116,7 @@ public class UI {
 	static JButton jbLoadEns = new JButton();
 	static JButton jbSaveEns = new JButton();
 	static JButton jbClassify = new JButton();
+	static JButton jb_Stop = new JButton("Stop Training");
 	
 	
 	public UI() {
@@ -205,13 +206,14 @@ public class UI {
 	}
 	
 	private static JPanel initStatusBar() {
+		
 		JPanel pan = new JPanel();
 		pan.setLayout(new FlowLayout(FlowLayout.RIGHT));
-//		pan.add(jb_Stop);
-//		jb_Stop.setEnabled(false);
-//		jb_Stop.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
-//			SolverStart.stop = true;
-//		}});
+		
+		jb_Stop.setEnabled(false);
+		jb_Stop.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
+			SolverStart.immediateStop = true;
+		}});
 		
 		labStatusIcon = new JLabel(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
 		
@@ -222,6 +224,7 @@ public class UI {
 		pan.add(labSamples);
 		pan.add(labVars);
 		pan.add(labClasses);
+		pan.add(jb_Stop);
 		pan.add(labStatusIcon);
 		return pan;
 	}
@@ -266,6 +269,7 @@ public class UI {
 		jbClassify.setEnabled(true);
 		menuActionTrain.setEnabled(true);
 		menuActionClassify.setEnabled(true);
+		jb_Stop.setEnabled(false);
 		
 		jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
 		
@@ -318,7 +322,7 @@ public class UI {
 			jbSaveEns.setEnabled(false);
 			jbTrain.setEnabled(false);
 			menuActionTrain.setEnabled(false);
-
+			jb_Stop.setEnabled(true);
 		}
 		
 		if ( !noEns)
@@ -474,7 +478,7 @@ public class UI {
 		
 
 		JMenuItem menuFileLoadDsFormat = new JMenuItem(" Load Dataset"); 
-		//menuFileLoadDsFormat.setToolTipText("TOOLTIP not yet set"); 
+		menuFileLoadDsFormat.setAccelerator(KeyStroke.getKeyStroke('L',InputEvent.CTRL_DOWN_MASK));
 		menuFile.add(menuFileLoadDsFormat);
 		JMenuItem menuFileLoadClip = new JMenuItem(" Import from Clipboard"); 
 		//menuFileLoadClip.setToolTipText("TOOLTIP not yet set"); 
@@ -486,13 +490,16 @@ public class UI {
 		menuFile.add(menuFileLoadEnsemble);
 		//menuFileSaveEnsemble.setToolTipText("TOOLTIP not yet set"); 
 		menuFile.add(menuFileSaveEnsemble);
+		menuFileSaveEnsemble.setAccelerator(KeyStroke.getKeyStroke('S',InputEvent.CTRL_DOWN_MASK));
 		menuFile.add(new JSeparator());
 		JMenuItem menuFileExit = new JMenuItem(" Quit"); 
 		menuFileExit.setAccelerator(KeyStroke.getKeyStroke('Q',InputEvent.CTRL_DOWN_MASK));
 		menuFile.add(menuFileExit);	
 		// ---------------------------------------------------------------------		
 		menuAction.add(menuActionTrain);
+		menuActionTrain.setAccelerator(KeyStroke.getKeyStroke('T',InputEvent.CTRL_DOWN_MASK));
 		menuAction.add(menuActionTrainImmediateStop);
+		menuActionTrainImmediateStop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CANCEL, InputEvent.CTRL_DOWN_MASK));
 		menuAction.add(new JSeparator());
 		menuAction.add(menuActionClassify);	
 		// ---------------------------------------------------------------------
@@ -524,7 +531,6 @@ public class UI {
 		mBar.add(menuAbout);
 		
 		menuFileLoadDsFormat.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
-			
 			loadData();
 		}});
 		menuFileLoadClip.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
