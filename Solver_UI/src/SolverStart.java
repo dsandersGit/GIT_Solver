@@ -43,11 +43,12 @@ public class SolverStart {
 	 * 37: BugFix Estimated runtime
 	 * 38: BugFix AUROC < 0.5
 	 * 39: ImmediateStop > no Freeze
+	 * 40: Mnemonics
 	 */
  
 	public static String 	app 			= "B-LC-DA";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 39";
+	public static String 	revision 		= " 40";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -130,40 +131,42 @@ public class SolverStart {
 			UI.proStatus.setValue(100*i/Opts.numEnsemble);
 			for (int j=0;j<DS.classAllIndices.length;j++) {
 				
-				if ( !SolverStart.immediateStop) {	
+				if ( !SolverStart.immediateStop ) {	
 					new Runner(DS.classAllIndices[j],DS.classAllIndNme[j]);
-					out.append(DS.freezs.get(DS.freezs.size()-1).getModelAsJson().toString(3));
-					JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
-					main.append("model", modl);
-					main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
-					long currTime = ((System.currentTimeMillis()-tme));
-					tmeCount++;
-					timeSum+=currTime;
-					avgTime =  (timeSum/(1000*tmeCount));
-					UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
-					tme = System.currentTimeMillis();
-																		//	FILL STATISTICS
-					Object[] row = new Object[14];
-					MC_Freeze mc = DS.freezs.get(DS.freezs.size()-1);
-					row[0] 		= DS.freezs.size();
-					row[1] 		= DS.classAllIndNme[Tools.getIndexOfTarget(mc.targetColorIndex)];
-					row[2] 		= mc.tp_fp_tn_fn[0][0];
-					row[3] 		= mc.tp_fp_tn_fn[1][0];
-					row[4] 		= mc.tp_fp_tn_fn[2][0];
-					row[5] 		= mc.tp_fp_tn_fn[3][0];
-					double sens = (double)(mc.tp_fp_tn_fn[0][0])/(double)(mc.tp_fp_tn_fn[0][0]+mc.tp_fp_tn_fn[3][0]);
-					row[6] 		= Tools.myRound(sens,4);
-					double spes = (double)(mc.tp_fp_tn_fn[2][0])/(double)(mc.tp_fp_tn_fn[2][0]+mc.tp_fp_tn_fn[1][0]);
-					row[7] 		= Tools.myRound(spes,4);
-					row[8] 		= mc.tp_fp_tn_fn[0][1];
-					row[9] 		= mc.tp_fp_tn_fn[1][1];
-					row[10] 		= mc.tp_fp_tn_fn[2][1];
-					row[11] 		= mc.tp_fp_tn_fn[3][1];
-					sens = (double)(mc.tp_fp_tn_fn[0][1])/(double)(mc.tp_fp_tn_fn[0][1]+mc.tp_fp_tn_fn[3][1]);
-					row[12] 		= Tools.myRound(sens,4);
-					spes = (double)(mc.tp_fp_tn_fn[2][1])/(double)(mc.tp_fp_tn_fn[2][1]+mc.tp_fp_tn_fn[1][1]);
-					row[13] 		= Tools.myRound(spes,4);
-					UI.tmtableStat.addRow(row);
+						if ( DS.freezs.size() > 0) {
+						out.append(DS.freezs.get(DS.freezs.size()-1).getModelAsJson().toString(3));
+						JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
+						main.append("model", modl);
+						main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
+						long currTime = ((System.currentTimeMillis()-tme));
+						tmeCount++;
+						timeSum+=currTime;
+						avgTime =  (timeSum/(1000*tmeCount));
+						UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
+						tme = System.currentTimeMillis();
+																			//	FILL STATISTICS
+						Object[] row = new Object[14];
+						MC_Freeze mc = DS.freezs.get(DS.freezs.size()-1);
+						row[0] 		= DS.freezs.size();
+						row[1] 		= DS.classAllIndNme[Tools.getIndexOfTarget(mc.targetColorIndex)];
+						row[2] 		= mc.tp_fp_tn_fn[0][0];
+						row[3] 		= mc.tp_fp_tn_fn[1][0];
+						row[4] 		= mc.tp_fp_tn_fn[2][0];
+						row[5] 		= mc.tp_fp_tn_fn[3][0];
+						double sens = (double)(mc.tp_fp_tn_fn[0][0])/(double)(mc.tp_fp_tn_fn[0][0]+mc.tp_fp_tn_fn[3][0]);
+						row[6] 		= Tools.myRound(sens,4);
+						double spes = (double)(mc.tp_fp_tn_fn[2][0])/(double)(mc.tp_fp_tn_fn[2][0]+mc.tp_fp_tn_fn[1][0]);
+						row[7] 		= Tools.myRound(spes,4);
+						row[8] 		= mc.tp_fp_tn_fn[0][1];
+						row[9] 		= mc.tp_fp_tn_fn[1][1];
+						row[10] 		= mc.tp_fp_tn_fn[2][1];
+						row[11] 		= mc.tp_fp_tn_fn[3][1];
+						sens = (double)(mc.tp_fp_tn_fn[0][1])/(double)(mc.tp_fp_tn_fn[0][1]+mc.tp_fp_tn_fn[3][1]);
+						row[12] 		= Tools.myRound(sens,4);
+						spes = (double)(mc.tp_fp_tn_fn[2][1])/(double)(mc.tp_fp_tn_fn[2][1]+mc.tp_fp_tn_fn[1][1]);
+						row[13] 		= Tools.myRound(spes,4);
+						UI.tmtableStat.addRow(row);
+					}
 				}
 			}
 			
@@ -463,6 +466,7 @@ public class SolverStart {
 	        // Files
 	        int c = 0;
 	        for(int i=fstLine+1;i<lines.length;i++){
+	        	UI.proStatus.setValue((100*i)/lines.length);
 		        if(!lines[i].startsWith("#")){
 		        	tmp = lines[i].split("\t");
 		        	String ClassName = tmp[1];
@@ -488,6 +492,7 @@ public class SolverStart {
 		        	// TODO: Comment
 		        }
 		     }
+	        UI.proStatus.setValue(0);
 	        if (fail) JOptionPane.showConfirmDialog(null, "<HTML><H3>Import of data failed</H3>", SolverStart.app, JOptionPane.OK_OPTION, JOptionPane.WARNING_MESSAGE);
 	}
 	
