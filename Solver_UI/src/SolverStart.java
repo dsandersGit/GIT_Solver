@@ -29,7 +29,7 @@ public class SolverStart {
 	
 	/*
 	 * Solver: Monte Carlo-Linear combination classifier based pattern recognition
-	 * Copyright: 2009-2023 Daniel Sanders <dsanders@gmx.net> 
+	 * AUTHOR: Daniel Sanders <dsanders@gmx.net> 
 	 */
 	
 	/*
@@ -40,11 +40,13 @@ public class SolverStart {
 	 * 34: Fingerprint Model und Opts
 	 * 35: Vieles
 	 * 36: Validation in Table
+	 * 37: BugFix Estimated runtime
+	 * 38: BugFix AUROC < 0.5
 	 */
  
 	public static String 	app 			= "B-LC-DA";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 36";
+	public static String 	revision 		= " 38";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -78,9 +80,10 @@ public class SolverStart {
 					new DS();										
 					DS.normParas = Tools.doNormData ();				
 					SolverStart.dataFileName = f.getName();
-					UI.refreshStatus();
+					
 					SolverStart.analyzeRawData(f.getName());
 					UI.maintabbed.setSelectedIndex(UI.tab_Summary);
+					UI.refreshStatus();
 				}
 			}
 		}
@@ -132,10 +135,10 @@ public class SolverStart {
 					JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
 					main.append("model", modl);
 					main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
-					long currTime = ((System.currentTimeMillis()-tme)/1000);
+					long currTime = ((System.currentTimeMillis()-tme));
 					tmeCount++;
 					timeSum+=currTime;
-					avgTime =  (timeSum/tmeCount);
+					avgTime =  (timeSum/(1000*tmeCount));
 					UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
 					tme = System.currentTimeMillis();
 																		//	FILL STATISTICS

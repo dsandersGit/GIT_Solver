@@ -111,7 +111,7 @@ public class Tools {
         		if (count[i]>0) {
         			U 		= sum[i] - (count[i]*(count[i]+1)/2.);
         			AUROC	= U / (count[i]*(countAll-count[i]));
-        		
+        			if ( AUROC < 0.5 )AUROC = 1-AUROC;
         		}
         		if ( AurocMax < AUROC ) {
         			AurocMax = AUROC;

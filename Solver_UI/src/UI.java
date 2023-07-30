@@ -710,7 +710,7 @@ public class UI {
 	private static void train() {
 		DS.js_Ensemble = null;
 		if ( !refreshOptions() ) {
-			JOptionPane.showMessageDialog(jF, "<HTML><H3>Options malformed > set to default</H3>");
+			JOptionPane.showMessageDialog(jF, "<HTML><H3>Options malformed > set to last well-formed</H3>");
 			return;
 		}
 		

@@ -24,8 +24,7 @@ public class Runner {
 	int[] classification 			= null;
 	boolean[] trainSet 				= null;
 	float split						= 0;
-	
-	//int plotRunner					= 0;
+
 	public long plotTime			= -1;
 	double maxDist 					= 0;
 	
@@ -862,7 +861,6 @@ public class Runner {
        	UI.tab3D.setPreLine(m,max,-max, true, 200, 200, 200);
         }
         
-        Color[] cols = {Color.magenta, Color.green, Color.red, Color.blue, Color.black};
         Color cn = null;
         
         int pointSize = 6;
@@ -876,10 +874,7 @@ public class Runner {
 			}else {
 				cn = Color.orange;
 			}
-			
-			
-			//if ( plotBuilder.doShowLabel)UI.tab3D.setCube(x, y, z, plotBuilder.pointSize*5, cn, PerformPCA.SampleNames[i]);//(px,py,wert-min,ads,red,green,blue);
-    		UI.tab3D.setCube(x, y, z, pointSize*5, cn, null);//(px,py,wert-min,ads,red,green,blue);
+    		UI.tab3D.setCube(x, y, z, pointSize*5, cn, null);
         }
 
 	}
