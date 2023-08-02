@@ -5,7 +5,7 @@
 
 
 Looping through cycles for all classes multiple classification models are created and combined to an ensemble of models. 
-During training, model's approximation to accuracy is plotted and validation is posible when dataset is splitted into train- and test- subsets. 
+During training, model's approximation to accuracy is plotted and validation is possible when dataset is splitted into train- and test- subsets. 
 
 ![Solver_Validation](https://github.com/dsandersGit/GIT_Solver/assets/140900940/1dea8a4b-45b7-4aba-8406-2fad58b1f0cc)
 
