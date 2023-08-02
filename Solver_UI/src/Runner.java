@@ -208,6 +208,7 @@ public class Runner {
 				//}
 			}
 		}
+		doStreamPlot();			// darw one last time
 	}
 	
 	private void doStreamPlot(){
@@ -660,6 +661,8 @@ public class Runner {
 
     }
     private double[] getAverageTarget() {
+    	
+    	if ( Opts.useMedian) return getMedianTarget();
     	
         double[] avg = new double[Opts.numDims];
         double count = 0;

@@ -46,11 +46,13 @@ public class SolverStart {
 	 * 40: Mnemonics
 	 * 41: Rename to Fingerprinter
 	 * 42: exchange divide by inv for speed
+	 * 43: rename to 'solver'
+	 * 44: Median Option for centering
 	 */
  
-	public static String 	app 			= "FingerPrinter";
+	public static String 	app 			= "Solver";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 42";
+	public static String 	revision 		= " 44";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
