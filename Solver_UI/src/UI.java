@@ -136,7 +136,7 @@ public class UI {
 		scStat.setPreferredSize(new Dimension (800,600));
 		
 		jF.setJMenuBar(setMyMenu());
-		sp.setTitle("Accuracy and Activation");
+		sp.setTitle("Accuracy and Bonus");
 		sp.setXAxis("run");
 		sp.setYAxis("accuracy");
 		spDst.setMargin(100,50);
@@ -715,6 +715,9 @@ public class UI {
 	
 	private static void train() {
 		DS.js_Ensemble = null;
+		
+		DS.freezs.clear();
+		
 		if ( !refreshOptions() ) {
 			JOptionPane.showMessageDialog(jF, "<HTML><H3>Options malformed > set to last well-formed</H3>");
 			return;
@@ -724,7 +727,7 @@ public class UI {
 		Runner.cleanRunner ();
 		tmtable.setColumnCount(0);
 		tmtable.setRowCount(0);
-		maintabbed.setSelectedIndex(tab_Statistics);
+		//maintabbed.setSelectedIndex(tab_Statistics);
 		jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
 		refreshStatus();
 		

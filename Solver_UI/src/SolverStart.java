@@ -33,7 +33,7 @@ public class SolverStart {
 	 */
 	
 	/*
-	 * SPPEARMAN Variable Reduktion einbauen?
+	 * Reduce Variable Count via SPPEARMAN Reduktion ?
 	 */
 	
 	/*
@@ -44,11 +44,13 @@ public class SolverStart {
 	 * 38: BugFix AUROC < 0.5
 	 * 39: ImmediateStop > no Freeze
 	 * 40: Mnemonics
+	 * 41: Rename to Fingerprinter
+	 * 42: exchange divide by inv for speed
 	 */
  
-	public static String 	app 			= "B-LC-DA";
+	public static String 	app 			= "FingerPrinter";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 40";
+	public static String 	revision 		= " 42";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -94,7 +96,7 @@ public class SolverStart {
 		
 		UI.menuFile.setEnabled(false);
 		UI.txtEnsemble.setText("");
-		DS.freezs.clear();
+		
 		immediateStop = false;
 		isRunning = true;
 		UI.tmtableStat.setRowCount(0);
@@ -218,7 +220,7 @@ public class SolverStart {
 		double[] ParetoScaleAvg	= new double[DS.numVars];										// AVG and SD
 		double[] ParetoScaleSd	= new double[DS.numVars];
 		double[][] aurocs = null;
-		if ( DS.numVars < 100) aurocs = Tools.calculateAurocs();
+		if ( DS.numVars < 100 && DS.numSamples < 500) aurocs = Tools.calculateAurocs();
 		for(int a = 0;a<DS.numVars;a++){
 			double[] vals = new double[DS.numSamples];
 			double avg = 0;

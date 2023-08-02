@@ -570,8 +570,9 @@ public class Runner {
            if ( distances[f]>maxDist ) maxDist = distances[f];
        }
        if ( maxDist == 0)return 0 ;
+       double fak = 1./maxDist;
        for (int f=0;f<DS.numSamples;f++){
-           distances[f] /= maxDist;
+           distances[f] *= fak;
            if ( trainSet[f]) {
            	if ( DS.classIndex[f] == targetColorIndex ) {
            		dstTarget += getMappedSigmoid(20*(distances[f]-0.5));
@@ -604,8 +605,9 @@ public class Runner {
            if ( distances[f]>maxDist ) maxDist = distances[f];
        }
        if ( maxDist == 0)return 0 ;
+       double fak = 1./maxDist;
        for (int f=0;f<DS.numSamples;f++){
-           distances[f] /= maxDist;
+           distances[f] *= fak;
            if ( trainSet[f]) {
            	if ( DS.classIndex[f] == targetColorIndex ) {
            		dstTarget += distances[f];
@@ -658,8 +660,9 @@ public class Runner {
 
     }
     private double[] getAverageTarget() {
+    	
         double[] avg = new double[Opts.numDims];
-        int count = 0;
+        double count = 0;
         if ( targetColorIndex>=0) {
             for (int f=0;f<DS.numSamples;f++){
                 if ( DS.classIndex[f] == targetColorIndex && trainSet[f] ){
@@ -669,8 +672,9 @@ public class Runner {
                     count ++;
                 }
             }
+            count = 1./count;
             for (int i=0;i<Opts.numDims;i++) {
-                avg[i] /= count;
+                avg[i] *= count;
             }
 
         }
