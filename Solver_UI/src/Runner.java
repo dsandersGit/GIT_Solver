@@ -225,7 +225,7 @@ public class Runner {
             }
             UI.sp.dats.clear();
             if ( SolverStart.darkMode)
-            	UI.sp.setXY(x, yDst, 4, Color.white, "activation", false, true, false);
+            	UI.sp.setXY(x, yDst, 4, Color.white, "bonus", false, true, false);
             if ( !SolverStart.darkMode)
             	UI.sp.setXY(x, yDst, 4, Color.DARK_GRAY, "activation", false, true, false);
             UI.sp.setXY(x, yTrain, 4, Color.orange, "accuracyTrain", false, true, false);

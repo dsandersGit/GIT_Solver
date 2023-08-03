@@ -48,11 +48,12 @@ public class SolverStart {
 	 * 42: exchange divide by inv for speed
 	 * 43: rename to 'solver'
 	 * 44: Median Option for centering
+	 * 45: Rename > uSort
 	 */
  
-	public static String 	app 			= "Solver";
+	public static String 	app 			= "uSort";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 44";
+	public static String 	revision 		= " 45";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -66,7 +67,7 @@ public class SolverStart {
 		
 		try {
 	          //UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel"); 
-			backColor 	= new Color(255,255,237);
+			backColor 	= new Color(255,255,245);
 			frontColor 	= Color.DARK_GRAY;
 	          UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 			}catch( Exception be ) { be.printStackTrace(); }
@@ -261,7 +262,9 @@ public class SolverStart {
 			Tools.sumryAdd (" You can analyze the data by setting the trainRation to '1.0'. All classe's data will be used for model training"
 					+ ", no testing data will be created. The resulting model is unvalidated and generalization to new data is likely poor."
 					+ " Use such models only for evaluation, not for production/publishing."+"\n");
-			Opts.trainRatio = 1;
+			
+			int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Low class population number</H3>Set trainRatio to 1.0? <BR> 100% data will be used for training, no testing</HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+			if ( erg == JOptionPane.YES_OPTION) Opts.trainRatio = 1;
 			UI.txtOpts.setText(Opts.getOptsAsJson().toString(3));
 		}
 		
