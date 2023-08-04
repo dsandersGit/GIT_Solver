@@ -1,19 +1,25 @@
 
 
+/*
+	 *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
+	 *  https://github.com/dsandersGit/GIT_Solver
+	 */
+
 public class Opts {
 	// INIT
 	public static String	dstType			 		= "GROUP"; 				// "EGO"; "GROUP"
 	public static String	normType		 		= "Pareto"; 			// "MaxMinNorm"; "Pareto"; "None"
+	public static String	activation	 			= "DxA";				// Activation Function "DxA" or "A" or "D"
 	public static int 		numDims			 		= 3; 					// Number of Neurons / Dimensions
 	public static double 	trainRatio				= 0.7;					// test / train > ratio of training to sample data  0 = full target 1 - no rget
 	public static int 		numEnsemble				= 5;					// Count of runs per index
-	public static int 		noBetterStop 			= 1500;					// Akzeptierte Fehlversuche
+	public static int 		noBetterStop 			= 500;					// Akzeptierte Fehlversuche
 	public static double	minBetter 				= 0.999d;				// Mindest Verbesserung nach akzeptierten Fehlveruchen
 	public static int		plotTimer				= 50;					// Plot wird gezeigt alle NNN Millisekunden
 	public static boolean	fixTrainSet 			= false;					// One Trainset for full ensemble (true) or per cycle (false)
 	public static boolean	doTheLeft	 			= false;				// One Trainset for full ensemble (true) or per cycle (false)
 	public static boolean	kickStart	 			= false;					// One Trainset for full ensemble (true) or per cycle (false)
-	public static String	activation	 			= "DxA";				// Activation Function "DxA" or "A" or "D"
+	
 	public static double	largeStep	 			= 0.2;					// Random step
 	public static boolean	useMedian	 			= false;				// Median / Average for Center of Target
 	

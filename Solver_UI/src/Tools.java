@@ -7,7 +7,10 @@ import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
+/*
+ *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
+ *  https://github.com/dsandersGit/GIT_Solver
+ */
 public class Tools {
 	public static String getFingerPrint(String txt) {
 		
@@ -208,12 +211,8 @@ public class Tools {
 		
 		JFileChooser chooser = new JFileChooser();
 		if ( shortFileType!= null) {
-			
 			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			chooser.setFileFilter(new FileNameExtensionFilter(fileType[0],shortFileType[0]));
-			for (int i=1;i<shortFileType.length;i++) {
-				chooser.addChoosableFileFilter(new FileNameExtensionFilter(fileType[i], shortFileType[i]));
-			}
+			chooser.setFileFilter(new FileNameExtensionFilter(fileType[0],shortFileType));
 		}
 		    chooser.setDialogTitle(title);
 		    if(folder!=null) chooser.setCurrentDirectory(new File(folder));

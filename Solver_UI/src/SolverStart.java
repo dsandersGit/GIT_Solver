@@ -28,8 +28,8 @@ import javax.swing.UIManager;
 public class SolverStart {
 	
 	/*
-	 * Solver: Monte Carlo-Linear combination classifier based pattern recognition
-	 * AUTHOR: Daniel Sanders <dsanders@gmx.net> 
+	 *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
+	 *  https://github.com/dsandersGit/GIT_Solver
 	 */
 	
 	/*
@@ -49,11 +49,12 @@ public class SolverStart {
 	 * 43: rename to 'solver'
 	 * 44: Median Option for centering
 	 * 45: Rename > uSort
+	 * 46: UI
 	 */
  
 	public static String 	app 			= "uSort";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 45";
+	public static String 	revision 		= " 46";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -67,7 +68,7 @@ public class SolverStart {
 		
 		try {
 	          //UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel"); 
-			backColor 	= new Color(255,255,245);
+			backColor 	= new Color(255,255,253);
 			frontColor 	= Color.DARK_GRAY;
 	          UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 			}catch( Exception be ) { be.printStackTrace(); }

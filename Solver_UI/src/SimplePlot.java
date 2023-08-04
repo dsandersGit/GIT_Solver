@@ -39,7 +39,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
-
+/*
+ *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
+ *  https://github.com/dsandersGit/GIT_Solver
+ */
 
 public class SimplePlot{
 

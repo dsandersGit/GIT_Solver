@@ -9,6 +9,10 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+/*
+ *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
+ *  https://github.com/dsandersGit/GIT_Solver
+ */
 
 public class Graph {
 	

@@ -1,13 +1,13 @@
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.swing.JTable;
+/*
+ *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
+ *  https://github.com/dsandersGit/GIT_Solver
+ */
 
 public class Classify {
 	

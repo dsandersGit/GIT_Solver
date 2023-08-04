@@ -1,4 +1,7 @@
-
+	/*
+	 *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
+	 *  https://github.com/dsandersGit/GIT_Solver
+	 */
 public class MC_Freeze {
 	public  float 		accuracyTrain;
 	public  float 		accuracyTest;

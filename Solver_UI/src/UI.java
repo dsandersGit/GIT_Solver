@@ -1,11 +1,9 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -14,29 +12,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
-import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -50,17 +34,15 @@ import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+
+/*
+ *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
+ *  https://github.com/dsandersGit/GIT_Solver
+ */
 
 public class UI {
 	public static 		JFrame jF = new JFrame();
@@ -76,11 +58,12 @@ public class UI {
 	static 		JLabel			labVars				= new JLabel("Vars: 0");
 	static 		JLabel			labSamples			= new JLabel("Samples: 0");
 	static 		JLabel			labClasses			= new JLabel("Classes: 0");
-	static 		JLabel			labStatus			= new JLabel("Status: ---");
+	//static 		JLabel			labStatus			= new JLabel("Status: ---");
 	static 		JLabel			labStatusIcon		= null;
 	static 		JLabel			labAccuracy			= new JLabel("---");
 	static 		JProgressBar	proStatus			= new JProgressBar();
 	static 		JLabel			labTimePerRun		= new JLabel("Process: ---");
+	static 		JLabel			labRun				= new JLabel("RUN: ---");
 	
 	
 	static JMenu menuFile = new JMenu( " File"); 
@@ -208,24 +191,33 @@ public class UI {
 	private static JPanel initStatusBar() {
 		
 		JPanel pan = new JPanel();
-		pan.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		JPanel panL = new JPanel();
+		JPanel panR = new JPanel();
+		pan.setLayout(new GridLayout(2,1));
+		panL.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		panR.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		
 		jb_Stop.setEnabled(false);
 		jb_Stop.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			SolverStart.immediateStop = true;
 		}});
-		
 		labStatusIcon = new JLabel(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
 		
-		pan.add(labTimePerRun);
-		pan.add(proStatus);
-		pan.add(labStatus);
-		pan.add(labAccuracy);
-		pan.add(labSamples);
-		pan.add(labVars);
-		pan.add(labClasses);
-		pan.add(jb_Stop);
-		pan.add(labStatusIcon);
+		panL.add(labAccuracy);
+		panL.add(labRun);
+		panR.add(labTimePerRun);
+		panL.add(labSamples);
+		panL.add(labVars);
+		panL.add(labClasses);
+		
+		
+		panR.add(proStatus);
+		//pan.add(labStatus);
+		panR.add(jb_Stop);
+		panR.add(labStatusIcon);
+		
+		pan.add(panL);
+		pan.add(panR);
 		return pan;
 	}
 	static boolean refreshOptions() {
@@ -264,12 +256,14 @@ public class UI {
 		menuFileSaveEnsemble.setEnabled(true);
 		menuFileLoadEnsemble.setEnabled(true);
 		menuExport.setEnabled(true);
+		jbLoad.setEnabled(true);
 		jbSaveEns.setEnabled(true);
 		jbTrain.setEnabled(true);
 		jbClassify.setEnabled(true);
 		menuActionTrain.setEnabled(true);
 		menuActionClassify.setEnabled(true);
 		jb_Stop.setEnabled(false);
+		jbLoadEns.setEnabled(true);
 		
 		jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
 		
@@ -323,6 +317,8 @@ public class UI {
 			jbTrain.setEnabled(false);
 			menuActionTrain.setEnabled(false);
 			jb_Stop.setEnabled(true);
+			jbLoad.setEnabled(false);
+			jbLoadEns.setEnabled(false);
 		}
 		
 		if ( !noEns)
@@ -517,12 +513,12 @@ public class UI {
 		
 		// ---------------------------------------------------------------------
 		JMenu menuAbout = new JMenu( " About");
-//		JMenuItem menuAboutAbout = new JMenuItem(" About "+SolverStart.app); 
-//		menuAbout.add(menuAboutAbout);
+		JMenuItem menuAboutAbout = new JMenuItem(" About "+SolverStart.app); 
+		menuAbout.add(menuAboutAbout);
 		JMenuItem menuAboutLicense = new JMenuItem(" License"); 
 		menuAbout.add(menuAboutLicense);
-//		JMenuItem menuAboutCredits = new JMenuItem(" Credits"); 
-//		menuAbout.add(menuAboutCredits);
+		JMenuItem menuAboutCredits = new JMenuItem(" Credits"); 
+		menuAbout.add(menuAboutCredits);
 		// ---------------------------------------------------------------------
 		// -------------------------------------------------------------------------------------
 		mBar.add(menuFile);
@@ -699,15 +695,15 @@ public class UI {
 		
 		
 		// *******************************
-//		menuAboutAbout.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
-//			JOptionPane.showMessageDialog(jF, "<HTML><H3>"+SolverStart.app+"</H3><I>Copyright 2009-2023 Daniel Sanders</I><BR><BR><SMALL>dsanders@gmx.net</SMALL><BR>");
-//		}});
-		menuAboutLicense.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
-			JOptionPane.showConfirmDialog(jF, "<HTML><H3>Licensed under GNU General Public License v3.0</H3>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+		menuAboutAbout.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
+			JOptionPane.showMessageDialog(jF, "<HTML><H3>"+SolverStart.app+" rev."+SolverStart.revision+"</H3><I>Copyright 2009-2023 Daniel Sanders</I><BR><BR><SMALL>dsanders@gmx.net</SMALL><BR>");
 		}});
-//		menuAboutCredits.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
-//			JOptionPane.showMessageDialog(null, "<HTML>Autho</li></ul><BR>", SolverStart.app, JOptionPane.INFORMATION_MESSAGE);
-//		}});
+		menuAboutLicense.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
+			JOptionPane.showMessageDialog(jF, "<HTML><I>Licensed under GNU General Public License v3.0</I>", SolverStart.app,  JOptionPane.INFORMATION_MESSAGE);
+		}});
+		menuAboutCredits.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
+			JOptionPane.showMessageDialog(null, "<HTML> used libraries and dependencies: <ul><li>JSON java libraries from JSON.org</li></ul><BR>", "CREDITS", JOptionPane.INFORMATION_MESSAGE);
+		}});
 		//-------------------------------------------------------------------------------------------------------------------
 		return mBar;
 	}
@@ -818,8 +814,8 @@ public class UI {
 		Preferences prefs;
 	    prefs = Preferences.userRoot().node("Solver");
 	    String path = prefs.get("path", ".");
-	    String[] type = {"CSV" , "DS_Data"};
-	    String[] sht = {"CSV" , "DAT"};
+	    String[] type = {"CSV, DS_Data"};
+	    String[] sht = {"CSV", "DAT"};
 		File f = Tools.getFile("Select dataset file", path,type,sht, false);
 		if ( f == null) return;
 		if ( !f.exists()) return;

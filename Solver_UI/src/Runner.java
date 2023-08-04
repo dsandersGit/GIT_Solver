@@ -7,6 +7,10 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+/*
+ *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
+ *  https://github.com/dsandersGit/GIT_Solver
+ */
 public class Runner {
 	public int targetColorIndex 	= -1;
 	public String targetName		 	= null;
@@ -89,6 +93,7 @@ public class Runner {
         }
         while ( reDo( -1 ) && !SolverStart.immediateStop ) {
         	absCount++;
+        	if ( absCount%1000 == 0 )UI.labRun.setText("Run: " + absCount);
         	//doStreamPlot();
         }
         finish();
