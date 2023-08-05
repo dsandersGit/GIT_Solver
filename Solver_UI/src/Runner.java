@@ -38,7 +38,7 @@ public class Runner {
 	int numTrain					= -1;
 	int numTest						= -1;
 	
-	 int[][] tp_fp_tn_fn 			= null;
+	int[][] tp_fp_tn_fn 			= null;
 	
 	static ArrayList<Float> accuracyTrain = new ArrayList<Float>();
     static ArrayList<Float> accuracyTest = new ArrayList<Float>();
@@ -91,13 +91,16 @@ public class Runner {
 	        int a = toTheLeft();
 	        mcEigenVec [a][0] =     toTheTop(a);
         }
+        int step = 100;
         while ( reDo( -1 ) && !SolverStart.immediateStop ) {
         	absCount++;
-        	if ( absCount%1000 == 0 )UI.labRun.setText("Run: " + absCount);
-        	//doStreamPlot();
+        	if ( absCount%step == 0 )UI.labRun.setText("Run: " + absCount);
+        	if ( absCount > 3000 ) step = 1000;
+ 
         }
         finish();
         if ( !SolverStart.immediateStop ) doFreeze();
+        doStreamPlot();
 	}
 	public static void cleanRunner () {
 		accuracyTrain.clear();

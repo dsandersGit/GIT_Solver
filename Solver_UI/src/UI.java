@@ -696,7 +696,7 @@ public class UI {
 		
 		// *******************************
 		menuAboutAbout.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
-			JOptionPane.showMessageDialog(jF, "<HTML><H3>"+SolverStart.app+" rev."+SolverStart.revision+"</H3><I>Copyright 2009-2023 Daniel Sanders</I><BR><BR><SMALL>dsanders@gmx.net</SMALL><BR>");
+			JOptionPane.showMessageDialog(jF, "<HTML><H3>"+SolverStart.app+" rev."+SolverStart.revision+"</H3><I>Copyright 2009-2023 Daniel Sanders</I>");
 		}});
 		menuAboutLicense.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			JOptionPane.showMessageDialog(jF, "<HTML><I>Licensed under GNU General Public License v3.0</I>", SolverStart.app,  JOptionPane.INFORMATION_MESSAGE);

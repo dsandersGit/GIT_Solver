@@ -42,11 +42,12 @@ public class SolverStart {
 	 * 45: Rename > uSort
 	 * 46: UI
 	 * 47: BugFix: Import DS_data with [label] tag
+	 * 48: AutoSave Ensemble desactivated
 	 */
  
 	public static String 	app 			= "uSort";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 47";
+	public static String 	revision 		= " 48";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -176,11 +177,11 @@ public class SolverStart {
 		UI.labTimePerRun.setText("Process: ---");
 		
 		
-		FileWriter fw = new FileWriter("ensemble.ens", false);
-	    BufferedWriter bw = new BufferedWriter(fw);
-	    bw.write(main.toString(3));
-	    bw.newLine();
-	    bw.close();
+//		FileWriter fw = new FileWriter("ensemble.ens", false);
+//	    BufferedWriter bw = new BufferedWriter(fw);
+//	    bw.write(main.toString(3));
+//	    bw.newLine();
+//	    bw.close();
 	    UI.menuFile.setEnabled(true);
 	    isRunning = false;
 	    UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colGreen.png")));
