@@ -1,9 +1,7 @@
 import java.awt.Color;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -11,17 +9,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Timer;
-
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
@@ -50,11 +41,12 @@ public class SolverStart {
 	 * 44: Median Option for centering
 	 * 45: Rename > uSort
 	 * 46: UI
+	 * 47: BugFix: Import DS_data with [label] tag
 	 */
  
 	public static String 	app 			= "uSort";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 46";
+	public static String 	revision 		= " 47";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -445,13 +437,25 @@ public class SolverStart {
 	        		break;
 	        	}
 	        }
+	        
+	        int noFiles;
+        	int noAreas = 0;
+        	noFiles = lines.length-1-fstLine;
+        	
+        	test = lines[fstLine].split("\t");
+        	System.out.println(lines[fstLine]);
+	        boolean[] areaIsLabel = new boolean[test.length-4];
+	        // [Label rausschmeissen]
+	        for(int i=4;i<test.length;i++){
+	        	if ( test[i].toLowerCase().contains("[label]")) {
+	        		areaIsLabel[i-4] = true;
+	        	}else {
+	        		noAreas++;
+	        	}
+	        }
 	        	
-        	int noFiles;
-        	int noAreas;
-        	boolean[] areaIsLabel = null;
-        		
-    		 noFiles = lines.length-1-fstLine;
-	         noAreas = test.length-4;
+    		 
+	       //  noAreas = test.length-4;
     	
 	         if ( noFiles < 1 || noAreas < 1) fail = true;
 	         
@@ -461,14 +465,16 @@ public class SolverStart {
 	         DS.classIndex 		= new int[noFiles];
 	         DS.ClassNames 		= new String[noFiles];
 //	         DS.noTrainingSet	= new boolean[noFiles];
-	         areaIsLabel = new boolean[noAreas];
+	         //areaIsLabel = new boolean[noAreas];
      	
     	  // Areas
-	        String[] tmp = lines[fstLine].split("\t");
-	        for(int i=4;i<tmp.length;i++){
-	        	DS.AreaNames[i-4] = tmp[i];
-	        	if ( tmp[i].toLowerCase().contains("[label]"))
-	        		areaIsLabel[i-4] = true;
+	      
+	        int ac = 0;
+	        for(int i=4;i<test.length;i++){
+	        	if ( !areaIsLabel[i-4]) {
+	        		DS.AreaNames[ac] = test[i];
+	        		ac++;
+	        	}
 	        }
 	        
 	        // Files
@@ -476,7 +482,7 @@ public class SolverStart {
 	        for(int i=fstLine+1;i<lines.length;i++){
 	        	UI.proStatus.setValue((100*i)/lines.length);
 		        if(!lines[i].startsWith("#")){
-		        	tmp = lines[i].split("\t");
+		        	String[] tmp = lines[i].split("\t");
 		        	String ClassName = tmp[1];
 		        	int ClassColIndex = (int)Integer.parseInt(tmp[2]);
 		        	DS.classIndex[i-fstLine-1] = ClassColIndex;
@@ -484,16 +490,16 @@ public class SolverStart {
 //		        	if (ClassColIndex ==0 && ClassName.equals("unknown"))DS.noTrainingSet[i-fstLine-1] = true;
 		        	if ( DS.ClassNames[i-fstLine-1].equals("")) DS.ClassNames[i-fstLine-1] = tmp[3];
 		        	DS.SampleNames[i-fstLine-1] = tmp[3];
+		        	ac=0;
 			        for(int j=4;j<tmp.length;j++){
-			        	if ( areaIsLabel[j-4] ) {
-			        		DS.rawData[i-fstLine-1][j-4] = 0;
-			        	}else {
+			        	if ( !areaIsLabel[j-4]) {
 			        		try {
-			        			DS.rawData[i-fstLine-1][j-4] = Double.parseDouble(tmp[j]);
+			        			DS.rawData[i-fstLine-1][ac] = Double.parseDouble(tmp[j]);
 			        		}catch (NumberFormatException e) {
-			        			DS.rawData[i-fstLine-1][j-4] = 0;
+			        			DS.rawData[i-fstLine-1][ac] = 0;
 		        			    fail = true;
 		        			}
+			        		ac++;
 			        	}
 			        }
 		        }else{
