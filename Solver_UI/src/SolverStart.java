@@ -127,7 +127,8 @@ public class SolverStart {
 		
 		boolean activationIsDst = false;
 		boolean activationBoth = false;
-		if ( Opts.activation.equals("DxA") )activationIsDst = true;
+		if ( Opts.activation.equals("DxA") )activationIsDst = true;		// HERE FIRST ACCURACY; THEN DISTANCE IS APPLIED
+		
 		if ( Opts.activation.equals("D+A") )activationBoth = true;
 		
 		UI.refreshStatus();
@@ -150,7 +151,7 @@ public class SolverStart {
 							avgTime =  (timeSum/(1000*tmeCount));
 							UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
 							tme = System.currentTimeMillis();
-							fillStatistics();
+							fillStatistics("D+A > A");
 						}
 						new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],true);
 						if ( DS.freezs.size() > 0) {
@@ -164,7 +165,7 @@ public class SolverStart {
 							avgTime =  (timeSum/(1000*tmeCount));
 							UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
 							tme = System.currentTimeMillis();
-							fillStatistics();
+							fillStatistics("D+A > DxA");
 						}
 						
 					}else {
@@ -180,7 +181,11 @@ public class SolverStart {
 							avgTime =  (timeSum/(1000*tmeCount));
 							UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
 							tme = System.currentTimeMillis();
-							fillStatistics();
+							if ( activationIsDst) {
+								fillStatistics("DxA");
+							}else {
+								fillStatistics("A");
+							}
 						}
 	
 					}
@@ -206,28 +211,30 @@ public class SolverStart {
 	    UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colGreen.png")));
 	    UI.refreshStatus();
 	}
-	private static void fillStatistics() {
+	private static void fillStatistics(String type) {
 		//	FILL STATISTICS
-		Object[] row = new Object[14];
+		Object[] row = new Object[15];
 		MC_Freeze mc = DS.freezs.get(DS.freezs.size()-1);
 		row[0] 		= DS.freezs.size();
-		row[1] 		= DS.classAllIndNme[Tools.getIndexOfTarget(mc.targetColorIndex)];
-		row[2] 		= mc.tp_fp_tn_fn[0][0];
-		row[3] 		= mc.tp_fp_tn_fn[1][0];
-		row[4] 		= mc.tp_fp_tn_fn[2][0];
-		row[5] 		= mc.tp_fp_tn_fn[3][0];
+		row[1] 		= type;
+		row[2] 		= DS.classAllIndNme[Tools.getIndexOfTarget(mc.targetColorIndex)];
+		row[3] 		= mc.tp_fp_tn_fn[0][0];
+		row[4] 		= mc.tp_fp_tn_fn[1][0];
+		row[5] 		= mc.tp_fp_tn_fn[2][0];
+		row[6] 		= mc.tp_fp_tn_fn[3][0];
 		double sens = (double)(mc.tp_fp_tn_fn[0][0])/(double)(mc.tp_fp_tn_fn[0][0]+mc.tp_fp_tn_fn[3][0]);
-		row[6] 		= Tools.myRound(sens,4);
+		row[7] 		= Tools.myRound(sens,4);
 		double spes = (double)(mc.tp_fp_tn_fn[2][0])/(double)(mc.tp_fp_tn_fn[2][0]+mc.tp_fp_tn_fn[1][0]);
-		row[7] 		= Tools.myRound(spes,4);
-		row[8] 		= mc.tp_fp_tn_fn[0][1];
-		row[9] 		= mc.tp_fp_tn_fn[1][1];
-		row[10] 		= mc.tp_fp_tn_fn[2][1];
-		row[11] 		= mc.tp_fp_tn_fn[3][1];
+		row[8] 		= Tools.myRound(spes,4);
+		row[9] 		= mc.tp_fp_tn_fn[0][1];
+		row[10] 		= mc.tp_fp_tn_fn[1][1];
+		row[11] 		= mc.tp_fp_tn_fn[2][1];
+		row[12] 		= mc.tp_fp_tn_fn[3][1];
 		sens = (double)(mc.tp_fp_tn_fn[0][1])/(double)(mc.tp_fp_tn_fn[0][1]+mc.tp_fp_tn_fn[3][1]);
-		row[12] 		= Tools.myRound(sens,4);
+		row[13] 		= Tools.myRound(sens,4);
 		spes = (double)(mc.tp_fp_tn_fn[2][1])/(double)(mc.tp_fp_tn_fn[2][1]+mc.tp_fp_tn_fn[1][1]);
-		row[13] 		= Tools.myRound(spes,4);
+		row[14] 		= Tools.myRound(spes,4);
+		
 		UI.tmtableStat.addRow(row);
 	}
 	public static void classify() {
@@ -319,8 +326,15 @@ public class SolverStart {
 			Tools.sumryAdd ("[!] The number of variables is too small.");
 		}
 		Tools.sumryAdd ("\n");
-		
-		
+		if ( DS.numVars*20 > 500) {
+			int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Auto adjust Options?</H3></HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+			if ( erg == JOptionPane.YES_OPTION) {
+				Opts.noBetterStop = DS.numVars*20;
+				UI.txtOpts.setText(Opts.getOptsAsJson().toString(3));
+				
+			}
+			
+		}
 	}
 
 	

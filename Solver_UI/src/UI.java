@@ -194,13 +194,21 @@ public class UI {
 		panLive.add(sp);
 		panLive.add(spDst);
 		
+		
 		maintabbed.add("Data",scSummary);
+		maintabbed.setIconAt(0, new ImageIcon(ClassLoader.getSystemResource("icon_data.png")));
 		maintabbed.add("Options",txtOpts);
+		maintabbed.setIconAt(1, new ImageIcon(ClassLoader.getSystemResource("icon_data.png")));
 		maintabbed.add("Live", panLive);
+		maintabbed.setIconAt(2, new ImageIcon(ClassLoader.getSystemResource("icon_cpu.png")));
 		maintabbed.addTab("3D",tab3D);
+		maintabbed.setIconAt(3, new ImageIcon(ClassLoader.getSystemResource("icon_cpu.png")));
 		maintabbed.add("Validation",scStat);
+		maintabbed.setIconAt(4, new ImageIcon(ClassLoader.getSystemResource("icon_cpu.png")));
 		maintabbed.add("Ensemble",scEnsemble);
+		maintabbed.setIconAt(5, new ImageIcon(ClassLoader.getSystemResource("icon_save_ens.png")));
 		maintabbed.add("Classification", sc);
+		maintabbed.setIconAt(6, new ImageIcon(ClassLoader.getSystemResource("icon_classify.png")));
 		
 		tab_Classify 	= 6;
 		tab_Train 		= 2;
@@ -281,7 +289,7 @@ public class UI {
 			Opts.fixTrainSet 	= jo_Opts.getBoolean("fixTrainSet");
 //			Opts.doTheLeft 		= jo_Opts.getBoolean("doTheLeft");
 //			Opts.kickStart 		= jo_Opts.getBoolean("kickStart");
-			Opts.activation		= jo_Opts.getString("activation");
+//			Opts.activation		= jo_Opts.getString("activation");
 		  } catch (JSONException e) {
 			  txtOpts.setText(Opts.getOptsAsJson().toString(3));
 		        return false;
@@ -399,6 +407,7 @@ public class UI {
 		tableStat.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		tableStat.setAutoCreateRowSorter(true);
 		tmtableStat.addColumn("run");
+		tmtableStat.addColumn("type");
 		tmtableStat.addColumn("Target");
 		tmtableStat.addColumn("TP_Train");
 		tmtableStat.addColumn("FP_Train");
@@ -687,12 +696,12 @@ public class UI {
 		menuExportTP_FP_TN_FN.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
 			StringBuffer out = new StringBuffer();
 			
-			out.append("Validation\tTRAIN\tTP\tFP\tTN\tFN\tTEST\tTP\tFP\tTN\tFN]");
+			out.append("Validation\tTarget\tTP\tFP\tTN\tFN\tTEST\tTP\tFP\tTN\tFN]");
 			out.append("\n");
 			for (int i=0;i<DS.freezs.size();i++) {
 				MC_Freeze mc = DS.freezs.get(i);
 
-				out.append(i);
+				out.append(i+1);
 				out.append("\t"+Tools.txtLen(DS.classAllIndNme[Tools.getIndexOfTarget(mc.targetColorIndex)]));
 				out.append("\t"+mc.tp_fp_tn_fn[0][0]);
 				out.append("\t"+mc.tp_fp_tn_fn[1][0]);
@@ -870,7 +879,6 @@ public class UI {
 		DS.fileName =  f.getName();
 		tmtable.setColumnCount(0);
 		tmtable.setRowCount(0);
-		
 		
 		new DS();												// INITS
 		DS.normParas = Tools.doNormData ();				// Daten Normalisieren

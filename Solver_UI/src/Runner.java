@@ -164,6 +164,13 @@ public class Runner {
 	       }
 	        if ( notBetterCount > Opts.noBetterStop) {
 	        	if ( dstLatestMax  > distanceOld* Opts.minBetter && dstLatestMax > 0 ) {
+	        	  	if (doAccur) {
+	        	  		doDistxAccur = true;
+	        	  		doAccur = false;
+	        	  		dstLatestMax = distanceOld;
+	    	            notBetterCount=0;
+	    	            distanceOld=0;
+	        	  	}
 	        		finish();
 	                return false;
 	            }

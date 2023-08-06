@@ -9,7 +9,7 @@ public class Opts {
 	// INIT
 	public static String	dstType			 		= "GROUP"; 				// "EGO"; "GROUP"
 	public static String	normType		 		= "Pareto"; 			// "MaxMinNorm"; "Pareto"; "None"
-	public static String	activation	 			= "D+A";				// Activation Function "DxA" or "A" or "D", "D+A"
+	public static String	activation	 			= "DxA";				// Activation Function "DxA" or "A" or "D", "D+A"
 	//
 	public static int 		numDims			 		= 3; 					// Number of Neurons / Dimensions
 	public static double 	trainRatio				= 0.7;					// test / train > ratio of training to sample data  0 = full target 1 - no rget
