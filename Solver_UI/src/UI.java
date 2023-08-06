@@ -19,8 +19,10 @@ import java.io.IOException;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -31,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -134,10 +137,47 @@ public class UI {
 		spDst.setInnerBackGroundColor(SolverStart.backColor);
 		spDst.setOuterBackGroundColor(SolverStart.backColor);
 		spDst.setBaseColor(SolverStart.frontColor);
+		
+		
+//		JPanel panOpts = new JPanel();
+//		panOpts.setLayout(new GridLayout(1,2));
+//		JPanel panOptLeft = new JPanel();
+//		panOptLeft.setLayout(new BoxLayout(panOptLeft,BoxLayout.PAGE_AXIS));
+//		String[] txtdstType = {"GROUP","EGO"};
+//		JComboBox<String> cbodstType = new JComboBox<String>(txtdstType);
+//		panOptLeft.add(cbodstType);
+//		String[] txtnormType = {"MaxMinNorm", "Pareto", "None"};
+//		JComboBox<String> cbonormType = new JComboBox<String>(txtnormType);
+//		panOptLeft.add(cbonormType);
+//		String[] txtactivation = {"DxA", "A", "D"};
+//		JComboBox<String> cboactivation = new JComboBox<String>(txtactivation);
+//		panOptLeft.add(cboactivation);
+//		JSlider sldnumDIms = new JSlider(1,10,3);
+//		panOptLeft.add(sldnumDIms);
+//		JSlider sldtrainRatio = new JSlider(10,100,70);
+//		panOptLeft.add(sldtrainRatio);
+//		JSlider sldensemble = new JSlider(1,20,5);
+//		panOptLeft.add(sldensemble);
+//		JSlider sldnoBetterStop = new JSlider(100,3000,500);
+//		panOptLeft.add(sldnoBetterStop);
+//		JSlider sldplotTimer = new JSlider(0,1000,50);
+//		panOptLeft.add(sldplotTimer);
+//		JSlider sldlargeStep = new JSlider(0,100,20);
+//		panOptLeft.add(sldlargeStep);
+//		JPanel panOptRight = new JPanel();
+//		panOptRight.setLayout(new FlowLayout());
+//		panOptRight.add(txtOpts);
+//		panOpts.add(panOptLeft);
+//		panOpts.add(panOptRight);
+		
 		txtOpts.setOpaque(false);
 		txtOpts.setBackground(SolverStart.backColor);
 		txtOpts.setForeground(SolverStart.frontColor);
 		txtOpts.setFont(new Font("Consolas", Font.PLAIN, 20));
+		
+		
+		
+		
 		txtEnsemble.setOpaque(false);
 		txtEnsemble.setBackground(SolverStart.backColor);
 		txtEnsemble.setForeground(SolverStart.frontColor);
@@ -241,7 +281,7 @@ public class UI {
 			Opts.fixTrainSet 	= jo_Opts.getBoolean("fixTrainSet");
 //			Opts.doTheLeft 		= jo_Opts.getBoolean("doTheLeft");
 //			Opts.kickStart 		= jo_Opts.getBoolean("kickStart");
-//			Opts.activation		= jo_Opts.getString("activation");
+			Opts.activation		= jo_Opts.getString("activation");
 		  } catch (JSONException e) {
 			  txtOpts.setText(Opts.getOptsAsJson().toString(3));
 		        return false;

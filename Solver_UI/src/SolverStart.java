@@ -44,11 +44,12 @@ public class SolverStart {
 	 * 47: BugFix: Import DS_data with [label] tag
 	 * 48: AutoSave Ensemble desactivated
 	 * 49: Double Run, Less Options
+	 * 50: Double Run removed
 	 */
  
 	public static String 	app 			= "uSort";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 49";
+	public static String 	revision 		= " 50";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -124,6 +125,11 @@ public class SolverStart {
 		int cycles = Opts.numEnsemble*DS.numClasses;
 		double avgTime = 0;
 		
+		boolean activationIsDst = false;
+		boolean activationBoth = false;
+		if ( Opts.activation.equals("DxA") )activationIsDst = true;
+		if ( Opts.activation.equals("D+A") )activationBoth = true;
+		
 		UI.refreshStatus();
 		
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));
@@ -131,34 +137,54 @@ public class SolverStart {
 			UI.proStatus.setValue(100*i/Opts.numEnsemble);
 			for (int j=0;j<DS.classAllIndices.length;j++) {
 				if ( !SolverStart.immediateStop ) {	
-					new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],false);
-					if ( DS.freezs.size() > 0) {
-						out.append(DS.freezs.get(DS.freezs.size()-1).getModelAsJson().toString(3));
-						JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
-						main.append("model", modl);
-						main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
-						long currTime = ((System.currentTimeMillis()-tme));
-						tmeCount++;
-						timeSum+=currTime;
-						avgTime =  (timeSum/(1000*tmeCount));
-						UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
-						tme = System.currentTimeMillis();
-						fillStatistics();
+					if ( activationBoth) {
+						new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],false);
+						if ( DS.freezs.size() > 0) {
+							out.append(DS.freezs.get(DS.freezs.size()-1).getModelAsJson().toString(3));
+							JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
+							main.append("model", modl);
+							main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
+							long currTime = ((System.currentTimeMillis()-tme));
+							tmeCount++;
+							timeSum+=currTime;
+							avgTime =  (timeSum/(1000*tmeCount));
+							UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
+							tme = System.currentTimeMillis();
+							fillStatistics();
+						}
+						new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],true);
+						if ( DS.freezs.size() > 0) {
+							out.append(DS.freezs.get(DS.freezs.size()-1).getModelAsJson().toString(3));
+							JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
+							main.append("model", modl);
+							main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
+							long currTime = ((System.currentTimeMillis()-tme));
+							tmeCount++;
+							timeSum+=currTime;
+							avgTime =  (timeSum/(1000*tmeCount));
+							UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
+							tme = System.currentTimeMillis();
+							fillStatistics();
+						}
+						
+					}else {
+						new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],activationIsDst);
+						if ( DS.freezs.size() > 0) {
+							out.append(DS.freezs.get(DS.freezs.size()-1).getModelAsJson().toString(3));
+							JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
+							main.append("model", modl);
+							main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
+							long currTime = ((System.currentTimeMillis()-tme));
+							tmeCount++;
+							timeSum+=currTime;
+							avgTime =  (timeSum/(1000*tmeCount));
+							UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
+							tme = System.currentTimeMillis();
+							fillStatistics();
+						}
+	
 					}
-					new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],true);
-					if ( DS.freezs.size() > 0) {
-						out.append(DS.freezs.get(DS.freezs.size()-1).getModelAsJson().toString(3));
-						JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
-						main.append("model", modl);
-						main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
-						long currTime = ((System.currentTimeMillis()-tme));
-						tmeCount++;
-						timeSum+=currTime;
-						avgTime =  (timeSum/(1000*tmeCount));
-						UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
-						tme = System.currentTimeMillis();
-						fillStatistics();
-					}
+										
 				}
 			}
 			
