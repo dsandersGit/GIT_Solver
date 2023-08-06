@@ -102,8 +102,6 @@ public class Classify {
 			double bonus = accuracyTest * accuracyTest; 													/// mmmmhhhh ?????
 			if ( trainCount == targetCount)
 				bonus = accuracyTrain * accuracyTrain; 														/// Training ohne TestDaten
-
-			
 			fullBonusClassification[getTargetColorIndexPos (targetColorIndex)] += 1;						//; + bonus ?
 			doClassify (mc, split, avgs, targetColorIndex, sumUpClassification, bonus, maxDst);
 		}

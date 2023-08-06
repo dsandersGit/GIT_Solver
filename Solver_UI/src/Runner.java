@@ -48,7 +48,7 @@ public class Runner {
     double[] mappedSigmoid = null;
     
 	
-	public Runner(int target, String tName) {
+	public Runner(int target, String tName, boolean activationIsDst) {
 
 		mappedSigmoid = new double[200];
 		for (double i=-10;i<10;i+=0.1) {
@@ -67,15 +67,21 @@ public class Runner {
         mcEigenVecOld         	= new double [DS.numVars][Opts.numDims];
         mcPCA                 	= new double [Opts.numDims][DS.numSamples];
         
-        
-        if (Opts.activation.equals("DxA")) {
+        if ( activationIsDst) {
         	doDistxAccur = true;
         	doAccur = false;
-        }
-		if (Opts.activation.equals("A")) {
-			doAccur = true;
+        }else {
+        	doAccur = true;
 			doDistxAccur = false;
-		}
+        }
+//        if (Opts.activation.equals("DxA")) {
+//        	doDistxAccur = true;
+//        	doAccur = false;
+//        }
+//		if (Opts.activation.equals("A")) {
+//			doAccur = true;
+//			doDistxAccur = false;
+//		}
         
         if  (Opts.fixTrainSet) {
         	int i = Tools.getIndexOfTarget (target);
@@ -87,16 +93,15 @@ public class Runner {
         }
         
         // KickStart
-        if ( Opts.kickStart) {
-	        int a = toTheLeft();
-	        mcEigenVec [a][0] =     toTheTop(a);
-        }
+//        if ( Opts.kickStart) {
+//	        int a = toTheLeft();
+//	        //mcEigenVec [a][0] =     toTheTop(a);
+//        }
         int step = 100;
         while ( reDo( -1 ) && !SolverStart.immediateStop ) {
         	absCount++;
         	if ( absCount%step == 0 )UI.labRun.setText("Run: " + absCount);
         	if ( absCount > 3000 ) step = 1000;
- 
         }
         finish();
         if ( !SolverStart.immediateStop ) doFreeze();
@@ -125,13 +130,13 @@ public class Runner {
 		 calcPlot();
 	        double ndst = 0;
 	        if ( Opts.dstType.contentEquals("EGO"))         ndst = getDistancesEGO(null);
-	        if ( Opts.dstType.contentEquals("GROUP"))         ndst = getDistances(null);
+	        if ( Opts.dstType.contentEquals("GROUP"))       ndst = getDistances(null);
 	        getSplit();
 	        accuracy = doClassify(true);
 	        
 	        
 	        if (doDistxAccur)
-				ndst *= accuracy;
+				ndst *= (accuracy*accuracy);
 	        if (doAccur)
 				ndst = accuracy;
 
@@ -178,7 +183,7 @@ public class Runner {
         getSplit();
         accuracy = doClassify(true);
         if (doDistxAccur)
-			ndst *= accuracy;
+			ndst *= (accuracy*accuracy);
         if (doAccur)
 			ndst = accuracy;
         //--------------------------------------------
@@ -393,7 +398,7 @@ public class Runner {
     	
 		double large = Opts.largeStep;
 		double small = large*0.1;
-        int z0     = (int)Math.floor(Math.random()*8);                // zufi
+        int z0     = (int)Math.floor(Math.random()*9);                // zufi
         Random random = ThreadLocalRandom.current();
         int a = random.nextInt(DS.numVars);
         int pc = random.nextInt(Opts.numDims);
@@ -438,8 +443,8 @@ public class Runner {
             }
             break;    
         case 6: 
-        	if ( Opts.doTheLeft )
-        		a = toTheLeft();
+//        	if ( Opts.doTheLeft )
+//        		a = toTheLeft();
         	for (int i=0;i<Opts.numDims;i++) {
                 mcEigenVec [a][i] = small- Math.random()*2*small;
             }
@@ -449,6 +454,13 @@ public class Runner {
                 mcEigenVec [a][i] = 0;
             }
         	break;
+        case 8: 
+        	for (int i=0;i<DS.numVars;i++) {
+        		for (int j=0;j<Opts.numDims;j++) {
+        			if (a!=i)mcEigenVec [i][j] = 0;
+        		}
+            }
+        	break;        	
         default:
             for (int sa=0;sa<DS.numVars;sa++){
                   for (int i=0;i<Opts.numDims;i++) {
@@ -468,7 +480,7 @@ public class Runner {
 		for (int a=0;a<DS.numVars;a++){
 			undoZufi();
 			double baseDst = doFullCalc();
-            mcEigenVec [a][0] += mcEigenVec [a][0] * 0.01;
+            mcEigenVec [a][0] =  0.1;
             double postDst = doFullCalc();
             if (Math.abs(postDst-baseDst)>maxWin) {
             	maxWin = Math.abs(postDst-baseDst);
@@ -476,6 +488,7 @@ public class Runner {
             }
 		}
 		undoZufi();
+		 mcEigenVec [maxPos][0] =  0.1;
 		return maxPos;
 	}
 	private double toTheTop(int a){

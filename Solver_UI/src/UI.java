@@ -239,9 +239,9 @@ public class UI {
 			Opts.minBetter 		= jo_Opts.getDouble("minBetter");
 			Opts.plotTimer 		= jo_Opts.getInt("plotTimer");
 			Opts.fixTrainSet 	= jo_Opts.getBoolean("fixTrainSet");
-			Opts.doTheLeft 		= jo_Opts.getBoolean("doTheLeft");
-			Opts.kickStart 		= jo_Opts.getBoolean("kickStart");
-			Opts.activation		= jo_Opts.getString("activation");
+//			Opts.doTheLeft 		= jo_Opts.getBoolean("doTheLeft");
+//			Opts.kickStart 		= jo_Opts.getBoolean("kickStart");
+//			Opts.activation		= jo_Opts.getString("activation");
 		  } catch (JSONException e) {
 			  txtOpts.setText(Opts.getOptsAsJson().toString(3));
 		        return false;
