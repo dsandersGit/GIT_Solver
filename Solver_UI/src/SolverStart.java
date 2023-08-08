@@ -45,11 +45,13 @@ public class SolverStart {
 	 * 48: AutoSave Ensemble desactivated
 	 * 49: Double Run, Less Options
 	 * 50: Double Run removed
+	 * 51: Redo Double Run, Shrink ensemble
+	 * 52: First round > Fully random
 	 */
  
 	public static String 	app 			= "uSort";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 50";
+	public static String 	revision 		= " 52";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -141,10 +143,10 @@ public class SolverStart {
 					if ( activationBoth) {
 						new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],false);
 						if ( DS.freezs.size() > 0) {
-							out.append(DS.freezs.get(DS.freezs.size()-1).getModelAsJson().toString(3));
-							JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
-							main.append("model", modl);
-							main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
+//							out.append(DS.freezs.get(DS.freezs.size()-1).getModelAsJson().toString(3));
+//							JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
+//							main.append("model", modl);
+//							main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
 							long currTime = ((System.currentTimeMillis()-tme));
 							tmeCount++;
 							timeSum+=currTime;
@@ -155,10 +157,10 @@ public class SolverStart {
 						}
 						new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],true);
 						if ( DS.freezs.size() > 0) {
-							out.append(DS.freezs.get(DS.freezs.size()-1).getModelAsJson().toString(3));
-							JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
-							main.append("model", modl);
-							main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
+//							out.append(DS.freezs.get(DS.freezs.size()-1).getModelAsJson().toString(3));
+//							JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
+//							main.append("model", modl);
+//							main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
 							long currTime = ((System.currentTimeMillis()-tme));
 							tmeCount++;
 							timeSum+=currTime;
@@ -171,10 +173,10 @@ public class SolverStart {
 					}else {
 						new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],activationIsDst);
 						if ( DS.freezs.size() > 0) {
-							out.append(DS.freezs.get(DS.freezs.size()-1).getModelAsJson().toString(3));
-							JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
-							main.append("model", modl);
-							main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
+//							out.append(DS.freezs.get(DS.freezs.size()-1).getModelAsJson().toString(3));
+//							JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
+//							main.append("model", modl);
+//							main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
 							long currTime = ((System.currentTimeMillis()-tme));
 							tmeCount++;
 							timeSum+=currTime;
@@ -192,20 +194,47 @@ public class SolverStart {
 										
 				}
 			}
-			
-
 		}
+		
+		
+		// Remove bad performing models, retain Opts.retainModelNum
+		if ( DS.freezs.size()>Opts.retainModelNum) {
+			int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Shrink ensemble?</H3> <BR> Number of models will be reduced to "+Opts.retainModelNum+"<BR> Only best perfoming models remain.</HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+			if ( erg == JOptionPane.YES_OPTION) {
+				
+				while (DS.freezs.size() > Opts.retainModelNum*DS.numClasses) {
+					for (int j=0;j<DS.classAllIndices.length;j++) {
+						int killTarget = DS.classAllIndices[j];
+						int kill = -1;double min = 5;
+						for (int i=0;i<DS.freezs.size();i++) {
+							MC_Freeze mc = DS.freezs.get(i);
+							if ( killTarget == mc.targetColorIndex ) {
+								if ( mc.accuracyTest < min || i==0) {
+									min = mc.accuracyTest;
+									kill = i;
+								}
+							}
+						}// DS.freeze.size
+						if (kill>-1) {
+							//System.out.println("Kill "+DS.freezs.get(kill).targetLabel + "\t"+DS.freezs.get(kill).accuracyTest);
+							DS.freezs.remove(kill);
+						}
+					}
+				}
+			}
+		}
+		
+		for (int i=0;i<DS.freezs.size();i++) {
+			//System.out.println("Remain "+DS.freezs.get(i).targetLabel + "\t"+DS.freezs.get(i).accuracyTest);
+			JSONObject modl = DS.freezs.get(i).getModelAsJson();
+			main.append("model", modl);
+			main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
+		}
+		
 		UI.proStatus.setValue(0);
 		DS.setEnsemble(main);
 		UI.txtEnsemble.setText(main.toString(3));
 		UI.labTimePerRun.setText("Process: ---");
-		
-		
-//		FileWriter fw = new FileWriter("ensemble.ens", false);
-//	    BufferedWriter bw = new BufferedWriter(fw);
-//	    bw.write(main.toString(3));
-//	    bw.newLine();
-//	    bw.close();
 	    UI.menuFile.setEnabled(true);
 	    isRunning = false;
 	    UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colGreen.png")));
@@ -326,15 +355,17 @@ public class SolverStart {
 			Tools.sumryAdd ("[!] The number of variables is too small.");
 		}
 		Tools.sumryAdd ("\n");
-		if ( DS.numVars*20 > 500) {
-			int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Auto adjust Options?</H3></HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-			if ( erg == JOptionPane.YES_OPTION) {
-				Opts.noBetterStop = DS.numVars*20;
-				UI.txtOpts.setText(Opts.getOptsAsJson().toString(3));
-				
-			}
-			
-		}
+//		if ( DS.numVars*20 > 500) {
+//			int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Auto adjust Options?</H3></HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+//			if ( erg == JOptionPane.YES_OPTION) {
+//				double nnn = (DS.numVars-10)/10;
+//				int val = (int)(1500*Runner.getSigmoid(nnn));
+//				Opts.noBetterStop = val;
+//				UI.txtOpts.setText(Opts.getOptsAsJson().toString(3));
+//				
+//			}
+//			
+//		}
 	}
 
 	

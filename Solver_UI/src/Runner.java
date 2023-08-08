@@ -47,9 +47,11 @@ public class Runner {
     static boolean doAccur = false;
     double[] mappedSigmoid = null;
     
+    int absCount =0 ;
+    
 	
 	public Runner(int target, String tName, boolean activationIsDst) {
-
+		absCount =0 ;
 		mappedSigmoid = new double[200];
 		for (double i=-10;i<10;i+=0.1) {
 			// (int)((val + 10)*10);
@@ -62,7 +64,7 @@ public class Runner {
 		}else {
 			targetName = tName;
 		}
-		int absCount =0 ;
+		
         mcEigenVec             	= new double [DS.numVars][Opts.numDims];
         mcEigenVecOld         	= new double [DS.numVars][Opts.numDims];
         mcPCA                 	= new double [Opts.numDims][DS.numSamples];
@@ -164,13 +166,13 @@ public class Runner {
 	       }
 	        if ( notBetterCount > Opts.noBetterStop) {
 	        	if ( dstLatestMax  > distanceOld* Opts.minBetter && dstLatestMax > 0 ) {
-	        	  	if (doAccur) {
-	        	  		doDistxAccur = true;
-	        	  		doAccur = false;
-	        	  		dstLatestMax = distanceOld;
-	    	            notBetterCount=0;
-	    	            distanceOld=0;
-	        	  	}
+//	        	  	if (doAccur) {
+//	        	  		doDistxAccur = true;
+//	        	  		doAccur = false;
+//	        	  		dstLatestMax = distanceOld;
+//	    	            notBetterCount=0;
+//	    	            distanceOld=0;
+//	        	  	}
 	        		finish();
 	                return false;
 	            }
@@ -413,6 +415,7 @@ public class Runner {
         
         if  ( again > -1)a = again;
        
+        if ( absCount < Opts.noBetterStop ) z0 = 99;
         
         switch(z0) {
         case 0:                                                            // EIN Area, ALLE PCA's Zufallswert
@@ -791,7 +794,7 @@ public class Runner {
     		return mappedSigmoid[v];
     	}
     }
-    private double getSigmoid( double val ) {
+    public static double getSigmoid( double val ) {
     	// TODO: Mapping
         return 1 / ( 1 + Math.exp( val * -1.));
     }

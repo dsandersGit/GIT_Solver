@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -30,6 +32,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -174,9 +177,7 @@ public class UI {
 		txtOpts.setBackground(SolverStart.backColor);
 		txtOpts.setForeground(SolverStart.frontColor);
 		txtOpts.setFont(new Font("Consolas", Font.PLAIN, 20));
-		
-		
-		
+	
 		
 		txtEnsemble.setOpaque(false);
 		txtEnsemble.setBackground(SolverStart.backColor);
@@ -196,19 +197,21 @@ public class UI {
 		
 		
 		maintabbed.add("Data",scSummary);
-		maintabbed.setIconAt(0, new ImageIcon(ClassLoader.getSystemResource("icon_data.png")));
+		//maintabbed.setIconAt(0, new ImageIcon(ClassLoader.getSystemResource("icon_data.png")));
+		maintabbed.setBackgroundAt(0,Color.magenta);
 		maintabbed.add("Options",txtOpts);
-		maintabbed.setIconAt(1, new ImageIcon(ClassLoader.getSystemResource("icon_data.png")));
+		maintabbed.setBackgroundAt(1,Color.red);
+		//maintabbed.setIconAt(1, new ImageIcon(ClassLoader.getSystemResource("icon_data.png")));
 		maintabbed.add("Live", panLive);
-		maintabbed.setIconAt(2, new ImageIcon(ClassLoader.getSystemResource("icon_cpu.png")));
+		//maintabbed.setIconAt(2, new ImageIcon(ClassLoader.getSystemResource("icon_cpu.png")));
 		maintabbed.addTab("3D",tab3D);
-		maintabbed.setIconAt(3, new ImageIcon(ClassLoader.getSystemResource("icon_cpu.png")));
+		//maintabbed.setIconAt(3, new ImageIcon(ClassLoader.getSystemResource("icon_cpu.png")));
 		maintabbed.add("Validation",scStat);
-		maintabbed.setIconAt(4, new ImageIcon(ClassLoader.getSystemResource("icon_cpu.png")));
+		//maintabbed.setIconAt(4, new ImageIcon(ClassLoader.getSystemResource("icon_cpu.png")));
 		maintabbed.add("Ensemble",scEnsemble);
-		maintabbed.setIconAt(5, new ImageIcon(ClassLoader.getSystemResource("icon_save_ens.png")));
+		//maintabbed.setIconAt(5, new ImageIcon(ClassLoader.getSystemResource("icon_save_ens.png")));
 		maintabbed.add("Classification", sc);
-		maintabbed.setIconAt(6, new ImageIcon(ClassLoader.getSystemResource("icon_classify.png")));
+		//maintabbed.setIconAt(6, new ImageIcon(ClassLoader.getSystemResource("icon_classify.png")));
 		
 		tab_Classify 	= 6;
 		tab_Train 		= 2;
@@ -289,7 +292,7 @@ public class UI {
 			Opts.fixTrainSet 	= jo_Opts.getBoolean("fixTrainSet");
 //			Opts.doTheLeft 		= jo_Opts.getBoolean("doTheLeft");
 //			Opts.kickStart 		= jo_Opts.getBoolean("kickStart");
-//			Opts.activation		= jo_Opts.getString("activation");
+			Opts.activation		= jo_Opts.getString("activation");
 		  } catch (JSONException e) {
 			  txtOpts.setText(Opts.getOptsAsJson().toString(3));
 		        return false;
@@ -423,6 +426,7 @@ public class UI {
 		tmtableStat.addColumn("Sensitivity_Test");
 		tmtableStat.addColumn("Speciticity_Test");
 		
+	  
 		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 	        /**
 			 * 
