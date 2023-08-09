@@ -19,6 +19,11 @@ import javax.swing.UIManager;
 public class SolverStart {
 	
 	/*
+	 * Main Class. 
+	 *  + starts the app
+	 *  + data import and check 
+	 *  + data classification training commander
+	 *  
 	 *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
 	 *  https://github.com/dsandersGit/GIT_Solver
 	 */
@@ -130,7 +135,6 @@ public class SolverStart {
 		boolean activationIsDst = false;
 		boolean activationBoth = false;
 		if ( Opts.activation.equals("DxA") )activationIsDst = true;		// HERE FIRST ACCURACY; THEN DISTANCE IS APPLIED
-		
 		if ( Opts.activation.equals("D+A") )activationBoth = true;
 		
 		UI.refreshStatus();
@@ -153,7 +157,7 @@ public class SolverStart {
 							avgTime =  (timeSum/(1000*tmeCount));
 							UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
 							tme = System.currentTimeMillis();
-							fillStatistics("D+A > A");
+							if ( !SolverStart.immediateStop ) fillStatistics("D+A > A");
 						}
 						new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],true);
 						if ( DS.freezs.size() > 0) {
@@ -167,7 +171,7 @@ public class SolverStart {
 							avgTime =  (timeSum/(1000*tmeCount));
 							UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
 							tme = System.currentTimeMillis();
-							fillStatistics("D+A > DxA");
+							if ( !SolverStart.immediateStop ) fillStatistics("D+A > DxA");
 						}
 						
 					}else {
@@ -183,11 +187,12 @@ public class SolverStart {
 							avgTime =  (timeSum/(1000*tmeCount));
 							UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
 							tme = System.currentTimeMillis();
-							if ( activationIsDst) {
-								fillStatistics("DxA");
-							}else {
-								fillStatistics("A");
-							}
+							if ( !SolverStart.immediateStop )
+								if ( activationIsDst) {
+									fillStatistics("DxA");
+								}else {
+									fillStatistics("A");
+								}
 						}
 	
 					}
@@ -199,7 +204,7 @@ public class SolverStart {
 		
 		// Remove bad performing models, retain Opts.retainModelNum
 		if ( DS.freezs.size()>Opts.retainModelNum) {
-			int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Shrink ensemble?</H3> <BR> Number of models will be reduced to "+Opts.retainModelNum+"<BR> Only best perfoming models remain.</HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+			int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Shrink ensemble?</H3> <BR> Number of models will be reduced to "+Opts.retainModelNum+" per class<BR> Only best perfoming models remain.</HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 			if ( erg == JOptionPane.YES_OPTION) {
 				
 				while (DS.freezs.size() > Opts.retainModelNum*DS.numClasses) {
@@ -218,6 +223,7 @@ public class SolverStart {
 						if (kill>-1) {
 							//System.out.println("Kill "+DS.freezs.get(kill).targetLabel + "\t"+DS.freezs.get(kill).accuracyTest);
 							DS.freezs.remove(kill);
+							UI.tmtableStat.removeRow(kill);
 						}
 					}
 				}
@@ -290,6 +296,7 @@ public class SolverStart {
 			}
 		}
 		Tools.sumryAdd ("\n");
+				
 		Tools.sumryAdd ("*Variable listing: ");
 		Tools.sumryAdd ("\n");
 		

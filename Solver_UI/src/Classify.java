@@ -4,7 +4,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+
 /*
+ * data-model-application 
+ *  + data classification based on trained/loaded model 
+ *  
  *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
  *  https://github.com/dsandersGit/GIT_Solver
  */

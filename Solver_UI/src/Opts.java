@@ -1,9 +1,13 @@
 
 
 /*
-	 *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
-	 *  https://github.com/dsandersGit/GIT_Solver
-	 */
+ * options storage 
+ *  + holds options
+ *  + delivers options as JSON 
+ *  
+ *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
+ *  https://github.com/dsandersGit/GIT_Solver
+ */
 
 public class Opts {
 	// INIT

@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 /*
+ * tools
+ *  + divers tool 
+ *  
  *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
  *  https://github.com/dsandersGit/GIT_Solver
  */
@@ -127,6 +130,9 @@ public class Tools {
 		return aurocs;
 	}
 	static double[][] doNormData () {
+		
+
+		
 		DS.normData = new double[DS.numSamples][DS.numVars];
 		double[][] erg = null;
 		if ( Opts.normType.equals("MaxMinNorm")) {
@@ -233,4 +239,52 @@ public class Tools {
 		String tmp 					= ds.getString("VariableNames");
 		return tmp.split(",");
 	}
+	static double getSpearman_Rank_Correlation(double[] x, double[] y){
+		//https://en.wikipedia.org/wiki/Spearman's_rank_correlation_coefficient
+		        float [] sortX = new float[  x.length];
+		        float [] sortY = new float[  y.length];
+		        double p = 0;double num = 0;
+		        for(int i=0;i<x.length;i++){
+		            double val = 0;
+		            float c = 0;
+		                try { val = x[i];}catch (java.lang.ArrayIndexOutOfBoundsException e) {}
+		                float numSame = 0f;
+		                for(int j=0;j<y.length;j++){
+	                        double inVal = 0;
+	                        try { inVal = x[j];}catch (java.lang.ArrayIndexOutOfBoundsException e) {}
+	                        if ( val==inVal )numSame++;
+	                        if ( val<inVal )c++;
+		                }
+		                if (numSame>1 ) {
+		                    for (float k=0;k<numSame; k++) {
+		                        sortX[i] += c + k;
+		                    }
+		                    sortX[i] /= numSame;
+		                }else {
+		                    sortX[i] = c;
+		                }
+
+
+		                c=0;val=0;
+		                try { val = y[i];}catch (java.lang.ArrayIndexOutOfBoundsException e) {}
+		                numSame = 0f;
+		                for(int j=0;j<y.length;j++){
+	                        double inVal = 0;
+	                        try { inVal = y[j];}catch (java.lang.ArrayIndexOutOfBoundsException e) {}
+	                        if ( val==inVal )numSame++;
+	                        if ( val<inVal )c++;
+		                }
+		                if (numSame>1 ) {
+		                    for (float k=0;k<numSame; k++) {
+		                        sortY[i] += c + k;
+		                    }
+		                    sortY[i] /= numSame;
+		                }else {
+		                    sortY[i] = c;
+		                }
+		                num++;
+		            p += Math.pow(sortX[i]-sortY[i],2);
+		        }
+		        return 1.-6.*p/(num*(Math.pow(num,2)-1));
+		    } 
 }

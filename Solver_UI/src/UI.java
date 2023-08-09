@@ -46,6 +46,9 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 /*
+ * user-interface
+ *  + graphical user interface, forms and actions 
+ *  
  *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
  *  https://github.com/dsandersGit/GIT_Solver
  */
@@ -531,7 +534,7 @@ public class UI {
 		menuFile.add(menuFileLoadDsFormat);
 		JMenuItem menuFileLoadClip = new JMenuItem(" Import from Clipboard"); 
 		//menuFileLoadClip.setToolTipText("TOOLTIP not yet set"); 
-		//menuFileLoadClip.setEnabled(false);
+		menuFileLoadClip.setEnabled(false);
 		menuFile.add(menuFileLoadClip);
 		menuFile.add(new JSeparator());
 		
@@ -556,6 +559,7 @@ public class UI {
 		JMenuItem menuExportVectors = new JMenuItem(" Vectors"); 
 		menuExport.add(menuExportVectors);
 		JMenuItem menuExportVectorsWeight = new JMenuItem(" Weighed Vectors (VIP Scores)"); 
+		menuExportVectorsWeight.setEnabled(false);
 		menuExport.add(menuExportVectorsWeight);
 		JMenuItem menuExportClassification = new JMenuItem(" Classification"); 
 		menuExport.add(menuExportClassification);

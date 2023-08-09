@@ -8,9 +8,13 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /*
+ * Thread: data-classification-training. 
+ *  + data classification training 
+ *  
  *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
  *  https://github.com/dsandersGit/GIT_Solver
  */
+
 public class Runner {
 	public int targetColorIndex 	= -1;
 	public String targetName		 	= null;
@@ -107,7 +111,7 @@ public class Runner {
         }
         finish();
         if ( !SolverStart.immediateStop ) doFreeze();
-        doStreamPlot();
+        //doStreamPlot();
 	}
 	public static void cleanRunner () {
 		accuracyTrain.clear();
@@ -415,7 +419,7 @@ public class Runner {
         
         if  ( again > -1)a = again;
        
-        if ( absCount < Opts.noBetterStop ) z0 = 99;
+        if ( absCount < Opts.noBetterStop &&  absCount < 100 ) z0 = 99;
         
         switch(z0) {
         case 0:                                                            // EIN Area, ALLE PCA's Zufallswert
