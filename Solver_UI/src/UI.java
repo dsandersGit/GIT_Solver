@@ -42,6 +42,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.border.BevelBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -109,7 +110,7 @@ public class UI {
 	static JButton jbSaveEns = new JButton();
 	static JButton jbClassify = new JButton();
 	static JButton jb_Stop = new JButton("Stop Training");
-	
+	static JButton jb_DefaultOptions = new JButton("Default Options");
 	
 	public UI() {
 
@@ -128,7 +129,7 @@ public class UI {
 		scStat.setPreferredSize(new Dimension (800,600));
 		
 		jF.setJMenuBar(setMyMenu());
-		sp.setTitle("Accuracy and Bonus");
+		sp.setTitle("Accuracy and Gain");
 		sp.setXAxis("run");
 		sp.setYAxis("accuracy");
 		spDst.setMargin(100,50);
@@ -183,6 +184,7 @@ public class UI {
 	
 		
 		txtEnsemble.setOpaque(false);
+		txtEnsemble.setEditable(false);
 		txtEnsemble.setBackground(SolverStart.backColor);
 		txtEnsemble.setForeground(SolverStart.frontColor);
 		txtEnsemble.setFont(new Font("Consolas", Font.PLAIN, 12));
@@ -198,23 +200,21 @@ public class UI {
 		panLive.add(sp);
 		panLive.add(spDst);
 		
+		JPanel panOptions = new JPanel();
+		panOptions.setLayout(new BorderLayout());
+		panOptions.add(txtOpts, BorderLayout.CENTER);
+		panOptions.add(jb_DefaultOptions, BorderLayout.SOUTH);
+		jb_DefaultOptions.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
+			txtOpts.setText(SolverStart.defOptions.toString(3));
+		}});
 		
 		maintabbed.add("Data",scSummary);
-		//maintabbed.setIconAt(0, new ImageIcon(ClassLoader.getSystemResource("icon_data.png")));
-		maintabbed.setBackgroundAt(0,Color.magenta);
-		maintabbed.add("Options",txtOpts);
-		maintabbed.setBackgroundAt(1,Color.red);
-		//maintabbed.setIconAt(1, new ImageIcon(ClassLoader.getSystemResource("icon_data.png")));
+		maintabbed.add("Options",panOptions);
 		maintabbed.add("Live", panLive);
-		//maintabbed.setIconAt(2, new ImageIcon(ClassLoader.getSystemResource("icon_cpu.png")));
 		maintabbed.addTab("3D",tab3D);
-		//maintabbed.setIconAt(3, new ImageIcon(ClassLoader.getSystemResource("icon_cpu.png")));
 		maintabbed.add("Validation",scStat);
-		//maintabbed.setIconAt(4, new ImageIcon(ClassLoader.getSystemResource("icon_cpu.png")));
 		maintabbed.add("Ensemble",scEnsemble);
-		//maintabbed.setIconAt(5, new ImageIcon(ClassLoader.getSystemResource("icon_save_ens.png")));
 		maintabbed.add("Classification", sc);
-		//maintabbed.setIconAt(6, new ImageIcon(ClassLoader.getSystemResource("icon_classify.png")));
 		
 		tab_Classify 	= 6;
 		tab_Train 		= 2;
@@ -231,7 +231,11 @@ public class UI {
 		
 		jF.add(getControlToolBar(), BorderLayout.EAST);
 		
-		jF.add(maintabbed,BorderLayout.CENTER);
+		JPanel main = new JPanel();
+		main.setLayout(new GridLayout(1,1));
+		main.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+		main.add(maintabbed);
+		jF.add(main,BorderLayout.CENTER);
 		jF.add(initStatusBar(),BorderLayout.SOUTH);
 		jF.pack();
 		jF.setLocationRelativeTo(null);
@@ -294,8 +298,10 @@ public class UI {
 			Opts.plotTimer 		= jo_Opts.getInt("plotTimer");
 			Opts.fixTrainSet 	= jo_Opts.getBoolean("fixTrainSet");
 //			Opts.doTheLeft 		= jo_Opts.getBoolean("doTheLeft");
-//			Opts.kickStart 		= jo_Opts.getBoolean("kickStart");
+			Opts.kickStart 		= jo_Opts.getBoolean("kickStart");
 			Opts.activation		= jo_Opts.getString("activation");
+			Opts.minBootstarpSamples		= jo_Opts.getInt("minBootstarpSamples");
+			Opts.doBoost		= jo_Opts.getBoolean("doBoost");
 		  } catch (JSONException e) {
 			  txtOpts.setText(Opts.getOptsAsJson().toString(3));
 		        return false;
@@ -391,7 +397,12 @@ public class UI {
 	
 	private static void initTables() {
 		
-		table = new JTable();
+		table = new JTable() {
+	        private static final long serialVersionUID = 1L;
+	        public boolean isCellEditable(int row, int column) {                
+	                return false;               
+	        };
+	    };
 		tmtable =(DefaultTableModel) table.getModel();
 		table.getTableHeader().setOpaque(false);
 		table.getTableHeader().setBackground(SolverStart.backColor);
@@ -402,7 +413,12 @@ public class UI {
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.setAutoCreateRowSorter(true);
 		
-		tableStat= new JTable();
+		tableStat= new JTable() {
+	        private static final long serialVersionUID = 1L;
+	        public boolean isCellEditable(int row, int column) {                
+	                return false;               
+	        };
+	    };
 		tmtableStat =(DefaultTableModel) tableStat.getModel();
 		tableStat.getTableHeader().setOpaque(false);
 		tableStat.getTableHeader().setBackground(SolverStart.backColor);
@@ -436,6 +452,7 @@ public class UI {
 			 */
 			private static final long serialVersionUID = 1L;
 
+		
 			@Override
 	        public Component getTableCellRendererComponent(JTable table,
 	                Object value, boolean isSelected, boolean hasFocus,
@@ -463,6 +480,7 @@ public class UI {
 	            }
 	            return this;
 	        }
+			
 	
 	    });
 	}
@@ -490,7 +508,7 @@ public class UI {
 			}
 		}});
 		jbLoadEns.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
-			loadEnsemble();
+			loadEnsemble(false);
 		}});
 		jbSaveEns.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			saveEnsemble();
@@ -596,7 +614,7 @@ public class UI {
 			UI.maintabbed.setSelectedIndex(UI.tab_Summary);
 		}});
 		menuFileLoadEnsemble.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
-			loadEnsemble();
+			loadEnsemble(false);
 		}});
 		menuFileSaveEnsemble.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 			saveEnsemble();
@@ -759,7 +777,10 @@ public class UI {
 			JOptionPane.showMessageDialog(jF, "<HTML><I>Licensed under GNU General Public License v3.0</I>", SolverStart.app,  JOptionPane.INFORMATION_MESSAGE);
 		}});
 		menuAboutCredits.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
-			JOptionPane.showMessageDialog(null, "<HTML> used libraries and dependencies: <ul><li>JSON java libraries from JSON.org</li></ul><BR>", "CREDITS", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, "<HTML> used libraries and dependencies: <ul>"
+					+ "<li>JSON java libraries from JSON.org</li>"
+					+ "<li>FlatLaf - Flat Look and Feel Theme</li>"
+					+ "</ul><BR>", "CREDITS", JOptionPane.INFORMATION_MESSAGE);
 		}});
 		//-------------------------------------------------------------------------------------------------------------------
 		return mBar;
@@ -812,6 +833,9 @@ public class UI {
 		if ( !f.getName().toLowerCase().endsWith(".ens")) {
 			f = new File(f.getAbsolutePath()+".ens");
 		}
+		
+		prefs.put("lastEnsemble", f.getAbsolutePath());
+		
 		FileWriter fw = null;
 		try {
 			fw = new FileWriter(f, false);
@@ -835,16 +859,24 @@ public class UI {
 			e1.printStackTrace();
 		}
 	}
-	private static void loadEnsemble() {
+	static void loadEnsemble(boolean auto) {
 		Preferences prefs;
 	    prefs = Preferences.userRoot().node("Solver");
-	    String path = prefs.get("path", ".");
-	    String[] type = {"DS_Ensemble"};
-	    String[] sht = {"ENS"};
-		File f = Tools.getFile("Select dataset file", path,type,sht, false);
+	    File f = null;
+	    if ( auto ) {
+	    	f = new File ( prefs.get("lastEnsemble", ".") );
+	    	if ( !f.exists() || !f.getName().toLowerCase().endsWith(".ens") )
+	    		return;
+	    }else {
+		    String path = prefs.get("path", ".");
+		    String[] type = {"DS_Ensemble"};
+		    String[] sht = {"ENS"};
+			f = Tools.getFile("Select dataset file", path,type,sht, false);
+			if ( f == null) return;
+			if ( !f.exists()) return;
+	    }
 		
-		if ( f == null) return;
-		if ( !f.exists()) return;
+		
 		DS.setEnsemble(Classify.readEnsemble(f.getAbsolutePath()));
 		if ( DS.js_Ensemble == null ) {
 			JOptionPane.showMessageDialog(jF, "NOT VALID ENSEMBLE");
@@ -889,6 +921,9 @@ public class UI {
 		tmtable.setRowCount(0);
 		
 		new DS();												// INITS
+		
+		SolverStart.bootstrap() ;
+		
 		DS.normParas = Tools.doNormData ();				// Daten Normalisieren
 		SolverStart.dataFileName = f.getName();
 		

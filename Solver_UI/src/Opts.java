@@ -12,8 +12,8 @@
 public class Opts {
 	// INIT
 	public static String	dstType			 		= "GROUP"; 				// "EGO"; "GROUP"
-	public static String	normType		 		= "Pareto"; 			// "MaxMinNorm"; "Pareto"; "None"
-	public static String	activation	 			= "D+A";				// Activation Function "DxA" or "A" or "D", "D+A"
+	public static String	normType		 		= "MaxMinNorm"; 			// "MaxMinNorm"; "Pareto"; "None"
+	public static String	activation	 			= "DxA";				// Activation Function "DxA" or "A" or "D", "D+A"
 	//
 	public static int 		numDims			 		= 3; 					// Number of Neurons / Dimensions
 	public static double 	trainRatio				= 0.7;					// test / train > ratio of training to sample data  0 = full target 1 - no rget
@@ -29,9 +29,12 @@ public class Opts {
 	public static int  		minPopulation 			= 25;					// No User Option! minimal Population of classes for split
 	public static int  		minVariableCount		= 2;					// No User Option! minimal number of variables
 	public static int  		retainModelNum 			= 3;					// Model per class in reduced ensemble
+	
+	public static int  		minBootstarpSamples		= 1;					// Model per class in reduced ensemble
+	public static boolean 	doBoost					= false;
 
 //	public static boolean	doTheLeft	 			= false;				// One Trainset for full ensemble (true) or per cycle (false)
-//	public static boolean	kickStart	 			= false;					// One Trainset for full ensemble (true) or per cycle (false)
+	public static boolean	kickStart	 			= false;					// One Trainset for full ensemble (true) or per cycle (false)
 	
 
 	public static JSONObject getOptsAsJson() {
@@ -46,10 +49,12 @@ public class Opts {
 		out.put("fixTrainSet", 	fixTrainSet);
 //		out.put("doTheLeft", 	doTheLeft);
 		out.put("plotTimer", 	plotTimer);
-//		out.put("kickStart", 	kickStart);
+		out.put("kickStart", 	kickStart);
 		out.put("activation", 	activation);
 		out.put("largeStep", 	largeStep);
 		out.put("useMedian", 	useMedian);
+		out.put("doBoost", 		doBoost);
+		out.put("minBootstarpSamples", 	minBootstarpSamples);
 		
 
 		return out;

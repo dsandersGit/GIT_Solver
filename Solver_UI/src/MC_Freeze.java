@@ -23,43 +23,43 @@ public class MC_Freeze {
 		this.distance 	= dst;
 		this.eigenVec	= new double[mc.length][mc[0].length];
 	}
-	public String getModelAsString() {
-		StringBuffer out = new StringBuffer();
-		out.append("<<<" + "\n");
-//		out.append("Model" + SolverStart.app + SolverStart.appAdd + "\n");
-//		out.append("accuracyTrain," + accuracyTrain + "\n");
-//		out.append("accuracyTest, " + accuracyTest + "\n");
-//		out.append("numDims," + Opts.numDims + "\n");
-//		out.append("split," + split + "\n");
-//		out.append("targetColorIndex," + targetColorIndex + "\n");
-//		out.append("targetLabel," + targetLabel + "\n");
+//	public String getModelAsString() {
+//		StringBuffer out = new StringBuffer();
+//		out.append("<<<" + "\n");
+////		out.append("Model" + SolverStart.app + SolverStart.appAdd + "\n");
+////		out.append("accuracyTrain," + accuracyTrain + "\n");
+////		out.append("accuracyTest, " + accuracyTest + "\n");
+////		out.append("numDims," + Opts.numDims + "\n");
+////		out.append("split," + split + "\n");
+////		out.append("targetColorIndex," + targetColorIndex + "\n");
+////		out.append("targetLabel," + targetLabel + "\n");
+////		
+//		out.append("Model, accuracyTrain, accuracyTest,	numDims, split, targetColorIndex, targetLabel" + "\n");
+//		out.append(SolverStart.app + SolverStart.appAdd + "," );
+//		out.append(accuracyTrain + "," );
+//		out.append(accuracyTest+ "," );
+//		out.append(Opts.numDims + "," );
+//		out.append(split + "," );
+//		out.append(targetColorIndex + "," );
+//		out.append(targetLabel + "\n" );
 //		
-		out.append("Model, accuracyTrain, accuracyTest,	numDims, split, targetColorIndex, targetLabel" + "\n");
-		out.append(SolverStart.app + SolverStart.appAdd + "," );
-		out.append(accuracyTrain + "," );
-		out.append(accuracyTest+ "," );
-		out.append(Opts.numDims + "," );
-		out.append(split + "," );
-		out.append(targetColorIndex + "," );
-		out.append(targetLabel + "\n" );
-		
-		
-		out.append("TAG, Dimension,average");
-		for (int i=0;i<DS.numVars;i++) {
-			out.append(",VECTOR: " + DS.AreaNames[i]);	
-		}
-		out.append("\n");
-		
-        for (int i=0;i<Opts.numDims;i++) {
-        	out.append(">EC,"+i +","+ averages[i]);
-            for (int a=0;a<DS.numVars;a++){
-                out.append( "," + eigenVec[a][i]);
-            }
-            out.append("\n");
-        }
-        out.append(">>>" + "\n");
-		return out.toString();
-	}
+//		
+//		out.append("TAG, Dimension,average");
+//		for (int i=0;i<DS.numVars;i++) {
+//			out.append(",VECTOR: " + DS.AreaNames[i]);	
+//		}
+//		out.append("\n");
+//		
+//        for (int i=0;i<Opts.numDims;i++) {
+//        	out.append(">EC,"+i +","+ averages[i]);
+//            for (int a=0;a<DS.numVars;a++){
+//                out.append( "," + eigenVec[a][i]);
+//            }
+//            out.append("\n");
+//        }
+//        out.append(">>>" + "\n");
+//		return out.toString();
+//	}
 	public JSONObject getModelAsJson() {
 		JSONObject out = new JSONObject();
 

@@ -16,6 +16,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+
 public class SolverStart {
 	
 	/*
@@ -30,6 +33,9 @@ public class SolverStart {
 	
 	/*
 	 * Reduce Variable Count via SPPEARMAN Reduktion ?
+	 */
+	/*
+	 * Might be benefitial to do bootstrapping for small sample sizes (resampling with duplicates )
 	 */
 	
 	/*
@@ -52,31 +58,49 @@ public class SolverStart {
 	 * 50: Double Run removed
 	 * 51: Redo Double Run, Shrink ensemble
 	 * 52: First round > Fully random
+	 * 53: Booster
+	 * 54: AutoLoad lastEnsemble
 	 */
  
+	
+	// Disperse > Recombine Departing
+	// Disperse > Merge Measure
+	// Combine > Merge > Measure
+	// Split > Disperse > Merge > Measure	S{DiM}n
 	public static String 	app 			= "uSort";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 52";
+	public static String 	revision 		= " 54";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
-	public static boolean 	darkMode 		= false;
+	public static boolean 	darkMode 		= true;
 	public static Color 	backColor 		= Color.DARK_GRAY;
 	public static Color 	frontColor 		= Color.LIGHT_GRAY;
-	
+	public static JSONObject defOptions     = null;
 	public static String dataFileName = "";
 	
 	public static void main(String[] args) {
-		
-		try {
-	          //UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel"); 
-			backColor 	= new Color(255,255,253);
+//		
+//		try {
+//	          //UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel"); 
+//			backColor 	= new Color(255,255,253);
+//			frontColor 	= Color.DARK_GRAY;
+//	          UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+//			}catch( Exception be ) { be.printStackTrace(); }
+//		
+		if ( darkMode ) {
+			FlatDarkLaf.setup();
+			backColor 	= Color.DARK_GRAY;
+			frontColor 	= new Color(255,255,237);
+		}else {
+			FlatLightLaf.setup();
+			backColor 	= new Color(255,255,237);
 			frontColor 	= Color.DARK_GRAY;
-	          UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-			}catch( Exception be ) { be.printStackTrace(); }
+		}
 		
-		
+		defOptions = Opts.getOptsAsJson();
 		new UI();
+		UI.loadEnsemble(true);
 		
 		if(args.length>0 && args[0].endsWith(".dat")){
 			if ( new File(args[0]).exists() ) {
@@ -124,7 +148,7 @@ public class SolverStart {
 	    main.put("DateOfCreation"				, ""+dtf.format(now));
 	    main.put(	"ObjectType"				, "ML_Ensemble");
 	    main.put(	"ObjectVersion"				, "01.00"); 
-	    main.put(	"Support"					,"dsanders@gmx.net");
+	    main.put(	"Support"					,"N/A");
 		long tme = System.currentTimeMillis();
 		long tmeStart = System.currentTimeMillis();
 		double tmeCount = 0;
@@ -137,7 +161,15 @@ public class SolverStart {
 		if ( Opts.activation.equals("DxA") )activationIsDst = true;		// HERE FIRST ACCURACY; THEN DISTANCE IS APPLIED
 		if ( Opts.activation.equals("D+A") )activationBoth = true;
 		
+		
+		
 		UI.refreshStatus();
+		Runner.cleanRunner();
+		
+		// Not confuse useres > disable 3D if not 3 dims are selected
+		UI.maintabbed.setEnabledAt(UI.tab_3D, true);
+		if ( Opts.numDims != 3) UI.maintabbed.setEnabledAt(UI.tab_3D, false);
+
 		
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));
 		for (int i=0;i<Opts.numEnsemble;i++) {
@@ -147,10 +179,6 @@ public class SolverStart {
 					if ( activationBoth) {
 						new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],false);
 						if ( DS.freezs.size() > 0) {
-//							out.append(DS.freezs.get(DS.freezs.size()-1).getModelAsJson().toString(3));
-//							JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
-//							main.append("model", modl);
-//							main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
 							long currTime = ((System.currentTimeMillis()-tme));
 							tmeCount++;
 							timeSum+=currTime;
@@ -161,10 +189,6 @@ public class SolverStart {
 						}
 						new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],true);
 						if ( DS.freezs.size() > 0) {
-//							out.append(DS.freezs.get(DS.freezs.size()-1).getModelAsJson().toString(3));
-//							JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
-//							main.append("model", modl);
-//							main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
 							long currTime = ((System.currentTimeMillis()-tme));
 							tmeCount++;
 							timeSum+=currTime;
@@ -177,10 +201,6 @@ public class SolverStart {
 					}else {
 						new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],activationIsDst);
 						if ( DS.freezs.size() > 0) {
-//							out.append(DS.freezs.get(DS.freezs.size()-1).getModelAsJson().toString(3));
-//							JSONObject modl = DS.freezs.get(DS.freezs.size()-1).getModelAsJson();
-//							main.append("model", modl);
-//							main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
 							long currTime = ((System.currentTimeMillis()-tme));
 							tmeCount++;
 							timeSum+=currTime;
@@ -202,7 +222,7 @@ public class SolverStart {
 		}
 		
 		
-		// Remove bad performing models, retain Opts.retainModelNum
+		// Remove bad performing models, retains Opts.retainModelNum per class
 		if ( DS.freezs.size()>Opts.retainModelNum) {
 			int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Shrink ensemble?</H3> <BR> Number of models will be reduced to "+Opts.retainModelNum+" per class<BR> Only best perfoming models remain.</HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 			if ( erg == JOptionPane.YES_OPTION) {
@@ -221,7 +241,6 @@ public class SolverStart {
 							}
 						}// DS.freeze.size
 						if (kill>-1) {
-							//System.out.println("Kill "+DS.freezs.get(kill).targetLabel + "\t"+DS.freezs.get(kill).accuracyTest);
 							DS.freezs.remove(kill);
 							UI.tmtableStat.removeRow(kill);
 						}
@@ -231,7 +250,6 @@ public class SolverStart {
 		}
 		
 		for (int i=0;i<DS.freezs.size();i++) {
-			//System.out.println("Remain "+DS.freezs.get(i).targetLabel + "\t"+DS.freezs.get(i).accuracyTest);
 			JSONObject modl = DS.freezs.get(i).getModelAsJson();
 			main.append("model", modl);
 			main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
@@ -675,5 +693,46 @@ public class SolverStart {
 		     }
 	        return true;
 	}
-	
+	public static void bootstrap() {
+		
+//		String erg = JOptionPane.showInputDialog(UI.jF, "Bootstrap Factor: ", 1);
+//		if ( erg == null || erg == "1") return;
+//		int fac = 0;
+//		try {
+//			fac = Integer.parseInt(erg);
+//		}catch (NumberFormatException e) {
+//			return;
+//		}
+		int fac = 1 + Opts.minBootstarpSamples / DS.rawData.length;
+		
+		if ( fac <= 1) return;
+		
+		int nNumSamples = DS.rawData.length*fac;
+		int nNumVars 	= DS.rawData[0].length;
+		
+		System.out.println(nNumSamples);
+		double[][] nRawData = new double[nNumSamples][nNumVars];
+		String[] nSampleNames = new String[nNumSamples];
+		String[] nClassNames = new String[nNumSamples];
+		int[] nClassColorIndex = new int[nNumSamples];;
+		
+		int c = 0;
+		while (c<nNumSamples) {
+			int r = (int) (Math.random()*DS.rawData.length);
+			for (int a = 0; a < nNumVars; a++) {
+				nRawData[c][a] = DS.rawData[r][a];
+			}
+			nSampleNames[c] 	= DS.SampleNames[r] + "_syn_"+c;
+			nClassNames[c] 		= DS.ClassNames[r];
+			nClassColorIndex[c]	= DS.classIndex[r];
+			c++;
+		}
+		DS.rawData 			= nRawData;
+		DS.SampleNames		= nSampleNames;
+		DS.ClassNames		= nClassNames;
+		DS.classIndex		= nClassColorIndex;
+		DS.numSamples		= nNumSamples;
+
+		
+	}
 }

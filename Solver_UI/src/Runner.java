@@ -21,6 +21,7 @@ public class Runner {
 	public double[][] mcEigenVec 	= null;
 	public double[][] mcEigenVecOld = null;
 	public double[][] mcPCA 		= null;
+	public static int[][] booster	= null;
 	int zuFiAgain 					= -1;
 	double curr_Dist 				= 0;
 	double[] distances 				= null;
@@ -50,6 +51,8 @@ public class Runner {
     static boolean doDistxAccur = false;									// activation function
     static boolean doAccur = false;
     double[] mappedSigmoid = null;
+    float[] xSigmoid = null;
+    float[] ySigmoid = null;
     
     int absCount =0 ;
     
@@ -62,17 +65,29 @@ public class Runner {
 			mappedSigmoid[(int)((i + 10)*10.)] = getSigmoid(i);	
 
 		}
+		xSigmoid = new float[200];
+        ySigmoid = new float[200];
+        for (int i=0;i<xSigmoid.length;i++) {
+        	xSigmoid[i] = (float) ((float)i/200.);
+        	ySigmoid[i] = DS.numSamples * (float) getMappedSigmoid(((float)i/200. - 0.5f)*10);
+        	
+        }
+		
+		
 		targetColorIndex 		= target;
 		if ( tName == null) {
 			targetName = "c"+target;
 		}else {
 			targetName = tName;
 		}
-		
-        mcEigenVec             	= new double [DS.numVars][Opts.numDims];
-        mcEigenVecOld         	= new double [DS.numVars][Opts.numDims];
-        mcPCA                 	= new double [Opts.numDims][DS.numSamples];
-        
+		if ( mcEigenVec == null) {
+	        mcEigenVec             	= new double [DS.numVars][Opts.numDims];
+	        mcEigenVecOld         	= new double [DS.numVars][Opts.numDims];
+	        mcPCA                 	= new double [Opts.numDims][DS.numSamples];
+		}
+		if ( booster == null) {
+			booster = new int[DS.numSamples][DS.numClasses];
+		}
         if ( activationIsDst) {
         	doDistxAccur = true;
         	doAccur = false;
@@ -99,10 +114,10 @@ public class Runner {
         }
         
         // KickStart
-//        if ( Opts.kickStart) {
-//	        int a = toTheLeft();
-//	        //mcEigenVec [a][0] =     toTheTop(a);
-//        }
+        if ( Opts.kickStart) {
+	        int a = toTheLeft();
+	        //mcEigenVec [a][0] =     toTheTop(a);
+        }
         int step = 100;
         while ( reDo( -1 ) && !SolverStart.immediateStop ) {
         	absCount++;
@@ -111,13 +126,19 @@ public class Runner {
         }
         finish();
         if ( !SolverStart.immediateStop ) doFreeze();
-        //doStreamPlot();
+//        if ( Opts.doBoost )
+//        for (int i=0;i<DS.numSamples;i++) {
+//        	for (int c=0;c<DS.numClasses;c++) {
+//        		System.out.print(booster[i] [c]+"\t");
+//        	}
+//        	System.out.println();
+//        }
 	}
 	public static void cleanRunner () {
 		accuracyTrain.clear();
 		accuracyTest.clear();
 		dstTrain.clear();
-
+		booster = null;
 	}
 
 	private boolean reDo(int src){														// src > Daten aus Freeze extrahieren
@@ -138,7 +159,7 @@ public class Runner {
 	        if ( Opts.dstType.contentEquals("EGO"))         ndst = getDistancesEGO(null);
 	        if ( Opts.dstType.contentEquals("GROUP"))       ndst = getDistances(null);
 	        getSplit();
-	        accuracy = doClassify(true);
+	        accuracy = doClassify(true, false);
 	        
 	        
 	        if (doDistxAccur)
@@ -149,7 +170,7 @@ public class Runner {
 	        
 	        if ( (ndst  > distanceOld)  ){
 	            accuracyTrain.add((float) accuracy);
-	            accuracyTest.add((float) doClassify(false));
+	            accuracyTest.add((float) doClassify(false, false));
 	            dstTrain.add((float) ndst);
 
 	            logZufi();
@@ -158,7 +179,7 @@ public class Runner {
 	            
 	            if ( (System.currentTimeMillis() - SolverStart.plotTimer) > Opts.plotTimer || SolverStart.plotTimer < 0) {
 	            	SolverStart.plotTimer = System.currentTimeMillis(); 
-	            	doStreamPlot();
+	            	doStreamPlot(false);
 	            }
 	            
 	        }else{
@@ -194,7 +215,7 @@ public class Runner {
         if ( Opts.dstType.contentEquals("EGO"))         ndst = getDistancesEGO(null);
         if ( Opts.dstType.contentEquals("GROUP"))         ndst = getDistances(null);
         getSplit();
-        accuracy = doClassify(true);
+        accuracy = doClassify(true, true);
         if (doDistxAccur)
 			ndst *= (accuracy*accuracy);
         if (doAccur)
@@ -234,11 +255,11 @@ public class Runner {
 				//}
 			}
 		}
-		doStreamPlot();			// darw one last time
+		doStreamPlot(true);			// darw one last time
 	}
 	
-	private void doStreamPlot(){
-	   	if ( UI.maintabbed.getSelectedIndex()==UI.tab_Distance || UI.maintabbed.getSelectedIndex()==UI.tab_Train) {
+	private void doStreamPlot(boolean doDraw){
+	   	if ( doDraw || (UI.maintabbed.getSelectedIndex()==UI.tab_Distance || UI.maintabbed.getSelectedIndex()==UI.tab_Train)) {
             float[] yDst = new float[dstTrain.size()];
             float[] yTrain = new float[accuracyTrain.size()];
             float[] yTest = new float[accuracyTrain.size()];
@@ -251,9 +272,9 @@ public class Runner {
             }
             UI.sp.dats.clear();
             if ( SolverStart.darkMode)
-            	UI.sp.setXY(x, yDst, 4, Color.white, "bonus", false, true, false);
+            	UI.sp.setXY(x, yDst, 4, Color.white, "gain", false, true, false);
             if ( !SolverStart.darkMode)
-            	UI.sp.setXY(x, yDst, 4, Color.DARK_GRAY, "bonus", false, true, false);
+            	UI.sp.setXY(x, yDst, 4, Color.DARK_GRAY, "gain", false, true, false);
             UI.sp.setXY(x, yTrain, 4, Color.orange, "accuracyTrain", false, true, false);
             UI.sp.setXY(x, yTest, 4, Color.LIGHT_GRAY, "accuracyTest", false, true, false);
             UI.sp.refreshPlot();
@@ -269,6 +290,7 @@ public class Runner {
 		            float[] yOTrain = null;
 		            float[] xOTest = null;
 		            float[] yOTest = null;
+		            
 		            if ( numTrain < 0 ) {
 			            xTrain = new float[distances.length];
 			            yTrain = new float[distances.length];
@@ -320,10 +342,12 @@ public class Runner {
 		            UI.spDst.dats.clear();
 		            int pSize = 6;
 		            if ( DS.numSamples>1000)pSize = 4;
-		            UI.spDst.setXY(xTrain,yTrain, pSize, new Color(0, 130, 0), "Train: " + DS.classAllIndNme[Classify.getTargetColorIndexPos (targetColorIndex)], true, false, false);
-		            UI.spDst.setXY(xOTrain,yOTrain, pSize, new Color(220,54,39), "OtherTrain", true, false, false);
+		            
 		            UI.spDst.setXY(xTest,yTest, pSize, Color.LIGHT_GRAY, null, true, false, false);
 		            UI.spDst.setXY(xOTest,yOTest, pSize, Color.orange, null, true, false, false);
+		            UI.spDst.setXY(xTrain,yTrain, pSize, new Color(0, 130, 0), "Train: " + DS.classAllIndNme[Classify.getTargetColorIndexPos (targetColorIndex)], true, false, false);
+		            UI.spDst.setXY(xOTrain,yOTrain, pSize, new Color(220,54,39), "OtherTrain", true, false, false);
+		            UI.spDst.setXY(xSigmoid,ySigmoid, pSize, Color.DARK_GRAY, null, false, true, false);
 		            UI.spDst.refreshPlot();
 
 	            }
@@ -411,7 +435,7 @@ public class Runner {
     	
 		double large = Opts.largeStep;
 		double small = large*0.1;
-        int z0     = (int)Math.floor(Math.random()*9);                // zufi
+        int z0     = (int)Math.floor(Math.random()*10);                // zufi
         Random random = ThreadLocalRandom.current();
         int a = random.nextInt(DS.numVars);
         int pc = random.nextInt(Opts.numDims);
@@ -527,7 +551,7 @@ public class Runner {
          if ( Opts.dstType.contentEquals("EGO"))         ndst = getDistancesEGO(null);
          if ( Opts.dstType.contentEquals("GROUP"))         ndst = getDistances(null);
          getSplit();
-         accuracy = doClassify(true);
+         accuracy = doClassify(true, false);
          ndst *= accuracy;
          return ndst;
 	}
@@ -547,8 +571,8 @@ public class Runner {
     }
     private void doFreeze(){
 
-        float accuracyTest = doClassify(false);
-        float accuracyTrain = doClassify(true);
+        float accuracyTest = doClassify(false, false);
+        float accuracyTrain = doClassify(true, false);
         
        
         DS.freezs.add(new MC_Freeze(distanceOld,mcEigenVec.clone() ));
@@ -622,7 +646,7 @@ public class Runner {
        }
        return dstOther/OtherCount - dstTarget/targetCount;
     }
-    private double getDistances(double[] avg){
+    private double getDistancesBAK(double[] avg){
     	maxDist = 0;
         float dstTarget = 0;
         float dstOther = 0;
@@ -642,12 +666,14 @@ public class Runner {
        }
        if ( maxDist == 0)return 0 ;
        double fak = 1./maxDist;
+       int indexOfTarget = Tools.getIndexOfTarget(targetColorIndex); 
        for (int f=0;f<DS.numSamples;f++){
+    	   if (booster[f][indexOfTarget] == 0) booster[f][indexOfTarget] = 1;
            distances[f] *= fak;
            if ( trainSet[f]) {
            	if ( DS.classIndex[f] == targetColorIndex ) {
-           		dstTarget += distances[f];
-           		targetCount++;
+           		dstTarget += (booster[f][indexOfTarget] * distances[f]);
+           		targetCount+=booster[f][indexOfTarget];
            	}
 	            if ( DS.classIndex[f] != targetColorIndex ) {
 	            	dstOther += distances[f];
@@ -657,7 +683,7 @@ public class Runner {
            
        }
        dstTarget	/= targetCount;
-       dstOther	/= OtherCount;
+       dstOther		/= OtherCount;
        dstTarget 	-= 0.5;
        dstOther 	-= 0.5;
        dstTarget 	*= 20;
@@ -665,10 +691,65 @@ public class Runner {
        return getMappedSigmoid(dstOther) - getMappedSigmoid(dstTarget);
        
     }
-    private float doClassify(boolean training) {
+    private double getDistances(double[] avg){
+    	maxDist = 0;
+        float[] dstPerClass = new float[DS.classAllIndices.length];
+        float[] classCount = new float[DS.classAllIndices.length];
+       if ( avg == null) avg = getAverageTarget();                        // Abstand vom Schwerpunkt Auswahl Target, Zahl zw 0 - 1
+       
+       distances = new double[DS.numSamples];
+       for (int f=0;f<DS.numSamples;f++){
+               double val = 0;
+               for (int i=0;i<Opts.numDims;i++) {
+                   val += (Math.pow(mcPCA[i][f]-avg[i], 2) );                
+               }
+           distances[f]=Math.pow(val, .5);
+           if ( distances[f]>maxDist ) maxDist = distances[f];
+       }
+       if ( maxDist == 0)return 0 ;
+       double fak = 1./maxDist;
+       int indexOfTarget = Tools.getIndexOfTarget(targetColorIndex); 
+       for (int f=0;f<DS.numSamples;f++){
+    	   if (booster[f][indexOfTarget] == 0) booster[f][indexOfTarget] = 1;		// init
+           distances[f] *= fak;
+           if ( trainSet[f]) {
+           	if ( DS.classIndex[f] == targetColorIndex ) {
+           		dstPerClass[indexOfTarget] += (booster[f][indexOfTarget] * distances[f]);
+           		classCount[indexOfTarget]+=booster[f][indexOfTarget];
+           	}
+	            if ( DS.classIndex[f] != targetColorIndex ) {
+	            	int indexOfOther = Tools.getIndexOfTarget(DS.classIndex[f]);
+	            	dstPerClass[indexOfOther] += distances[f];
+	            	classCount[indexOfOther]++;
+	            }
+           }
+           
+       }
+       double sum=0;
+       for (int i=0;i<DS.classAllIndices.length;i++) {
+    	   dstPerClass[i] 	/= classCount[i];
+    	   dstPerClass[i]	-= 0.5;
+    	   dstPerClass[i]	*= 20.;
+       }
+       for (int i=0;i<DS.classAllIndices.length;i++) {
+    	   if ( i != indexOfTarget )
+    		   sum +=  (getMappedSigmoid(dstPerClass[i]) - getMappedSigmoid(dstPerClass[indexOfTarget]));
+       }
+       sum /= (DS.classAllIndices.length-1);
+//       dstTarget	/= targetCount;
+//       dstOther		/= OtherCount;
+//       dstTarget 	-= 0.5;
+//       dstOther 	-= 0.5;
+//       dstTarget 	*= 20;
+//       dstOther 	*= 20;
+       return sum;
+       
+    }
+    private float doClassify(boolean training, boolean boost) {
         classification = new int [DS.numSamples];
         float tp=0, fp=0, tn=0, fn=0;
         float correct = 0;float all =0;
+        int indexOfTarget = Tools.getIndexOfTarget(targetColorIndex); 
         for (int i=0;i<DS.numSamples;i++){
             //if (trainSet[i]) {
                 if ( distances[i] < split/100) {
@@ -681,12 +762,14 @@ public class Runner {
                         }
                 }else {
                     classification[i] = -1;
-                    if (trainSet[i] == training)
+                    if ( boost &&  Opts.doBoost && DS.classIndex[i] == targetColorIndex ) booster[i][indexOfTarget] ++;
+                    if (trainSet[i] == training) {
                         if (DS.classIndex[i] == targetColorIndex) {
                             fp++;
                         }else {
                             tn++;//correct++;
                         }
+                    }
                 }
                 if (trainSet[i] == training && DS.classIndex[i] == targetColorIndex) all++;
         }
@@ -701,7 +784,7 @@ public class Runner {
     	
         double[] avg = new double[Opts.numDims];
         double count = 0;
-        if ( targetColorIndex>=0) {
+        if ( targetColorIndex>-1) {
             for (int f=0;f<DS.numSamples;f++){
                 if ( DS.classIndex[f] == targetColorIndex && trainSet[f] ){
                     for (int i=0;i<Opts.numDims;i++) {
@@ -720,7 +803,7 @@ public class Runner {
     }
     private double[] getMedianTarget() {
         double[] avg = new double[Opts.numDims];
-        if ( targetColorIndex>=0) {
+        if ( targetColorIndex>-1) {
             for (int i=0;i<Opts.numDims;i++) {
                 ArrayList<Double> mid = new ArrayList<Double>();
                 for (int f=0;f<DS.numSamples;f++){

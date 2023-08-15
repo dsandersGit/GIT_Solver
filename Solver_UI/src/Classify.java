@@ -18,16 +18,16 @@ public class Classify {
 	public  Classify() {
 		JSONObject ensemble = DS.js_Ensemble;
 		if (ensemble== null )return;
-		JSONObject ds = ensemble.getJSONObject("DS");
-		JSONObject opts = ensemble.getJSONObject("Opts");
-		JSONArray models = ensemble.getJSONArray("model");
+		JSONObject ds 		= ensemble.getJSONObject("DS");
+		JSONObject opts 	= ensemble.getJSONObject("Opts");
+		JSONArray models 	= ensemble.getJSONArray("model");
 		
-		int targetColorIndex = -1;
+		int targetColorIndex 	= -1;
 		String targetName 		= "";
 		double accuracyTest 	= 0;
 		double accuracyTrain 	= 0;
 		double split 			= -1;
-		double maxDst		= 0;
+		double maxDst			= 0;
 		int numVars				= -1;
 		int numClasses			= -1;
 		Opts.numDims 			= opts.getInt(		"numDims");
@@ -70,10 +70,10 @@ public class Classify {
 		numVars = DS.normParas[0].length;
 		DS.numClasses = DS.classAllIndices.length;
 		
-		double[][] mc = new double[DS.numVars][Opts.numDims];
-		double[] avgs = new double[Opts.numDims];
+		double[][] mc 						= new double[DS.numVars][Opts.numDims];
+		double[] avgs 						= new double[Opts.numDims];
 		double[][] sumUpClassification 		= new double[DS.numSamples][DS.classAllIndices.length];
-		double[] fullBonusClassification = new double[DS.classAllIndices.length];
+		double[] fullBonusClassification 	= new double[DS.classAllIndices.length];
 		
 		
 		for (int i=0;i<models.length(); i++) {
@@ -103,7 +103,7 @@ public class Classify {
 				targetCount++;
 			}
 			
-			double bonus = accuracyTest * accuracyTest; 													/// mmmmhhhh ?????
+			double bonus = accuracyTest * accuracyTest; 													
 			if ( trainCount == targetCount)
 				bonus = accuracyTrain * accuracyTrain; 														/// Training ohne TestDaten
 			fullBonusClassification[getTargetColorIndexPos (targetColorIndex)] += 1;						//; + bonus ?
