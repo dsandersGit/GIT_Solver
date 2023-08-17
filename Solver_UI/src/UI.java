@@ -208,21 +208,22 @@ public class UI {
 			txtOpts.setText(SolverStart.defOptions.toString(3));
 		}});
 		
+		
 		maintabbed.add("Data",scSummary);
 		maintabbed.add("Options",panOptions);
 		maintabbed.add("Live", panLive);
-		maintabbed.addTab("3D",tab3D);
+		//maintabbed.addTab("3D",tab3D);
 		maintabbed.add("Validation",scStat);
 		maintabbed.add("Ensemble",scEnsemble);
 		maintabbed.add("Classification", sc);
 		
-		tab_Classify 	= 6;
+		tab_Classify 	= 5;
 		tab_Train 		= 2;
 		tab_Distance 	= 2;
-		tab_3D 			= 3;
+//		tab_3D 			= 3;
 		tab_Opts 		= 1;
 		tab_Summary 	= 0;
-		tab_Statistics 	= 4;
+		tab_Statistics 	= 3;
 		
 		
 		txtOpts.setWrapStyleWord(true);
@@ -288,7 +289,7 @@ public class UI {
 		        return false;
 		    }
 		 try {
-			Opts.dstType 		= jo_Opts.getString("dstType");
+//			Opts.dstType 		= jo_Opts.getString("dstType");
 			Opts.normType 		= jo_Opts.getString("normType");
 			Opts.numDims 		= jo_Opts.getInt("numDims");
 			Opts.trainRatio 	= jo_Opts.getDouble("trainRatio");
@@ -298,10 +299,16 @@ public class UI {
 			Opts.plotTimer 		= jo_Opts.getInt("plotTimer");
 			Opts.fixTrainSet 	= jo_Opts.getBoolean("fixTrainSet");
 //			Opts.doTheLeft 		= jo_Opts.getBoolean("doTheLeft");
-			Opts.kickStart 		= jo_Opts.getBoolean("kickStart");
+//			Opts.kickStart 		= jo_Opts.getBoolean("kickStart");
 			Opts.activation		= jo_Opts.getString("activation");
-			Opts.minBootstarpSamples		= jo_Opts.getInt("minBootstarpSamples");
-			Opts.doBoost		= jo_Opts.getBoolean("doBoost");
+//			int newBootstarpSamples		= jo_Opts.getInt("minBootstarpSamples");
+//			if ( Opts.minBootstarpSamples != newBootstarpSamples) {
+//				Opts.minBootstarpSamples = newBootstarpSamples;
+//				JOptionPane.showConfirmDialog(jF, "You need to reload dataset to apply changes", "Options changed",  JOptionPane.INFORMATION_MESSAGE);
+//			}
+			
+//			Opts.doBoost		= jo_Opts.getBoolean("doBoost");
+//			Opts.largeStep		= jo_Opts.getDouble("largeStep");
 		  } catch (JSONException e) {
 			  txtOpts.setText(Opts.getOptsAsJson().toString(3));
 		        return false;
@@ -779,7 +786,7 @@ public class UI {
 		menuAboutCredits.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			JOptionPane.showMessageDialog(null, "<HTML> used libraries and dependencies: <ul>"
 					+ "<li>JSON java libraries from JSON.org</li>"
-					+ "<li>FlatLaf - Flat Look and Feel Theme</li>"
+					//+ "<li>FlatLaf - Flat Look and Feel Theme</li>"
 					+ "</ul><BR>", "CREDITS", JOptionPane.INFORMATION_MESSAGE);
 		}});
 		//-------------------------------------------------------------------------------------------------------------------
@@ -922,7 +929,7 @@ public class UI {
 		
 		new DS();												// INITS
 		
-		SolverStart.bootstrap() ;
+//		SolverStart.bootstrap() ;
 		
 		DS.normParas = Tools.doNormData ();				// Daten Normalisieren
 		SolverStart.dataFileName = f.getName();

@@ -23,23 +23,23 @@ public class Opts {
 	public static int		plotTimer				= 50;					// Plot wird gezeigt alle NNN Millisekunden
 	public static boolean	fixTrainSet 			= false;					// One Trainset for full ensemble (true) or per cycle (false)
 
-	public static double	largeStep	 			= 0.2;					// Random step
+//	public static double	largeStep	 			= 0.2;					// Random step
 	public static boolean	useMedian	 			= false;				// Median / Average for Center of Target
 	
 	public static int  		minPopulation 			= 25;					// No User Option! minimal Population of classes for split
 	public static int  		minVariableCount		= 2;					// No User Option! minimal number of variables
 	public static int  		retainModelNum 			= 3;					// Model per class in reduced ensemble
 	
-	public static int  		minBootstarpSamples		= 1;					// Model per class in reduced ensemble
+//	public static int  		minBootstarpSamples		= 1;					// Model per class in reduced ensemble
 	public static boolean 	doBoost					= false;
 
 //	public static boolean	doTheLeft	 			= false;				// One Trainset for full ensemble (true) or per cycle (false)
-	public static boolean	kickStart	 			= false;					// One Trainset for full ensemble (true) or per cycle (false)
+//	public static boolean	kickStart	 			= false;					// One Trainset for full ensemble (true) or per cycle (false)
 	
 
 	public static JSONObject getOptsAsJson() {
 		JSONObject out = new JSONObject();
-		out.put("dstType", 		dstType);
+//		out.put("dstType", 		dstType);
 		out.put("normType", 	normType);
 		out.put("numDims", 		numDims);
 		out.put("trainRatio", 	trainRatio);
@@ -49,12 +49,12 @@ public class Opts {
 		out.put("fixTrainSet", 	fixTrainSet);
 //		out.put("doTheLeft", 	doTheLeft);
 		out.put("plotTimer", 	plotTimer);
-		out.put("kickStart", 	kickStart);
+//		out.put("kickStart", 	kickStart);
 		out.put("activation", 	activation);
-		out.put("largeStep", 	largeStep);
+//		out.put("largeStep", 	largeStep);
 		out.put("useMedian", 	useMedian);
-		out.put("doBoost", 		doBoost);
-		out.put("minBootstarpSamples", 	minBootstarpSamples);
+//		out.put("doBoost", 		doBoost);
+//		out.put("minBootstarpSamples", 	minBootstarpSamples);
 		
 
 		return out;

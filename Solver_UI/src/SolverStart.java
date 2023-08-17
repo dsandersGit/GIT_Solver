@@ -60,6 +60,7 @@ public class SolverStart {
 	 * 52: First round > Fully random
 	 * 53: Booster
 	 * 54: AutoLoad lastEnsemble
+	 * 55: Options reduced
 	 */
  
 	
@@ -69,34 +70,34 @@ public class SolverStart {
 	// Split > Disperse > Merge > Measure	S{DiM}n
 	public static String 	app 			= "uSort";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 54";
+	public static String 	revision 		= " 55";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
-	public static boolean 	darkMode 		= true;
+	public static boolean 	darkMode 		= false;
 	public static Color 	backColor 		= Color.DARK_GRAY;
 	public static Color 	frontColor 		= Color.LIGHT_GRAY;
 	public static JSONObject defOptions     = null;
 	public static String dataFileName = "";
 	
 	public static void main(String[] args) {
-//		
-//		try {
-//	          //UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel"); 
-//			backColor 	= new Color(255,255,253);
-//			frontColor 	= Color.DARK_GRAY;
-//	          UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-//			}catch( Exception be ) { be.printStackTrace(); }
-//		
-		if ( darkMode ) {
-			FlatDarkLaf.setup();
-			backColor 	= Color.DARK_GRAY;
-			frontColor 	= new Color(255,255,237);
-		}else {
-			FlatLightLaf.setup();
-			backColor 	= new Color(255,255,237);
+		
+		try {
+	          //UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel"); 
+			backColor 	= new Color(255,255,253);
 			frontColor 	= Color.DARK_GRAY;
-		}
+	          UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+			}catch( Exception be ) { be.printStackTrace(); }
+		
+//		if ( darkMode ) {
+//			FlatDarkLaf.setup();
+//			backColor 	= Color.DARK_GRAY;
+//			frontColor 	= new Color(255,255,237);
+//		}else {
+//			FlatLightLaf.setup();
+//			backColor 	= new Color(255,255,237);
+//			frontColor 	= Color.DARK_GRAY;
+//		}
 		
 		defOptions = Opts.getOptsAsJson();
 		new UI();
@@ -167,9 +168,7 @@ public class SolverStart {
 		Runner.cleanRunner();
 		
 		// Not confuse useres > disable 3D if not 3 dims are selected
-		UI.maintabbed.setEnabledAt(UI.tab_3D, true);
-		if ( Opts.numDims != 3) UI.maintabbed.setEnabledAt(UI.tab_3D, false);
-
+		
 		
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));
 		for (int i=0;i<Opts.numEnsemble;i++) {
@@ -693,46 +692,53 @@ public class SolverStart {
 		     }
 	        return true;
 	}
-	public static void bootstrap() {
-		
-//		String erg = JOptionPane.showInputDialog(UI.jF, "Bootstrap Factor: ", 1);
-//		if ( erg == null || erg == "1") return;
-//		int fac = 0;
-//		try {
-//			fac = Integer.parseInt(erg);
-//		}catch (NumberFormatException e) {
-//			return;
+//	public static void bootstrap() {
+//		
+//////		// TODO: Histogramm Bootstrapping 
+////		for (int a=0;a<DS.numVars; a++) {
+////			double min = -1;
+////			double max = -1;
+////			for (int f=0;f<DS.numSamples; f++) {
+////				if ( f==0 || min > DS.rawData[f][a] )  min = DS.rawData[f][a];
+////				if ( f==0 || max < DS.rawData[f][a] )  max = DS.rawData[f][a];
+////			}
+////			for (int c=0;c<DS.numClasses;c++) {
+////				int[][] histo = new int[DS.classAllIndPop[c]][100];
+////				
+////			}
+////			
+////		}
+//		
+//		int fac = 1 + Opts.minBootstarpSamples / DS.rawData.length;
+//		
+//		if ( fac <= 1) return;
+//		
+//		int nNumSamples = DS.rawData.length*fac;
+//		int nNumVars 	= DS.rawData[0].length;
+//		
+//		System.out.println(nNumSamples);
+//		double[][] nRawData = new double[nNumSamples][nNumVars];
+//		String[] nSampleNames = new String[nNumSamples];
+//		String[] nClassNames = new String[nNumSamples];
+//		int[] nClassColorIndex = new int[nNumSamples];;
+//		
+//		int c = 0;
+//		while (c<nNumSamples) {
+//			int r = (int) (Math.random()*DS.rawData.length);
+//			for (int a = 0; a < nNumVars; a++) {
+//				nRawData[c][a] = DS.rawData[r][a];
+//			}
+//			nSampleNames[c] 	= DS.SampleNames[r] + "_syn_"+c;
+//			nClassNames[c] 		= DS.ClassNames[r];
+//			nClassColorIndex[c]	= DS.classIndex[r];
+//			c++;
 //		}
-		int fac = 1 + Opts.minBootstarpSamples / DS.rawData.length;
-		
-		if ( fac <= 1) return;
-		
-		int nNumSamples = DS.rawData.length*fac;
-		int nNumVars 	= DS.rawData[0].length;
-		
-		System.out.println(nNumSamples);
-		double[][] nRawData = new double[nNumSamples][nNumVars];
-		String[] nSampleNames = new String[nNumSamples];
-		String[] nClassNames = new String[nNumSamples];
-		int[] nClassColorIndex = new int[nNumSamples];;
-		
-		int c = 0;
-		while (c<nNumSamples) {
-			int r = (int) (Math.random()*DS.rawData.length);
-			for (int a = 0; a < nNumVars; a++) {
-				nRawData[c][a] = DS.rawData[r][a];
-			}
-			nSampleNames[c] 	= DS.SampleNames[r] + "_syn_"+c;
-			nClassNames[c] 		= DS.ClassNames[r];
-			nClassColorIndex[c]	= DS.classIndex[r];
-			c++;
-		}
-		DS.rawData 			= nRawData;
-		DS.SampleNames		= nSampleNames;
-		DS.ClassNames		= nClassNames;
-		DS.classIndex		= nClassColorIndex;
-		DS.numSamples		= nNumSamples;
-
-		
-	}
+//		DS.rawData 			= nRawData;
+//		DS.SampleNames		= nSampleNames;
+//		DS.ClassNames		= nClassNames;
+//		DS.classIndex		= nClassColorIndex;
+//		DS.numSamples		= nNumSamples;
+//
+//		
+//	}
 }

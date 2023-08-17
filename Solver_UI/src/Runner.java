@@ -114,10 +114,10 @@ public class Runner {
         }
         
         // KickStart
-        if ( Opts.kickStart) {
-	        int a = toTheLeft();
-	        //mcEigenVec [a][0] =     toTheTop(a);
-        }
+//        if ( Opts.kickStart) {
+//	        int a = toTheLeft();
+//	        //mcEigenVec [a][0] =     toTheTop(a);
+//        }
         int step = 100;
         while ( reDo( -1 ) && !SolverStart.immediateStop ) {
         	absCount++;
@@ -433,7 +433,7 @@ public class Runner {
 	}
 	private int zufi(int again){
     	
-		double large = Opts.largeStep;
+		double large = 0.2;
 		double small = large*0.1;
         int z0     = (int)Math.floor(Math.random()*10);                // zufi
         Random random = ThreadLocalRandom.current();
@@ -454,7 +454,7 @@ public class Runner {
             break;
         case 1:
             //mcEigenVec [a][pc]  +=     1.-Math.random()*2;                // EIN Area, EIN PCA's Zufallswert
-            mcEigenVec [a][pc] = -r.nextDouble()+r.nextDouble();
+            mcEigenVec [a][pc] = -r.nextDouble()*large+r.nextDouble()*large;
             break;
         case 2:
             for (int sa=0;sa<DS.numVars;sa++){                        // EIN Area, EIN PCA's Zufallswert
@@ -508,7 +508,7 @@ public class Runner {
             break;
         }
         
-        
+
         
         return a;
     }
