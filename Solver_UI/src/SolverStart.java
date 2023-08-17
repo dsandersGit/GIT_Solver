@@ -64,10 +64,7 @@ public class SolverStart {
 	 */
  
 	
-	// Disperse > Recombine Departing
-	// Disperse > Merge Measure
-	// Combine > Merge > Measure
-	// Split > Disperse > Merge > Measure	S{DiM}n
+	
 	public static String 	app 			= "uSort";
 	public static String 	appAdd 			= " 0.1";
 	public static String 	revision 		= " 55";

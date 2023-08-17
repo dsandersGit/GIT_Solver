@@ -39,7 +39,7 @@ public class Opts {
 
 	public static JSONObject getOptsAsJson() {
 		JSONObject out = new JSONObject();
-//		out.put("dstType", 		dstType);
+		out.put("dstType", 		dstType);
 		out.put("normType", 	normType);
 		out.put("numDims", 		numDims);
 		out.put("trainRatio", 	trainRatio);
