@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.BufferedWriter;
@@ -24,7 +25,9 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -43,6 +46,8 @@ import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -181,7 +186,16 @@ public class UI {
 		txtOpts.setBackground(SolverStart.backColor);
 		txtOpts.setForeground(SolverStart.frontColor);
 		txtOpts.setFont(new Font("Consolas", Font.PLAIN, 20));
-	
+//		 MouseListener mouseListenerHelp = new MouseAdapter() {
+//             
+//			public void mouseClicked(MouseEvent mouseEvent) {
+//            	  if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
+//            		  Tools.txtHelp(txtOpts.getSelectedText());
+//	              }
+//                
+//            }};
+//            txtOpts.addMouseListener(mouseListenerHelp);
+	 
 		
 		txtEnsemble.setOpaque(false);
 		txtEnsemble.setEditable(false);
@@ -290,17 +304,17 @@ public class UI {
 		    }
 		 try {
 //			Opts.dstType 		= jo_Opts.getString("dstType");
-			Opts.normType 		= jo_Opts.getString("normType");
-			Opts.numDims 		= jo_Opts.getInt("numDims");
-			Opts.trainRatio 	= jo_Opts.getDouble("trainRatio");
-			Opts.numEnsemble 	= jo_Opts.getInt("numEnsemble");
-			Opts.noBetterStop 	= jo_Opts.getInt("noBetterStop");
-			Opts.minBetter 		= jo_Opts.getDouble("minBetter");
-			Opts.plotTimer 		= jo_Opts.getInt("plotTimer");
-			Opts.fixTrainSet 	= jo_Opts.getBoolean("fixTrainSet");
+			if (jo_Opts.has("normType")) 	Opts.normType 		= jo_Opts.getString("normType");
+			if (jo_Opts.has("numDims")) 	Opts.numDims 		= jo_Opts.getInt("numDims");
+			if (jo_Opts.has("trainRatio"))	Opts.trainRatio 	= jo_Opts.getDouble("trainRatio");
+			if (jo_Opts.has("numCyles")) 	Opts.numCyles 		= jo_Opts.getInt("numCyles");
+			if (jo_Opts.has("noBetterStop")) 	Opts.noBetterStop 	= jo_Opts.getInt("noBetterStop");
+			if (jo_Opts.has("minBetter")) 	Opts.minBetter 		= jo_Opts.getDouble("minBetter");
+			if (jo_Opts.has("plotTimer")) 	Opts.plotTimer 		= jo_Opts.getInt("plotTimer");
+			if (jo_Opts.has("fixTrainSet")) 	Opts.fixTrainSet 	= jo_Opts.getBoolean("fixTrainSet");
 //			Opts.doTheLeft 		= jo_Opts.getBoolean("doTheLeft");
 //			Opts.kickStart 		= jo_Opts.getBoolean("kickStart");
-			Opts.activation		= jo_Opts.getString("activation");
+			if (jo_Opts.has("activation")) 	Opts.activation		= jo_Opts.getString("activation");
 //			int newBootstarpSamples		= jo_Opts.getInt("minBootstarpSamples");
 //			if ( Opts.minBootstarpSamples != newBootstarpSamples) {
 //				Opts.minBootstarpSamples = newBootstarpSamples;
@@ -452,6 +466,8 @@ public class UI {
 		tmtableStat.addColumn("Sensitivity_Test");
 		tmtableStat.addColumn("Speciticity_Test");
 		
+//		tmtableStat.addColumn("area");
+		
 	  
 		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 	        /**
@@ -579,12 +595,16 @@ public class UI {
 		menuActionTrainImmediateStop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CANCEL, InputEvent.CTRL_DOWN_MASK));
 		menuAction.add(new JSeparator());
 		menuAction.add(menuActionClassify);	
+		menuAction.add(new JSeparator());
+		menuAction.add(new JSeparator());
+		JMenuItem menuActionOptions = new JMenuItem(" Options"); 
+		menuAction.add(menuActionOptions);
 		// ---------------------------------------------------------------------
 		
 		JMenuItem menuExportVectors = new JMenuItem(" Vectors"); 
 		menuExport.add(menuExportVectors);
 		JMenuItem menuExportVectorsWeight = new JMenuItem(" Weighed Vectors (VIP Scores)"); 
-		menuExportVectorsWeight.setEnabled(false);
+		//menuExportVectorsWeight.setEnabled(false);
 		menuExport.add(menuExportVectorsWeight);
 		JMenuItem menuExportClassification = new JMenuItem(" Classification"); 
 		menuExport.add(menuExportClassification);
@@ -641,6 +661,61 @@ public class UI {
 			maintabbed.setSelectedIndex(tab_Classify);
 			SolverStart.classify();
 		}});
+		
+		menuActionOptions.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
+		
+			JLabel lab_noBetter = new JLabel ("Number of tolerated non-improvement " + Opts.noBetterStop );
+			JSlider sld_noBetter = new JSlider (100,10000,1000);
+			sld_noBetter.setMajorTickSpacing(500);
+			sld_noBetter.setMinorTickSpacing(100);
+			sld_noBetter.setPaintTicks(true);
+			sld_noBetter.addChangeListener(new ChangeListener() {
+		        @Override
+		        public void stateChanged(ChangeEvent event) {
+		            int val = ((JSlider)event.getSource()).getValue();
+		            lab_noBetter.setText("Number of tolerated non-improvement " + val);
+		        }
+		    });
+			JLabel lab_actMode = new JLabel ("Set activation function");
+			String[] actModes = {"DxA", "D+A", "A"};
+			JComboBox<String> cbo_act = new JComboBox<String>(actModes);
+			
+			JLabel lab_dstMode = new JLabel ("Set distance function");
+			String[] dstModes = {"GROUP", "EGO"};
+			JComboBox<String> cbo_dst = new JComboBox<String>(dstModes);
+			
+			JLabel lab_train = new JLabel ("Set train/test ratio");
+			JSlider sld_train = new JSlider (10,100,70);
+			sld_train.setMajorTickSpacing(10);
+			sld_train.setPaintTicks(true);
+			sld_train.addChangeListener(new ChangeListener() {
+		        @Override
+		        public void stateChanged(ChangeEvent event) {
+		            int val = ((JSlider)event.getSource()).getValue();
+		            lab_train.setText("Set train/test ratio " + ((float)val/100.));
+		        }
+		    });
+			JCheckBox chk_fixTrain = new JCheckBox("Fix trainset", Opts.fixTrainSet);
+			
+			JPanel jp = new JPanel();
+		 	jp.setLayout(new BoxLayout(jp,BoxLayout.Y_AXIS));
+			Object[] array = new Object[1];
+			jp.add(lab_noBetter);
+			jp.add(sld_noBetter);
+			jp.add(lab_actMode);
+			jp.add(cbo_act);
+			jp.add(lab_dstMode);
+			jp.add(cbo_dst);
+			jp.add(lab_train);
+			jp.add(sld_train);
+			jp.add(chk_fixTrain);
+			array[0] = jp;
+		    int eingabe = JOptionPane.showConfirmDialog(null,array,"Options", JOptionPane.OK_CANCEL_OPTION);
+		    if(eingabe != 0){
+		    	return;
+		    }
+			
+		}});
 		// *******************************
 		menuExportVectors.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 			JSONObject ensemble = DS.js_Ensemble;
@@ -679,29 +754,41 @@ public class UI {
 			if (ensemble== null )return;
 			JSONArray models = ensemble.getJSONArray("model");
 			JSONObject ds = ensemble.getJSONObject("DS");
+			JSONObject opts = ensemble.getJSONObject("Opts");
 			String VariableNames = ds.getString("VariableNames");
 			String[] varNames = VariableNames.split(",");
-	
-			double[] weight = new double[varNames.length];
+			int numDims = opts.getInt("numDims");
+			
+			double[][] weight = new double[varNames.length][DS.numClasses];
 			for (int i=0;i<models.length(); i++) {
 				JSONObject in = models.getJSONObject(i);
-				int numDims = in.getInt("Opts.numDims");
+				int index = in.getInt("targetColorIndex");
+				int index0 = Tools.getIndexOfTarget(index);
 				for (int p=0;p<numDims; p++) {
 					String vTemp = in.getString(		"Vector"+p);
 					String[] line = vTemp.split(","); 
 					for (int a=0; a<line.length;a++) {
-						weight[a] += Double.parseDouble(line[a].trim())*Double.parseDouble(line[a].trim());
+						weight[a][index0] += Math.abs(Double.parseDouble(line[a].trim()));
 					}
 				}
 
 			}
-			for (int a=0; a<weight.length;a++) {
-				weight[a] = Math.sqrt(weight[a]);
-			}
+			
 			StringBuffer out = new StringBuffer();
-			out.append("Weighted Vectors" + "\n");
+			out.append("Weighted Vectors" );
+			for (int c=0; c<DS.numClasses;c++) {
+				out.append("\t" + Tools.getClassNameOfIndex(c));
+			}
+			out.append("\n");
 			for (int a=0; a<weight.length;a++) {
-				out.append(varNames[a]+"\t"+weight[a] +"\n");
+				for (int c=0; c<DS.numClasses;c++) {	
+					if ( c == 0) {
+						out.append(varNames[a]+"\t"+weight[a][c] +"\t");
+					}else {
+						out.append(weight[a][c] +"\t");
+					}
+				}
+				out.append("\n");
 			}
 			StringSelection stringSelection = new StringSelection( out.toString() );
 		    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -778,7 +865,9 @@ public class UI {
 		
 		// *******************************
 		menuAboutAbout.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
-			JOptionPane.showMessageDialog(jF, "<HTML><H3>"+SolverStart.app+" rev."+SolverStart.revision+"</H3><I>Copyright 2009-2023 Daniel Sanders</I>");
+			JOptionPane.showMessageDialog(jF, "<HTML><H3>"+SolverStart.app+" rev."+SolverStart.revision+"</H3>"
+					+ "<I>Copyright 2009-2023 Daniel Sanders</I><BR>Check for updates:<BR>"
+					+ "https://github.com/dsandersGit/GIT_Solver/tags");
 		}});
 		menuAboutLicense.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			JOptionPane.showMessageDialog(jF, "<HTML><I>Licensed under GNU General Public License v3.0</I>", SolverStart.app,  JOptionPane.INFORMATION_MESSAGE);

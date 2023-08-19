@@ -17,8 +17,8 @@ public class Opts {
 	//
 	public static int 		numDims			 		= 3; 					// Number of Neurons / Dimensions
 	public static double 	trainRatio				= 0.7;					// test / train > ratio of training to sample data  0 = full target 1 - no rget
-	public static int 		numEnsemble				= 5;					// Count of runs per index
-	public static int 		noBetterStop 			= 500;					// Akzeptierte Fehlversuche
+	public static int 		numCyles				= 5;					// Count of runs per index
+	public static int 		noBetterStop 			= 2500;					// Akzeptierte Fehlversuche
 	public static double	minBetter 				= 0.999d;				// Mindest Verbesserung nach akzeptierten Fehlveruchen
 	public static int		plotTimer				= 50;					// Plot wird gezeigt alle NNN Millisekunden
 	public static boolean	fixTrainSet 			= false;					// One Trainset for full ensemble (true) or per cycle (false)
@@ -39,20 +39,20 @@ public class Opts {
 
 	public static JSONObject getOptsAsJson() {
 		JSONObject out = new JSONObject();
-		out.put("dstType", 		dstType);
+		out.put("dstType", 		dstType);				
 		out.put("normType", 	normType);
-		out.put("numDims", 		numDims);
-		out.put("trainRatio", 	trainRatio);
-		out.put("numEnsemble", 	numEnsemble);
-		out.put("noBetterStop", noBetterStop);
+		out.put("numDims", 		numDims);					// **
+		out.put("trainRatio", 	trainRatio);				// **
+		out.put("numCyles", 	numCyles);					// **
+		out.put("noBetterStop", noBetterStop);				// **
 		out.put("minBetter", 	minBetter);
-		out.put("fixTrainSet", 	fixTrainSet);
+		out.put("fixTrainSet", 	fixTrainSet);				// **
 //		out.put("doTheLeft", 	doTheLeft);
-		out.put("plotTimer", 	plotTimer);
+		//out.put("plotTimer", 	plotTimer);
 //		out.put("kickStart", 	kickStart);
 		out.put("activation", 	activation);
 //		out.put("largeStep", 	largeStep);
-		out.put("useMedian", 	useMedian);
+		//out.put("useMedian", 	useMedian);
 //		out.put("doBoost", 		doBoost);
 //		out.put("minBootstarpSamples", 	minBootstarpSamples);
 		

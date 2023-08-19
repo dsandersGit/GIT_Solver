@@ -26,6 +26,7 @@ public class Runner {
 	double curr_Dist 				= 0;
 	double[] distances 				= null;
 	double distanceOld				= 0;
+	//double anotherIndication		=0;
 	double dstLatestMax				= 0;
 	double innerDstOld				= 0;
 	int notBetterCount				= 0;
@@ -163,7 +164,7 @@ public class Runner {
 	        
 	        
 	        if (doDistxAccur)
-				ndst *= (accuracy*accuracy);
+				ndst *= (accuracy);
 	        if (doAccur)
 				ndst = accuracy;
 
@@ -214,10 +215,12 @@ public class Runner {
         calcPlot();
         if ( Opts.dstType.contentEquals("EGO"))         ndst = getDistancesEGO(null);
         if ( Opts.dstType.contentEquals("GROUP"))         ndst = getDistances(null);
+        
+    
         getSplit();
         accuracy = doClassify(true, true);
         if (doDistxAccur)
-			ndst *= (accuracy*accuracy);
+			ndst *= (accuracy);
         if (doAccur)
 			ndst = accuracy;
         //--------------------------------------------
@@ -363,6 +366,7 @@ public class Runner {
 	            int fiendTstCount =0;
 	            int foeTstCount =0;
 	            double imax = 0;
+	            
 	           
 	            for (int i=0;i<distances.length;i++) {
 	                if ( imax < distances[i])  imax = distances[i];
@@ -417,6 +421,7 @@ public class Runner {
 	                    foeRatioTst[i] = DS.numSamples*sum/foeTstCount;
 	                }
 	            }
+
 	            for (int i=0;i<fx.length;i++) {
 	            	fx[i] = (float)(i/100.);
 	            	
@@ -594,7 +599,8 @@ public class Runner {
         DS.freezs.get(DS.freezs.size()-1).split    				= split;
         DS.freezs.get(DS.freezs.size()-1).classification   		= classification.clone();
         DS.freezs.get(DS.freezs.size()-1).tp_fp_tn_fn   		= tp_fp_tn_fn.clone();
-
+        //DS.freezs.get(DS.freezs.size()-1).area	   				= anotherIndication;
+//System.out.println(distanceOld + "\t" + anotherIndication);
        
     }
     private void calcPlot(){												// Calculate responce of Neurons
@@ -857,6 +863,16 @@ public class Runner {
                 sum +=foeRatio[i];
                 foeRatio[i] = 100*sum/foeTrainCount;
             }
+            
+//        	for (int i=0;i<fiendRatio.length;i++) {
+//        		if ( fiendRatio[i] >= foeRatio[i]) {
+//        			anotherIndication +=(100-fiendRatio[i]);
+//        		}else {
+//        			anotherIndication +=(100-foeRatio[i]);
+//        		}
+//            }
+//            anotherIndication /= 101;
+            
             split =0 ;
             boolean has0Split = false;int startSplit = 0;
             for (int i=0;i<foeRatio.length;i++) {

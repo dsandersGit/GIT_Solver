@@ -18,6 +18,7 @@ public class MC_Freeze {
 	boolean[] 			isTrain = null;
 	int[] 				sampleColorIndices = null;
 	public int[][] 		tp_fp_tn_fn = null;
+	//public double area	= 0;
 	
 	public MC_Freeze(double dst, double[][] mc){
 		this.distance 	= dst;
@@ -71,6 +72,7 @@ public class MC_Freeze {
 		out.put("targetColorIndex", targetColorIndex);
 		out.put("targetLabel", 		targetLabel);
 		out.put("maxDistance", 		maxDistance);
+//		out.put("area", 			area);
 	
 		StringBuffer tmp = new StringBuffer();
         for (int i=0;i<Opts.numDims;i++) {

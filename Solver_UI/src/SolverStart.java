@@ -16,8 +16,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatLightLaf;
 
 public class SolverStart {
 	
@@ -61,13 +59,16 @@ public class SolverStart {
 	 * 53: Booster
 	 * 54: AutoLoad lastEnsemble
 	 * 55: Options reduced
+	 * 56: anotherIndication
+	 * 57: anotherIndication removed, less options
+	 * 58: BugFixes
 	 */
  
 	
 	
 	public static String 	app 			= "uSort";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 55";
+	public static String 	revision 		= " 58";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -80,21 +81,10 @@ public class SolverStart {
 	public static void main(String[] args) {
 		
 		try {
-	          //UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel"); 
 			backColor 	= new Color(255,255,253);
 			frontColor 	= Color.DARK_GRAY;
 	          UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 			}catch( Exception be ) { be.printStackTrace(); }
-		
-//		if ( darkMode ) {
-//			FlatDarkLaf.setup();
-//			backColor 	= Color.DARK_GRAY;
-//			frontColor 	= new Color(255,255,237);
-//		}else {
-//			FlatLightLaf.setup();
-//			backColor 	= new Color(255,255,237);
-//			frontColor 	= Color.DARK_GRAY;
-//		}
 		
 		defOptions = Opts.getOptsAsJson();
 		new UI();
@@ -131,7 +121,7 @@ public class SolverStart {
 		DS.fixedTrainSet = null;
 		
 		JSONObject main = new JSONObject();
-		main.put("creator", SolverStart.app + SolverStart.appAdd);
+		main.put("creator", SolverStart.app + SolverStart.appAdd + " r" + SolverStart.revision);
 		StringBuffer out = new StringBuffer();
 		out.append(Opts.getOptsAsJson().toString(3));
 		out.append(DS.getDSsAsJson().toString(3));
@@ -151,25 +141,21 @@ public class SolverStart {
 		long tmeStart = System.currentTimeMillis();
 		double tmeCount = 0;
 		double timeSum = 0;
-		int cycles = Opts.numEnsemble*DS.numClasses;
+		int cycles = Opts.numCyles*DS.numClasses;
 		double avgTime = 0;
 		
 		boolean activationIsDst = false;
 		boolean activationBoth = false;
-		if ( Opts.activation.equals("DxA") )activationIsDst = true;		// HERE FIRST ACCURACY; THEN DISTANCE IS APPLIED
+		if ( Opts.activation.equals("DxA") )activationIsDst = true;		
 		if ( Opts.activation.equals("D+A") )activationBoth = true;
-		
-		
 		
 		UI.refreshStatus();
 		Runner.cleanRunner();
 		
-		// Not confuse useres > disable 3D if not 3 dims are selected
-		
 		
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));
-		for (int i=0;i<Opts.numEnsemble;i++) {
-			UI.proStatus.setValue(100*i/Opts.numEnsemble);
+		for (int i=0;i<Opts.numCyles;i++) {
+			UI.proStatus.setValue(100*i/Opts.numCyles);
 			for (int j=0;j<DS.classAllIndices.length;j++) {
 				if ( !SolverStart.immediateStop ) {	
 					if ( activationBoth) {
@@ -217,33 +203,32 @@ public class SolverStart {
 			}
 		}
 		
-		
-		// Remove bad performing models, retains Opts.retainModelNum per class
-		if ( DS.freezs.size()>Opts.retainModelNum) {
-			int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Shrink ensemble?</H3> <BR> Number of models will be reduced to "+Opts.retainModelNum+" per class<BR> Only best perfoming models remain.</HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-			if ( erg == JOptionPane.YES_OPTION) {
-				
-				while (DS.freezs.size() > Opts.retainModelNum*DS.numClasses) {
-					for (int j=0;j<DS.classAllIndices.length;j++) {
-						int killTarget = DS.classAllIndices[j];
-						int kill = -1;double min = 5;
-						for (int i=0;i<DS.freezs.size();i++) {
-							MC_Freeze mc = DS.freezs.get(i);
-							if ( killTarget == mc.targetColorIndex ) {
-								if ( mc.accuracyTest < min || i==0) {
-									min = mc.accuracyTest;
-									kill = i;
+		// Prune Ensemble: Remove bad performing models, retains Opts.retainModelNum per class
+				if ( DS.freezs.size()>Opts.retainModelNum) {
+					int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Shrink ensemble?</H3> <BR> Number of models will be reduced to "+Opts.retainModelNum+" per class<BR> Only best perfoming models remain.</HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+					if ( erg == JOptionPane.YES_OPTION) {
+						
+						while (DS.freezs.size() > Opts.retainModelNum*DS.numClasses) {
+							for (int j=0;j<DS.classAllIndices.length;j++) {
+								int killTarget = DS.classAllIndices[j];
+								int kill = -1;double min = 5;
+								for (int i=0;i<DS.freezs.size();i++) {
+									MC_Freeze mc = DS.freezs.get(i);
+									if ( killTarget == mc.targetColorIndex ) {
+										if ( mc.accuracyTest < min || i==0) {
+											min = mc.accuracyTest;
+											kill = i;
+										}
+									}
+								}// DS.freeze.size
+								if (kill>-1) {
+									DS.freezs.remove(kill);
+									UI.tmtableStat.removeRow(kill);
 								}
 							}
-						}// DS.freeze.size
-						if (kill>-1) {
-							DS.freezs.remove(kill);
-							UI.tmtableStat.removeRow(kill);
 						}
 					}
 				}
-			}
-		}
 		
 		for (int i=0;i<DS.freezs.size();i++) {
 			JSONObject modl = DS.freezs.get(i).getModelAsJson();
@@ -283,6 +268,7 @@ public class SolverStart {
 		row[13] 		= Tools.myRound(sens,4);
 		spes = (double)(mc.tp_fp_tn_fn[2][1])/(double)(mc.tp_fp_tn_fn[2][1]+mc.tp_fp_tn_fn[1][1]);
 		row[14] 		= Tools.myRound(spes,4);
+//		row[15] 		= (int)mc.area;
 		
 		UI.tmtableStat.addRow(row);
 	}
@@ -311,71 +297,77 @@ public class SolverStart {
 		}
 		Tools.sumryAdd ("\n");
 				
-		Tools.sumryAdd ("*Variable listing: ");
-		Tools.sumryAdd ("\n");
-		
-		double[] ParetoScaleAvg	= new double[DS.numVars];										// AVG and SD
-		double[] ParetoScaleSd	= new double[DS.numVars];
-		double[][] aurocs = null;
-		if ( DS.numVars < 100 && DS.numSamples < 500) aurocs = Tools.calculateAurocs();
-		for(int a = 0;a<DS.numVars;a++){
-			double[] vals = new double[DS.numSamples];
-			double avg = 0;
-			double c = 0;
-			for(int f = 0;f<DS.numSamples;f++){
-				vals[f] = 	DS.rawData[f][a];
-				avg+=		DS.rawData[f][a];
-				c++;
-			}
-			double sd = Tools.calculateSD(vals)[1];
-			avg /= c;
-			ParetoScaleAvg[a] = avg;
-			ParetoScaleSd[a] = sd;
-		}
-		Tools.sumryAdd (Tools.txtLen("Variable") +"\t"+ Tools.txtLen("Average") + "\t" + Tools.txtLen("Standard Dev.")+ "\t" + Tools.txtLen("AUROC max") + "\n");
-		Tools.sumryAdd ("________________\t________________\t________________\t________________" + "\n");
-		Tools.sumryAdd ("\n");
-		 
-		for (int i=0;i< DS.numVars;i++) {
-			if ( aurocs != null) {
-				Tools.sumryAdd (Tools.txtLen(DS.AreaNames[i]) + "\t" + Tools.txtLen(""+Tools.myRound(ParetoScaleAvg[i],4))+ "\t" 
-			+ Tools.txtLen(""+Tools.myRound(ParetoScaleSd[i],4)) +"\t" + Tools.txtLen(DS.classAllIndNme[(int)aurocs[i][1]])+" | "+Tools.myRound(aurocs[i][0],4) + "\n");
-			}else{
-				Tools.sumryAdd (Tools.txtLen(DS.AreaNames[i]) + "\t" + Tools.txtLen(""+Tools.myRound(ParetoScaleAvg[i],4))+ "\t" 
-						+ Tools.txtLen(""+Tools.myRound(ParetoScaleSd[i],4)) + "\n");
-			}
-		}
-	
-		
-		Tools.sumryAdd ("----------------------------------------------------------------------------" + "\n");
-		if ( min > Opts.minPopulation ) {																		// MindestAnzahl Population / Class
-			Tools.sumryAdd ("+ Population is sufficient (>"+Opts.minPopulation+") to perform training and validation."+"\n");
-			
+		if ( DS.numClasses < 2) {
+			Tools.sumryAdd ("Low Class number, Training is not possible. ");
+			Tools.sumryAdd ("You can apply a previously saved enemble for classification. ");
 		}else {
-			Tools.sumryAdd ("[!] Population of e.g. '" + DS.classAllIndNme[minCl] + "' is too small (<"+Opts.minPopulation+"). Training & Validation is disadvised.");
-			Tools.sumryAdd (" You can analyze the data by setting the trainRation to '1.0'. All classe's data will be used for model training"
-					+ ", no testing data will be created. The resulting model is unvalidated and generalization to new data is likely poor."
-					+ " Use such models only for evaluation, not for production/publishing."+"\n");
+				
+			Tools.sumryAdd ("*Variable listing: ");
+			Tools.sumryAdd ("\n");
 			
-			int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Low class population number</H3>Set trainRatio to 1.0? <BR> 100% data will be used for training, no testing</HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-			if ( erg == JOptionPane.YES_OPTION) Opts.trainRatio = 1;
-			UI.txtOpts.setText(Opts.getOptsAsJson().toString(3));
-		}
+			double[] ParetoScaleAvg	= new double[DS.numVars];										// AVG and SD
+			double[] ParetoScaleSd	= new double[DS.numVars];
+			double[][] aurocs = null;
+			if ( DS.numVars < 100 && DS.numSamples < 500) aurocs = Tools.calculateAurocs();
+			for(int a = 0;a<DS.numVars;a++){
+				double[] vals = new double[DS.numSamples];
+				double avg = 0;
+				double c = 0;
+				for(int f = 0;f<DS.numSamples;f++){
+					vals[f] = 	DS.rawData[f][a];
+					avg+=		DS.rawData[f][a];
+					c++;
+				}
+				double sd = Tools.calculateSD(vals)[1];
+				avg /= c;
+				ParetoScaleAvg[a] = avg;
+				ParetoScaleSd[a] = sd;
+			}
+			Tools.sumryAdd (Tools.txtLen("Variable") +"\t"+ Tools.txtLen("Average") + "\t" + Tools.txtLen("Standard Dev.")+ "\t" + Tools.txtLen("AUROC max") + "\n");
+			Tools.sumryAdd ("________________\t________________\t________________\t________________" + "\n");
+			Tools.sumryAdd ("\n");
+			 
+			for (int i=0;i< DS.numVars;i++) {
+				if ( aurocs != null) {
+					Tools.sumryAdd (Tools.txtLen(DS.AreaNames[i]) + "\t" + Tools.txtLen(""+Tools.myRound(ParetoScaleAvg[i],4))+ "\t" 
+				+ Tools.txtLen(""+Tools.myRound(ParetoScaleSd[i],4)) +"\t" + Tools.txtLen(DS.classAllIndNme[(int)aurocs[i][1]])+" | "+Tools.myRound(aurocs[i][0],4) + "\n");
+				}else{
+					Tools.sumryAdd (Tools.txtLen(DS.AreaNames[i]) + "\t" + Tools.txtLen(""+Tools.myRound(ParetoScaleAvg[i],4))+ "\t" 
+							+ Tools.txtLen(""+Tools.myRound(ParetoScaleSd[i],4)) + "\n");
+				}
+			}
+		
+			
+			Tools.sumryAdd ("----------------------------------------------------------------------------" + "\n");
+			if ( min > Opts.minPopulation ) {																		// MindestAnzahl Population / Class
+				Tools.sumryAdd ("+ Population is sufficient (>"+Opts.minPopulation+") to perform training and validation."+"\n");
+				
+			}else {
+				Tools.sumryAdd ("[!] Population of e.g. '" + DS.classAllIndNme[minCl] + "' is too small (<"+Opts.minPopulation+"). Training & Validation is disadvised.");
+				Tools.sumryAdd (" You can still train the data by setting the trainRation to '1.0'. All classe's data will be used for model training"
+						+ ", no testing data will be created. The resulting model is unvalidated and generalization to new data is likely poor."
+						+ " Use such models only for evaluation, not for production/publishing."+"\n");
+				
+				int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Low class population number</H3>Set trainRatio to 1.0? <BR> 100% data will be used for training, no testing</HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				if ( erg == JOptionPane.YES_OPTION) Opts.trainRatio = 1;
+				UI.txtOpts.setText(Opts.getOptsAsJson().toString(3));
+			}
+			
 		
 	
-
-		if ( DS.numVars < DS.numSamples  ) {																			// MindestAnzahl Population / Class
-			Tools.sumryAdd ("+ Number of variables is reasonable for training (#Variables < #Samples)."+"\n");
-		}else {
-			Tools.sumryAdd ("[!] The number of variables surpasses the number of samples. Training is disadvised.");
-			Tools.sumryAdd (" Excessive variables typically push models to overfit. Generalization to new data is likely poor.\"\r\n"  
-					+ " Use such models only for evaluation, not for production/publishing."+"\n");
+			if ( DS.numVars < DS.numSamples  ) {																			// MindestAnzahl Population / Class
+				Tools.sumryAdd ("+ Number of variables is reasonable for training (#Variables < #Samples)."+"\n");
+			}else {
+				Tools.sumryAdd ("[!] The number of variables surpasses the number of samples. Training is disadvised.");
+				Tools.sumryAdd (" Excessive variables typically push models to overfit. Generalization to new data is likely poor.\"\r\n"  
+						+ " Use such models only for evaluation, not for production/publishing."+"\n");
+			}
+			
+			if ( DS.numVars < 2  ) {																						// MindestAnzahl Population / Class
+				Tools.sumryAdd ("[!] The number of variables is too small.");
+			}
+			Tools.sumryAdd ("\n");
 		}
-		
-		if ( DS.numVars < 2  ) {																						// MindestAnzahl Population / Class
-			Tools.sumryAdd ("[!] The number of variables is too small.");
-		}
-		Tools.sumryAdd ("\n");
 //		if ( DS.numVars*20 > 500) {
 //			int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Auto adjust Options?</H3></HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 //			if ( erg == JOptionPane.YES_OPTION) {
@@ -597,7 +589,7 @@ public class SolverStart {
 		        	DS.classIndex[i-fstLine-1] = ClassColIndex;
 		        	DS.ClassNames[i-fstLine-1] = ClassName;
 //		        	if (ClassColIndex ==0 && ClassName.equals("unknown"))DS.noTrainingSet[i-fstLine-1] = true;
-		        	if ( DS.ClassNames[i-fstLine-1].equals("")) DS.ClassNames[i-fstLine-1] = tmp[3];
+		        	if ( DS.ClassNames[i-fstLine-1].equals("")) DS.ClassNames[i-fstLine-1] = "undefined";
 		        	DS.SampleNames[i-fstLine-1] = tmp[3];
 		        	ac=0;
 			        for(int j=4;j<tmp.length;j++){

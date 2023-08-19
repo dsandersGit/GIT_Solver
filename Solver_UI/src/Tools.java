@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 /*
  * tools
@@ -203,6 +204,9 @@ public class Tools {
     	}
 		return -1;
 	}
+	public static String getClassNameOfIndex ( int index) {
+		return DS.classAllIndNme[index];
+	}
 	public static void sumryAdd ( String txt) {
 		if ( DS.txtSummary == null )
 			 DS.txtSummary = new StringBuffer();
@@ -286,5 +290,22 @@ public class Tools {
 		            p += Math.pow(sortX[i]-sortY[i],2);
 		        }
 		        return 1.-6.*p/(num*(Math.pow(num,2)-1));
-		    } 
+		    }
+	public static void txtHelp(String selectedText) {
+		String[] items = {"dstType","normType","activation"};
+		String[] help = {"dstType",
+						"normType",
+						"<B>DxA</B> Use both distance + accuracy as discriminant function<BR>"
+						+ "<B>D+A</B> use alternating both<BR>"
+						+ "<B>A use only accuracy<BR>"};
+		int pos = -1;
+		for (int i=0;i<items.length; i++) {
+			if ( selectedText.equals(items[i]))
+				pos = i;
+		}
+		if ( pos < 0 )return;
+		JOptionPane.showMessageDialog(UI.jF, "<HTML>"+help[pos]+"</HTML>");
+
+		
+	} 
 }
