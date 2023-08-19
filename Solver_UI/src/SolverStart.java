@@ -62,13 +62,14 @@ public class SolverStart {
 	 * 56: anotherIndication
 	 * 57: anotherIndication removed, less options
 	 * 58: BugFixes
+	 * 59: Back to 'solver'
 	 */
  
 	
 	
-	public static String 	app 			= "uSort";
+	public static String 	app 			= "solver";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 58";
+	public static String 	revision 		= " 59";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
