@@ -29,5 +29,8 @@ Sepal_Length,Sepal_Width,Petal_Length,Petal_Width,Species
 ....
 
 Datasets with up to approx. 5000 samples and 100 variables are processed within reasonable speed on a general computer. 
+The algorithm sums up to this graphical representation:
+![image](https://github.com/dsandersGit/GIT_Solver/assets/140900940/cef8ff88-c168-493e-b4f5-1472ebfa8b1e)
+
 
 Credits: Json.org JAVA libraries are used
