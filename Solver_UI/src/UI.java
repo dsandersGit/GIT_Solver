@@ -19,6 +19,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
@@ -89,6 +90,7 @@ public class UI {
 	static JMenuItem 	menuFileSaveEnsemble = new JMenuItem(" Save Ensemble"); 
 	static JMenuItem 	menuFileLoadEnsemble = new JMenuItem(" Load Ensemble"); 
 	static JMenu 		menuExport = new JMenu( " Export");
+	static JMenuItem 	menuFileSplitData = new JMenuItem(" Split Data"); 
 	
 	static int tab_Classify = 0;
 	static int tab_Train = 1;
@@ -578,6 +580,8 @@ public class UI {
 		menuFileLoadClip.setEnabled(false);
 		menuFile.add(menuFileLoadClip);
 		menuFile.add(new JSeparator());
+		menuFile.add(menuFileSplitData);
+		menuFile.add(new JSeparator());
 		
 		//menuFileLoadEnsemble.setToolTipText("TOOLTIP not yet set"); 
 		menuFile.add(menuFileLoadEnsemble);
@@ -595,10 +599,10 @@ public class UI {
 		menuActionTrainImmediateStop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CANCEL, InputEvent.CTRL_DOWN_MASK));
 		menuAction.add(new JSeparator());
 		menuAction.add(menuActionClassify);	
-		menuAction.add(new JSeparator());
-		menuAction.add(new JSeparator());
-		JMenuItem menuActionOptions = new JMenuItem(" Options"); 
-		menuAction.add(menuActionOptions);
+//		menuAction.add(new JSeparator());
+//		menuAction.add(new JSeparator());
+//		JMenuItem menuActionOptions = new JMenuItem(" Options"); 
+//		menuAction.add(menuActionOptions);
 		// ---------------------------------------------------------------------
 		
 		JMenuItem menuExportVectors = new JMenuItem(" Vectors"); 
@@ -640,6 +644,93 @@ public class UI {
 			SolverStart.analyzeRawData("Clipboard");
 			UI.maintabbed.setSelectedIndex(UI.tab_Summary);
 		}});
+		menuFileSplitData.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
+			refreshOptions();
+			StringBuffer outTrain = new StringBuffer();
+			StringBuffer outTest = new StringBuffer();
+			outTrain.append("Class");
+        	for (int j=0;j< DS.numVars; j++) {
+        		outTrain.append("," + DS.AreaNames[j]);	
+        	}
+        	outTrain.append("\n");
+        	outTest.append("Class");
+        	for (int j=0;j< DS.numVars; j++) {
+        		outTest.append("," + DS.AreaNames[j]);	
+        	}
+        	outTest.append("\n");
+        	
+			int targetCount=0;
+			ArrayList<Integer> tgts = new ArrayList<Integer>();
+			for (int f=0;f<DS.numSamples;f++){
+                tgts.add(f);
+                targetCount++;
+	        }
+			int count = 0;
+	        while (count < targetCount*(1.-Opts.trainRatio)) {
+	            int rnd = (int) (Math.random()*tgts.size());
+	            tgts.remove(rnd);
+	            count++;
+	        }
+	        for (int f=0;f<DS.numSamples;f++){
+	        	String cls = DS.ClassNames[f];
+	        	if ( cls.length()<1 ) {
+	        		cls = "class"+DS.classAllIndices[DS.classIndex[f]];
+	        	}
+	        	boolean isIn = false;
+	            for (int i=0;i<tgts.size();i++){
+	                if (f == tgts.get(i)) {
+	                	outTrain.append(cls);
+	                	for (int j=0;j< DS.numVars; j++) {
+	                		outTrain.append("," + DS.rawData[f][j]);	
+	                	}
+	                	outTrain.append("\n");
+	                	isIn = true;
+	                }
+	            }
+	            if ( !isIn ) {
+	            	outTest.append(cls);
+                	for (int j=0;j< DS.numVars; j++) {
+                		outTest.append("," + DS.rawData[f][j]);	
+                	}
+                	outTest.append("\n");
+	            }
+	        }
+			
+			Preferences prefs;
+		    prefs = Preferences.userRoot().node("Solver");
+		    String path = prefs.get("path", ".");
+		    String[] type = {"CSV"};
+		    String[] sht = {"CSV"};
+			File f = Tools.getFile("Select file to save", path,type,sht, true);
+			if ( f == null) return;
+
+			File fTrain = new File(f.getAbsolutePath()+"_Train.csv");
+			File fTest  = new File(f.getAbsolutePath()+"_Test.csv");
+			
+			FileWriter fwTrain = null;
+			FileWriter fwTest = null;
+			try {
+				fwTrain = new FileWriter(fTrain, false);
+				fwTest = new FileWriter(fTest, false);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		    BufferedWriter bwTrain = new BufferedWriter(fwTrain);
+		    BufferedWriter bwTest = new BufferedWriter(fwTest);
+		    try {
+		    	fwTrain.write(outTrain.toString());
+		    	fwTest.write(outTest.toString());
+			} catch (JSONException | IOException e1) {
+				e1.printStackTrace();
+			}
+		  
+		    try {
+		    	bwTrain.close();
+		    	bwTest.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}});
 		menuFileLoadEnsemble.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
 			loadEnsemble(false);
 		}});
@@ -662,60 +753,60 @@ public class UI {
 			SolverStart.classify();
 		}});
 		
-		menuActionOptions.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
-		
-			JLabel lab_noBetter = new JLabel ("Number of tolerated non-improvement " + Opts.noBetterStop );
-			JSlider sld_noBetter = new JSlider (100,10000,1000);
-			sld_noBetter.setMajorTickSpacing(500);
-			sld_noBetter.setMinorTickSpacing(100);
-			sld_noBetter.setPaintTicks(true);
-			sld_noBetter.addChangeListener(new ChangeListener() {
-		        @Override
-		        public void stateChanged(ChangeEvent event) {
-		            int val = ((JSlider)event.getSource()).getValue();
-		            lab_noBetter.setText("Number of tolerated non-improvement " + val);
-		        }
-		    });
-			JLabel lab_actMode = new JLabel ("Set activation function");
-			String[] actModes = {"DxA", "D+A", "A"};
-			JComboBox<String> cbo_act = new JComboBox<String>(actModes);
-			
-			JLabel lab_dstMode = new JLabel ("Set distance function");
-			String[] dstModes = {"GROUP", "EGO"};
-			JComboBox<String> cbo_dst = new JComboBox<String>(dstModes);
-			
-			JLabel lab_train = new JLabel ("Set train/test ratio");
-			JSlider sld_train = new JSlider (10,100,70);
-			sld_train.setMajorTickSpacing(10);
-			sld_train.setPaintTicks(true);
-			sld_train.addChangeListener(new ChangeListener() {
-		        @Override
-		        public void stateChanged(ChangeEvent event) {
-		            int val = ((JSlider)event.getSource()).getValue();
-		            lab_train.setText("Set train/test ratio " + ((float)val/100.));
-		        }
-		    });
-			JCheckBox chk_fixTrain = new JCheckBox("Fix trainset", Opts.fixTrainSet);
-			
-			JPanel jp = new JPanel();
-		 	jp.setLayout(new BoxLayout(jp,BoxLayout.Y_AXIS));
-			Object[] array = new Object[1];
-			jp.add(lab_noBetter);
-			jp.add(sld_noBetter);
-			jp.add(lab_actMode);
-			jp.add(cbo_act);
-			jp.add(lab_dstMode);
-			jp.add(cbo_dst);
-			jp.add(lab_train);
-			jp.add(sld_train);
-			jp.add(chk_fixTrain);
-			array[0] = jp;
-		    int eingabe = JOptionPane.showConfirmDialog(null,array,"Options", JOptionPane.OK_CANCEL_OPTION);
-		    if(eingabe != 0){
-		    	return;
-		    }
-			
-		}});
+//		menuActionOptions.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
+//		
+//			JLabel lab_noBetter = new JLabel ("Number of tolerated non-improvement " + Opts.noBetterStop );
+//			JSlider sld_noBetter = new JSlider (100,10000,1000);
+//			sld_noBetter.setMajorTickSpacing(500);
+//			sld_noBetter.setMinorTickSpacing(100);
+//			sld_noBetter.setPaintTicks(true);
+//			sld_noBetter.addChangeListener(new ChangeListener() {
+//		        @Override
+//		        public void stateChanged(ChangeEvent event) {
+//		            int val = ((JSlider)event.getSource()).getValue();
+//		            lab_noBetter.setText("Number of tolerated non-improvement " + val);
+//		        }
+//		    });
+//			JLabel lab_actMode = new JLabel ("Set activation function");
+//			String[] actModes = {"DxA", "D+A", "A"};
+//			JComboBox<String> cbo_act = new JComboBox<String>(actModes);
+//			
+//			JLabel lab_dstMode = new JLabel ("Set distance function");
+//			String[] dstModes = {"GROUP", "EGO"};
+//			JComboBox<String> cbo_dst = new JComboBox<String>(dstModes);
+//			
+//			JLabel lab_train = new JLabel ("Set train/test ratio");
+//			JSlider sld_train = new JSlider (10,100,70);
+//			sld_train.setMajorTickSpacing(10);
+//			sld_train.setPaintTicks(true);
+//			sld_train.addChangeListener(new ChangeListener() {
+//		        @Override
+//		        public void stateChanged(ChangeEvent event) {
+//		            int val = ((JSlider)event.getSource()).getValue();
+//		            lab_train.setText("Set train/test ratio " + ((float)val/100.));
+//		        }
+//		    });
+//			JCheckBox chk_fixTrain = new JCheckBox("Fix trainset", Opts.fixTrainSet);
+//			
+//			JPanel jp = new JPanel();
+//		 	jp.setLayout(new BoxLayout(jp,BoxLayout.Y_AXIS));
+//			Object[] array = new Object[1];
+//			jp.add(lab_noBetter);
+//			jp.add(sld_noBetter);
+//			jp.add(lab_actMode);
+//			jp.add(cbo_act);
+//			jp.add(lab_dstMode);
+//			jp.add(cbo_dst);
+//			jp.add(lab_train);
+//			jp.add(sld_train);
+//			jp.add(chk_fixTrain);
+//			array[0] = jp;
+//		    int eingabe = JOptionPane.showConfirmDialog(null,array,"Options", JOptionPane.OK_CANCEL_OPTION);
+//		    if(eingabe != 0){
+//		    	return;
+//		    }
+//			
+//		}});
 		// *******************************
 		menuExportVectors.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 			JSONObject ensemble = DS.js_Ensemble;

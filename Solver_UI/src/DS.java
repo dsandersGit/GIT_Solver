@@ -74,6 +74,8 @@ public class DS {
 		// ***
 	}
 	public static void getFixedTrainSet() {
+		
+		
 		fixedTrainSet = new boolean[numClasses][DS.numSamples];
 		for (int c = 0;c <numClasses;c++) {
 	        boolean[] tSet = new boolean[DS.numSamples];
@@ -89,19 +91,19 @@ public class DS {
 	                tgts.add(f);
 	                targetCount++;
 	            }else {
-	                rest.add(f);// TODO: Training Daten nicht nur aus Targets, sondern auch Foes
+	                rest.add(f);
 	                foeCount++;
 	            }
 	        }
 	        int count = 0;
 
-	        while (count < targetCount*(1.-Opts.trainRatio)) {// TODO: Training Daten nicht nur aus Targets, sondern auch Foes
+	        while (count < targetCount*(1.-Opts.trainRatio)) {
 	            int rnd = (int) (Math.random()*tgts.size());
 	            tgts.remove(rnd);
 	            count++;
 	        }
 	        count = 0;
-	        while (count < foeCount*(1.-Opts.trainRatio)) {// TODO: Training Daten nicht nur aus Targets, sondern auch Foes
+	        while (count < foeCount*(1.-Opts.trainRatio)) {
 	            int rnd = (int) (Math.random()*rest.size());
 	            rest.remove(rnd);
 	            count++;
@@ -119,30 +121,8 @@ public class DS {
 		}
 	     
 	}
-//	public static String getDSsAsString() {
-//		StringBuffer out = new StringBuffer();
-//			out.append("classAllIndices,classAllIndPop,classAllIndNme" + "\n");
-//			for (int i=0;i<classAllIndices.length;i++) {
-//				out.append(classAllIndices[i] + "," + classAllIndPop[i] + "," +"\""+classAllIndNme[i]+"\"" + "\n" );
-//			}
-//			
-//			if ( normParas == null) {
-//				out.append("normParas[0],null" + "\n" );
-//				out.append("normParas[1],null" + "\n" );
-//			}else {
-//				out.append(">normParas[0]" );
-//				for ( int i=0;i<DS.numVars; i++) {
-//					out.append(", " + normParas[0][i]);	
-//				}
-//				out.append( "\n" );
-//				out.append(">normParas[1]" );
-//				for ( int i=0;i<numVars; i++) {
-//					out.append(", " + normParas[1][i]);	
-//				}
-//			}
-//			out.append( "\n" );
-//		return out.toString();
-//	}
+
+//	
 	public static JSONObject getDSsAsJson() {
 		JSONObject out = new JSONObject();
 		out.put("fileName", 	DS.fileName);

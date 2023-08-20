@@ -63,13 +63,14 @@ public class SolverStart {
 	 * 57: anotherIndication removed, less options
 	 * 58: BugFixes
 	 * 59: Back to 'solver'
+	 * 60: New Feature Split Dataset into Files
 	 */
  
 	
 	
 	public static String 	app 			= "solver";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 59";
+	public static String 	revision 		= " 60";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
