@@ -12,9 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -23,12 +20,8 @@ import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -36,19 +29,15 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.border.BevelBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -103,6 +92,7 @@ public class UI {
 	public static 		JTabbedPane maintabbed = new JTabbedPane();
 	public static 		SP_PlotCanvas sp = new SP_PlotCanvas();
 	public static 		SP_PlotCanvas spDst = new SP_PlotCanvas();
+	public static 		SP_PlotCanvas sp1D = new SP_PlotCanvas();
 	
 	public static 		JTextArea txtOpts = new JTextArea();
 	public static 		JTextArea txtEnsemble = new JTextArea();
@@ -216,6 +206,12 @@ public class UI {
 		panLive.add(sp);
 		panLive.add(spDst);
 		
+		JPanel panLiveAcc = new JPanel();
+		panLiveAcc.setLayout(new GridLayout(1,1));
+		panLiveAcc.add(sp1D);
+		
+	
+		
 		JPanel panOptions = new JPanel();
 		panOptions.setLayout(new BorderLayout());
 		panOptions.add(txtOpts, BorderLayout.CENTER);
@@ -230,10 +226,16 @@ public class UI {
 		maintabbed.add("Live", panLive);
 		//maintabbed.addTab("3D",tab3D);
 		maintabbed.add("Validation",scStat);
+		maintabbed.add("Accuracy development", panLiveAcc);
 		maintabbed.add("Ensemble",scEnsemble);
 		maintabbed.add("Classification", sc);
+		maintabbed.add("Algorithm", new Icon_Solver());
+		sp1D.setTitle("Accuracy development");
+		sp1D.setXAxis("# cylce");
+		sp1D.setYAxis("accuracy");
 		
-		tab_Classify 	= 5;
+		
+		tab_Classify 	= 6;
 		tab_Train 		= 2;
 		tab_Distance 	= 2;
 //		tab_3D 			= 3;
@@ -673,8 +675,9 @@ public class UI {
 	        }
 	        for (int f=0;f<DS.numSamples;f++){
 	        	String cls = DS.ClassNames[f];
-	        	if ( cls.length()<1 ) {
-	        		cls = "class"+DS.classAllIndices[DS.classIndex[f]];
+	        	
+	        	if ( cls.length()<1 || Tools.isNumeric(cls) ) {
+	        		cls = "class"+DS.classAllIndices[Tools.getIndexOfTarget(DS.classIndex[f])];
 	        	}
 	        	boolean isIn = false;
 	            for (int i=0;i<tgts.size();i++){

@@ -15,12 +15,16 @@ import java.util.ArrayList;
 
 public class Classify {
 	
+	public static double accuracy = 0;
+	
 	public  Classify() {
 		JSONObject ensemble = DS.js_Ensemble;
 		if (ensemble== null )return;
 		JSONObject ds 		= ensemble.getJSONObject("DS");
 		JSONObject opts 	= ensemble.getJSONObject("Opts");
 		JSONArray models 	= ensemble.getJSONArray("model");
+		
+		
 		
 		int targetColorIndex 	= -1;
 		String targetName 		= "";
@@ -186,6 +190,8 @@ public class Classify {
 		 }
 
 		UI.tmtable.setDataVector(row, header);
+		accuracy = Tools.myRound(100* (matchCount/allCount),1);
+		
 		UI.labAccuracy.setText("Accuracy: " + Tools.myRound(100* (matchCount/allCount),1) + "%");
 	
 	}

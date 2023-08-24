@@ -391,7 +391,7 @@ class SP_PlotCanvas extends JPanel{
 	
 	private Color outerBackCol = Color.white;
 	private Color innerBackCol = Color.white;
-	private Color baseCol = Color.white;
+	private Color baseCol = Color.black;
 	
 	public boolean show0 = true;
 
@@ -704,7 +704,7 @@ class SP_PlotCanvas extends JPanel{
 	
 	public void setXY(float[] x, float[] y, int size,Color col,String name,boolean ShowDots, boolean ShowLines, boolean Dots3D){
 		dats.add(new SP_PlotData(x,y, size,col,name,ShowDots,ShowLines,Dots3D));
-		
+		//refreshPlot();
 	}
 	public void setXY(float[] x, float[] y, boolean[] ok, int size,Color col,String name,boolean ShowDots, boolean ShowLines, boolean Dots3D){
 		dats.add(new SP_PlotData(x,y,ok, size,col,name,ShowDots,ShowLines,Dots3D));

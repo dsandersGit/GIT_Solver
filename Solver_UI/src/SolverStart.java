@@ -4,10 +4,8 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -64,13 +62,17 @@ public class SolverStart {
 	 * 58: BugFixes
 	 * 59: Back to 'solver'
 	 * 60: New Feature Split Dataset into Files
+	 * 61: numeric classes during split save
+	 * 62: Algo Plan
+	 * 63: Low Prune Probability ( Opts )
+	 * 64: Added: Accuracy Development per cycles > Start with unnecessary many classes, stop when accuracy does not increase
 	 */
  
 	
 	
 	public static String 	app 			= "solver";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 60";
+	public static String 	revision 		= " 63";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -80,6 +82,8 @@ public class SolverStart {
 	public static JSONObject defOptions     = null;
 	public static String dataFileName = "";
 	
+	public static float[] rollingAccuracy			= null;    // gain / class
+	public static float[] rollingAccuracyX			= null;
 	public static void main(String[] args) {
 		
 		try {
@@ -113,6 +117,10 @@ public class SolverStart {
 		}
 	}
 	public static void trainPattern() throws IOException {
+		
+		rollingAccuracy = new float[Opts.numCyles];
+		rollingAccuracyX= new float[Opts.numCyles];
+		int rACount = 0;
 		
 		UI.menuFile.setEnabled(false);
 		UI.txtEnsemble.setText("");
@@ -202,38 +210,71 @@ public class SolverStart {
 					}
 										
 				}
+
+				
+			}
+			// HACK
+			if ( !SolverStart.immediateStop ) {	
+				UI.sp1D.dats.clear();
+				for (int j=0;j<DS.freezs.size();j++) {
+					JSONObject modl = DS.freezs.get(j).getModelAsJson();
+					main.append("model", modl);
+					main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
+				}
+	
+				DS.setEnsemble(main);
+				new Classify();
+				int rest = rACount;
+				while (rest < Opts.numCyles) {
+					rollingAccuracy[rest] = (float)Classify.accuracy;
+					rollingAccuracyX[rest] = rACount+1;
+					rest++;
+					
+				}
+				rACount++;
+				
+				   if ( SolverStart.darkMode)
+					   UI.sp1D.setXY(rollingAccuracyX, rollingAccuracy, 15, Color.cyan, "accuracy", true, true, true);
+		            if ( !SolverStart.darkMode)
+		            	UI.sp1D.setXY(rollingAccuracyX, rollingAccuracy, 15, Color.blue, "accuracy", true, true, true);
+				
+	
+					UI.sp1D.refreshPlot();
 			}
 		}
 		
 		// Prune Ensemble: Remove bad performing models, retains Opts.retainModelNum per class
-				if ( DS.freezs.size()>Opts.retainModelNum) {
-					int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Shrink ensemble?</H3> <BR> Number of models will be reduced to "+Opts.retainModelNum+" per class<BR> Only best perfoming models remain.</HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-					if ( erg == JOptionPane.YES_OPTION) {
-						
-						while (DS.freezs.size() > Opts.retainModelNum*DS.numClasses) {
-							for (int j=0;j<DS.classAllIndices.length;j++) {
-								int killTarget = DS.classAllIndices[j];
-								int kill = -1;double min = 5;
-								for (int i=0;i<DS.freezs.size();i++) {
-									MC_Freeze mc = DS.freezs.get(i);
-									if ( killTarget == mc.targetColorIndex ) {
-										if ( mc.accuracyTest < min || i==0) {
-											min = mc.accuracyTest;
-											kill = i;
-										}
-									}
-								}// DS.freeze.size
-								if (kill>-1) {
-									DS.freezs.remove(kill);
-									UI.tmtableStat.removeRow(kill);
+		if ( DS.freezs.size() > DS.numClasses * Opts.retainModelNum) {
+			int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Shrink ensemble?</H3> <BR> Number of models will be reduced to "+Opts.retainModelNum+" per class<BR> Only best perfoming models remain.</HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+			if ( erg == JOptionPane.YES_OPTION) {
+				
+				while (DS.freezs.size() > Opts.retainModelNum*DS.numClasses) {
+					for (int j=0;j<DS.classAllIndices.length;j++) {
+						int killTarget = DS.classAllIndices[j];
+						int kill = -1;double min = 5;
+						for (int i=0;i<DS.freezs.size();i++) {
+							MC_Freeze mc = DS.freezs.get(i);
+							if ( killTarget == mc.targetColorIndex ) {
+								if ( mc.accuracyTest < min || i==0) {
+									min = mc.accuracyTest;
+									kill = i;
 								}
 							}
+						}// DS.freeze.size
+						if (kill>-1) {
+							DS.freezs.remove(kill);
+							UI.tmtableStat.removeRow(kill);
 						}
 					}
 				}
-		
+			}
+		}
+				
+		main.remove("model");
+		main.remove("FingerPrints");
 		for (int i=0;i<DS.freezs.size();i++) {
 			JSONObject modl = DS.freezs.get(i).getModelAsJson();
+		
 			main.append("model", modl);
 			main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
 		}
@@ -247,7 +288,10 @@ public class SolverStart {
 	    UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colGreen.png")));
 	    UI.refreshStatus();
 	}
+
 	private static void fillStatistics(String type) {
+	
+		
 		//	FILL STATISTICS
 		Object[] row = new Object[15];
 		MC_Freeze mc = DS.freezs.get(DS.freezs.size()-1);
@@ -420,6 +464,7 @@ public class SolverStart {
 	        for (int i=0;i<test.length;i++) {
 	        	if (!Tools.isNumeric(test[i]) )classNamesPos = i;
 	        }
+	        
 	        int c0 = 0;
 	        for (int i=0;i<test.length;i++) {
 	        	if ( Tools.isNumeric(test[i]) )c0++;
