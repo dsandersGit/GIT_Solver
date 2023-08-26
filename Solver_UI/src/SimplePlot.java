@@ -763,7 +763,19 @@ class SP_PlotCanvas extends JPanel{
 		if(!freezeY0)Ymin=(float) (Ymin - (Ymax-Ymin)*0.1);
 		if(!freezeY1)Ymax=(float) (Ymax + (Ymax-Ymin)*0.1);
 		if(!freezeX0)xmin=(float) (xmin - (xmax-xmin)*0.05); 
+		
+		if ( Ymin == Ymax) {
+			Ymin = Ymin - 1;
+			Ymax = Ymax + 1;
+		}
+		if ( xmin == xmax) {
+			xmin = xmin - 1;
+			xmax = xmax + 1;
+		}
+		
 		xmax=(float) (xmax + (xmax-xmin)*0.05); 
+		
+		
 	}
 	
 	

@@ -66,13 +66,13 @@ public class SolverStart {
 	 * 62: Algo Plan
 	 * 63: Low Prune Probability ( Opts )
 	 * 64: Added: Accuracy Development per cycles > Start with unnecessary many classes, stop when accuracy does not increase
-	 */
+	 * 65: Major Changes: +Export Plots, + Import, +3D View, + Live Classification Change, + Trends & Loadings
+	 * 	 */
  
-	
 	
 	public static String 	app 			= "solver";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 63";
+	public static String 	revision 		= " 65";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -117,19 +117,34 @@ public class SolverStart {
 		}
 	}
 	public static void trainPattern() throws IOException {
+
+		ArrayList<Float> rollingAccuracy = new ArrayList<Float>();
+		ArrayList<Float> rollingAccuracyX = new ArrayList<Float>();
 		
-		rollingAccuracy = new float[Opts.numCyles];
-		rollingAccuracyX= new float[Opts.numCyles];
+//		rollingAccuracy.add( 0f);
+//		rollingAccuracyX.add( 0f);
+		
 		int rACount = 0;
-		
-		UI.menuFile.setEnabled(false);
-		UI.txtEnsemble.setText("");
-		
 		immediateStop = false;
 		isRunning = true;
+		
+		// cleaning stuff
+		UI.labAccuracy.setText("Accuracy: ---");
+		UI.sp1D.dats.clear();
+		UI.sp1D.refreshPlot();
+		UI.sp2D.dats.clear();
+		UI.sp2D.refreshPlot();
+		UI.menuFile.setEnabled(false);
+		UI.txtEnsemble.setText("");
 		UI.tmtableStat.setRowCount(0);
 		DS.fixedTrainSet = null;
+		UI.labTimePerRun.setText("Process: THIS MIGHT TAKE SOME TIME");
+		UI.refreshStatus();
+		Runner.cleanRunner();
 		
+
+		
+		// Preparing Ensemble JSON
 		JSONObject main = new JSONObject();
 		main.put("creator", SolverStart.app + SolverStart.appAdd + " r" + SolverStart.revision);
 		StringBuffer out = new StringBuffer();
@@ -137,12 +152,10 @@ public class SolverStart {
 		out.append(DS.getDSsAsJson().toString(3));
 		main.put("Opts", Opts.getOptsAsJson());
 		main.put("DS", DS.getDSsAsJson());
-		
-		UI.labTimePerRun.setText("Process: THIS MIGHT TAKE SOME TIME");
-		
+
+		// Time / run estimation
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 	    LocalDateTime now = LocalDateTime.now();
-	    
 	    main.put("DateOfCreation"				, ""+dtf.format(now));
 	    main.put(	"ObjectType"				, "ML_Ensemble");
 	    main.put(	"ObjectVersion"				, "01.00"); 
@@ -151,21 +164,21 @@ public class SolverStart {
 		long tmeStart = System.currentTimeMillis();
 		double tmeCount = 0;
 		double timeSum = 0;
-		int cycles = Opts.numCyles*DS.numClasses;
+		int cycles = Opts.numCycles*DS.numClasses;
 		double avgTime = 0;
 		
+		// Activation Equation selection
 		boolean activationIsDst = false;
 		boolean activationBoth = false;
 		if ( Opts.activation.equals("DxA") )activationIsDst = true;		
 		if ( Opts.activation.equals("D+A") )activationBoth = true;
 		
-		UI.refreshStatus();
-		Runner.cleanRunner();
+
 		
 		
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));
-		for (int i=0;i<Opts.numCyles;i++) {
-			UI.proStatus.setValue(100*i/Opts.numCyles);
+		for (int i=0;i<Opts.numCycles;i++) {
+			UI.proStatus.setValue(100*i/Opts.numCycles);
 			for (int j=0;j<DS.classAllIndices.length;j++) {
 				if ( !SolverStart.immediateStop ) {	
 					if ( activationBoth) {
@@ -213,9 +226,11 @@ public class SolverStart {
 
 				
 			}
-			// HACK
-			if ( !SolverStart.immediateStop ) {	
+			// Cycle wise Classification
+			if ( !SolverStart.immediateStop && Opts.showDevelopment) {	
 				UI.sp1D.dats.clear();
+				main.remove("model");
+				main.remove("FingerPrints");
 				for (int j=0;j<DS.freezs.size();j++) {
 					JSONObject modl = DS.freezs.get(j).getModelAsJson();
 					main.append("model", modl);
@@ -224,51 +239,49 @@ public class SolverStart {
 	
 				DS.setEnsemble(main);
 				new Classify();
-				int rest = rACount;
-				while (rest < Opts.numCyles) {
-					rollingAccuracy[rest] = (float)Classify.accuracy;
-					rollingAccuracyX[rest] = rACount+1;
-					rest++;
-					
-				}
 				rACount++;
+				rollingAccuracy.add( (float)Classify.accuracy);
+				rollingAccuracyX.add( (float)rACount);
+				
+				float[] rA = new float[rollingAccuracy.size()];
+				float[] rAx = new float[rollingAccuracy.size()];
+				for (int j=0;j<rA.length;j++) {
+					rA[j] 	= rollingAccuracy.get(j);
+					rAx[j] 	= rollingAccuracyX.get(j);
+				}
+				
 				
 				   if ( SolverStart.darkMode)
-					   UI.sp1D.setXY(rollingAccuracyX, rollingAccuracy, 15, Color.cyan, "accuracy", true, true, true);
+					   UI.sp1D.setXY(rAx, rA, 15, Color.cyan, "accuracy", true, true, true);
 		            if ( !SolverStart.darkMode)
-		            	UI.sp1D.setXY(rollingAccuracyX, rollingAccuracy, 15, Color.blue, "accuracy", true, true, true);
-				
-	
+		            	UI.sp1D.setXY(rAx, rA, 15, Color.blue, "accuracy", true, true, true);
 					UI.sp1D.refreshPlot();
+
+					// Loadings
+					float[][] weight = new float[DS.numClasses][DS.numVars];
+					float[] wx = new float[DS.numVars];
+					for (int j=0;j<wx.length; j++) {
+						wx[j] = j+1;
+					}
+					for (int j=0;j<DS.freezs.size(); j++) {
+						MC_Freeze mc = DS.freezs.get(j);
+						int index = mc.targetColorIndex;
+						int index0 = Tools.getIndexOfTarget(index);
+						for (int p=0;p<Opts.numDims; p++) {
+							for (int a=0; a<mc.eigenVec.length;a++) {
+								weight[index0][a] += Math.abs(mc.eigenVec[a][p]);
+							}
+						}
+					}
+					UI.sp2D.dats.clear();
+					for (int a=0; a<weight.length;a++) {
+
+						UI.sp2D.setXY(wx, weight[a], 12, DS.classCols[a], DS.classAllIndNme[a], true, true, true);
+					}
+					UI.sp2D.refreshPlot();
 			}
 		}
 		
-		// Prune Ensemble: Remove bad performing models, retains Opts.retainModelNum per class
-		if ( DS.freezs.size() > DS.numClasses * Opts.retainModelNum) {
-			int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Shrink ensemble?</H3> <BR> Number of models will be reduced to "+Opts.retainModelNum+" per class<BR> Only best perfoming models remain.</HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-			if ( erg == JOptionPane.YES_OPTION) {
-				
-				while (DS.freezs.size() > Opts.retainModelNum*DS.numClasses) {
-					for (int j=0;j<DS.classAllIndices.length;j++) {
-						int killTarget = DS.classAllIndices[j];
-						int kill = -1;double min = 5;
-						for (int i=0;i<DS.freezs.size();i++) {
-							MC_Freeze mc = DS.freezs.get(i);
-							if ( killTarget == mc.targetColorIndex ) {
-								if ( mc.accuracyTest < min || i==0) {
-									min = mc.accuracyTest;
-									kill = i;
-								}
-							}
-						}// DS.freeze.size
-						if (kill>-1) {
-							DS.freezs.remove(kill);
-							UI.tmtableStat.removeRow(kill);
-						}
-					}
-				}
-			}
-		}
 				
 		main.remove("model");
 		main.remove("FingerPrints");
@@ -276,8 +289,12 @@ public class SolverStart {
 			JSONObject modl = DS.freezs.get(i).getModelAsJson();
 		
 			main.append("model", modl);
+
 			main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
 		}
+		
+		DS.setEnsemble(main);
+		new Classify();
 		
 		UI.proStatus.setValue(0);
 		DS.setEnsemble(main);
@@ -295,7 +312,12 @@ public class SolverStart {
 		//	FILL STATISTICS
 		Object[] row = new Object[15];
 		MC_Freeze mc = DS.freezs.get(DS.freezs.size()-1);
-		row[0] 		= DS.freezs.size();
+		String val = ""+DS.freezs.size();
+		while (val.length()<6) {
+			val = "0"+val;
+		}
+		
+		row[0] 		= val; //DS.freezs.size();
 		row[1] 		= type;
 		row[2] 		= DS.classAllIndNme[Tools.getIndexOfTarget(mc.targetColorIndex)];
 		row[3] 		= mc.tp_fp_tn_fn[0][0];
@@ -429,33 +451,60 @@ public class SolverStart {
 
 	
 	public static void importDataCSV(String datei){								// nur ClassenName und Daten
-		 File file = new File(datei);
+		
+		 String split = ",";
+		 boolean fromClip = false;
+		 boolean commaAsDecimalSep = false;
+		 
+		 if ( datei == null) {
+			 fromClip = true;
+			 split = "\t";
+		 }
+		 
 		 boolean fail = false;
 		  StringBuilder contents = new StringBuilder();
-		  BufferedReader reader = null;
-	        try {
-	            reader = new BufferedReader(new FileReader(file));
-	            String text = null;
+		  
+		  if ( !fromClip ) {
+			  File file = new File(datei);
+			  BufferedReader reader = null;
+		        try {
+		            reader = new BufferedReader(new FileReader(file));
+		            String text = null;
+	
+		            while ((text = reader.readLine()) != null) {
+		                contents.append(text)
+		                        .append("\n");
+		            }
+		        } catch (IOException e) {
+		            e.printStackTrace();
+		        } finally {
+		            try {
+		                if (reader != null) {
+		                    reader.close();
+		                }
+		            } catch (IOException e) {
+		                e.printStackTrace();
+		            }
+		        }
+		  }else {
+			  String data = null;
+				try {
+					data = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+				} catch (HeadlessException e) {	e.printStackTrace();} catch (UnsupportedFlavorException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} 
 
-	            while ((text = reader.readLine()) != null) {
-	                contents.append(text)
-	                        .append(System.getProperty(
-	                                "line.separator"));
-	            }
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        } finally {
-	            try {
-	                if (reader != null) {
-	                    reader.close();
-	                }
-	            } catch (IOException e) {
-	                e.printStackTrace();
-	            }
-	        }
-	        
-	        String[] lines = contents.toString().split(System.getProperty("line.separator"));
-	        String[] test = lines[1].split(",");
+				if(data==null) {
+					abbruch ("No data");
+					return ;
+				}
+				contents.append(data);
+		  }
+		  
+		    String[] lines = contents.toString().split("\n");
+	        String[] test = lines[1].split(split);
 	        
 	        int noFiles = lines.length;
 	        int noAreas = test.length-1;
@@ -469,13 +518,23 @@ public class SolverStart {
 	        for (int i=0;i<test.length;i++) {
 	        	if ( Tools.isNumeric(test[i]) )c0++;
 	        }
-	        test = lines[0].split(",");
+	        test = lines[0].split(split);
 	        int c1 = 0;
 	        for (int i=0;i<test.length;i++) {
 	        	if ( Tools.isNumeric(test[i]) )c1++;
 	        }
 	        boolean hasHeader = true;
 	        if ( c0 == c1 )hasHeader = false;
+	        // ',' as decimal separator
+	        if ( c0 < noAreas) {
+	        	commaAsDecimalSep = true;
+	        	test = lines[1].replace(",", ".").split(split);
+	        	c0 = 0;
+		        for (int i=0;i<test.length;i++) {
+		        	if ( Tools.isNumeric(test[i]) )c0++;
+		        }
+		        if ( c0 < noAreas) return;
+	        }
 	        DS.rawData = new double[noFiles][noAreas];
 	        DS.AreaNames = new String[noAreas];
 	        DS.SampleNames = new String[noFiles];
@@ -495,7 +554,7 @@ public class SolverStart {
 			    int c = 0;
 			    
 			    if ( hasHeader) {
-			    	test = lines[0].split(",");
+			    	test = lines[0].split(split);
 			    	for (int i=0;i<test.length; i++) {
 		        		 if ( i!= classNamesPos) { DS.AreaNames [c] = test[i];
 			        		 c++;
@@ -515,7 +574,9 @@ public class SolverStart {
 	        ArrayList<String> allClassNames = new ArrayList<String>(); 
 	        for(int i=fstLine;i<lines.length;i++){
 	        	DS.SampleNames[i-fstLine] = "Sample: "+ (1+i-fstLine);
-	        	test = lines[i].split(",");
+	        	String lne = lines[i]; 
+	        	if ( commaAsDecimalSep) lne = lne.replace(",", ".");
+	        	test = lne.split(split);
 	        	int c=0;
 	        	for (int j=0;j<test.length; j++) {
 	        		 if ( j!= classNamesPos) {
@@ -658,123 +719,5 @@ public class SolverStart {
 	        if (fail) JOptionPane.showConfirmDialog(null, "<HTML><H3>Import of data failed</H3>", SolverStart.app, JOptionPane.OK_OPTION, JOptionPane.WARNING_MESSAGE);
 	}
 	
-	public static boolean importDataFromClipboard(){
-		
-		
-		String data = null;
-		try {
-			data = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
-		} catch (HeadlessException e) {	e.printStackTrace();} catch (UnsupportedFlavorException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-
-		if(data==null) {
-			abbruch ("No data");
-			return false;
-		}
-		 String[] lines = data.toString().split("\n");
-	        String[] test = lines[0].split("\t");
-	        int fstLine = 0;
-	        for(int i=0;i<lines.length;i++){
-	        	if(!lines[i].startsWith("\\\\")){
-	        		test = lines[i].split("\t");
-	        		fstLine = i;
-	        		break;
-	        	}
-	        }
-	        	
-     	int noFiles;
-     	int noAreas;
-     		
- 		 noFiles = lines.length-1-fstLine;
-	         noAreas = test.length-4;
- 	
-	         if (noFiles<2 || noAreas<2 ) {
-	 			abbruch ("No data");
-	 			return false;
-			}
-	         
-	         DS.rawData = new double[noFiles][noAreas];
-	         DS.AreaNames = new String[noAreas];
-	         DS.SampleNames = new String[noFiles];
-	         DS.classIndex = new int[noFiles];
-	         DS.ClassNames = new String[noFiles];
-  	
- 	  // Areas
-	        String[] tmp = lines[fstLine].split("\t");
-	        for(int i=4;i<tmp.length;i++){
-	        DS.AreaNames[i-4] = tmp[i];
-	        }
-		    
-	        // Files
-	        int c = 0;
-	        for(int i=fstLine+1;i<lines.length;i++){
-		        if(!lines[i].startsWith("#")){
-		        	tmp = lines[i].split("\t");
-		        	String ClassName = tmp[1];
-		        	int ClassColIndex = (int)Integer.parseInt(tmp[2]);
-		        	DS.classIndex[i-fstLine-1] = ClassColIndex;
-		        	DS.ClassNames[i-fstLine-1] = ClassName;
-		        	if ( DS.ClassNames[i-fstLine-1].equals("")) DS.ClassNames[i-fstLine-1] = tmp[3];
-		        	DS.SampleNames[i-fstLine-1] = tmp[3];
-			        for(int j=4;j<tmp.length;j++){
-			        	DS.rawData[i-fstLine-1][j-4] = Double.parseDouble(tmp[j]);
-			        }
-		        }else{
-		        	// TODO: Comment
-		        }
-		     }
-	        return true;
-	}
-//	public static void bootstrap() {
-//		
-//////		// TODO: Histogramm Bootstrapping 
-////		for (int a=0;a<DS.numVars; a++) {
-////			double min = -1;
-////			double max = -1;
-////			for (int f=0;f<DS.numSamples; f++) {
-////				if ( f==0 || min > DS.rawData[f][a] )  min = DS.rawData[f][a];
-////				if ( f==0 || max < DS.rawData[f][a] )  max = DS.rawData[f][a];
-////			}
-////			for (int c=0;c<DS.numClasses;c++) {
-////				int[][] histo = new int[DS.classAllIndPop[c]][100];
-////				
-////			}
-////			
-////		}
-//		
-//		int fac = 1 + Opts.minBootstarpSamples / DS.rawData.length;
-//		
-//		if ( fac <= 1) return;
-//		
-//		int nNumSamples = DS.rawData.length*fac;
-//		int nNumVars 	= DS.rawData[0].length;
-//		
-//		System.out.println(nNumSamples);
-//		double[][] nRawData = new double[nNumSamples][nNumVars];
-//		String[] nSampleNames = new String[nNumSamples];
-//		String[] nClassNames = new String[nNumSamples];
-//		int[] nClassColorIndex = new int[nNumSamples];;
-//		
-//		int c = 0;
-//		while (c<nNumSamples) {
-//			int r = (int) (Math.random()*DS.rawData.length);
-//			for (int a = 0; a < nNumVars; a++) {
-//				nRawData[c][a] = DS.rawData[r][a];
-//			}
-//			nSampleNames[c] 	= DS.SampleNames[r] + "_syn_"+c;
-//			nClassNames[c] 		= DS.ClassNames[r];
-//			nClassColorIndex[c]	= DS.classIndex[r];
-//			c++;
-//		}
-//		DS.rawData 			= nRawData;
-//		DS.SampleNames		= nSampleNames;
-//		DS.ClassNames		= nClassNames;
-//		DS.classIndex		= nClassColorIndex;
-//		DS.numSamples		= nNumSamples;
-//
-//		
-//	}
+	
 }

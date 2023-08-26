@@ -62,9 +62,7 @@ public class Runner {
 		absCount =0 ;
 		mappedSigmoid = new double[200];
 		for (double i=-10;i<10;i+=0.1) {
-			// (int)((val + 10)*10);
 			mappedSigmoid[(int)((i + 10)*10.)] = getSigmoid(i);	
-
 		}
 		xSigmoid = new float[200];
         ySigmoid = new float[200];
@@ -73,7 +71,6 @@ public class Runner {
         	ySigmoid[i] = DS.numSamples * (float) getMappedSigmoid(((float)i/200. - 0.5f)*10);
         	
         }
-		
 		
 		targetColorIndex 		= target;
 		if ( tName == null) {
@@ -96,15 +93,6 @@ public class Runner {
         	doAccur = true;
 			doDistxAccur = false;
         }
-//        if (Opts.activation.equals("DxA")) {
-//        	doDistxAccur = true;
-//        	doAccur = false;
-//        }
-//		if (Opts.activation.equals("A")) {
-//			doAccur = true;
-//			doDistxAccur = false;
-//		}
-        
         if  (Opts.fixTrainSet) {
         	int i = Tools.getIndexOfTarget (target);
         	if ( DS.fixedTrainSet == null)
@@ -113,12 +101,7 @@ public class Runner {
         }else {
         	trainSet = getTrainSet();
         }
-        
-        // KickStart
-//        if ( Opts.kickStart) {
-//	        int a = toTheLeft();
-//	        //mcEigenVec [a][0] =     toTheTop(a);
-//        }
+
         int step = 100;
         while ( reDo( -1 ) && !SolverStart.immediateStop ) {
         	absCount++;
@@ -127,13 +110,6 @@ public class Runner {
         }
         finish();
         if ( !SolverStart.immediateStop ) doFreeze();
-//        if ( Opts.doBoost )
-//        for (int i=0;i<DS.numSamples;i++) {
-//        	for (int c=0;c<DS.numClasses;c++) {
-//        		System.out.print(booster[i] [c]+"\t");
-//        	}
-//        	System.out.println();
-//        }
 	}
 	public static void cleanRunner () {
 		accuracyTrain.clear();
@@ -192,13 +168,6 @@ public class Runner {
 	       }
 	        if ( notBetterCount > Opts.noBetterStop) {
 	        	if ( dstLatestMax  > distanceOld* Opts.minBetter && dstLatestMax > 0 ) {
-//	        	  	if (doAccur) {
-//	        	  		doDistxAccur = true;
-//	        	  		doAccur = false;
-//	        	  		dstLatestMax = distanceOld;
-//	    	            notBetterCount=0;
-//	    	            distanceOld=0;
-//	        	  	}
 	        		finish();
 	                return false;
 	            }
@@ -210,7 +179,7 @@ public class Runner {
 	}
 	
 	private void finish() {
-		// Finale Berechnung
+		// Final Calc
 		double ndst=0;;
         calcPlot();
         if ( Opts.dstType.contentEquals("EGO"))         ndst = getDistancesEGO(null);

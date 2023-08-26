@@ -31,8 +31,8 @@ public class ThreeDee extends JPanel{
 	*/
 	
 	private static final long serialVersionUID = 1L;
-	static Color genBackColor = Color.DARK_GRAY;
-	static Color genFrontColor = Color.LIGHT_GRAY;
+	static Color genBackColor = Color.white;
+	static Color genFrontColor = Color.DARK_GRAY;
 
 	private String title="";
 	

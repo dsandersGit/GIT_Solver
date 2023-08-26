@@ -18,8 +18,10 @@ public class Classify {
 	public static double accuracy = 0;
 	
 	public  Classify() {
+		
 		JSONObject ensemble = DS.js_Ensemble;
 		if (ensemble== null )return;
+		if ( !ensemble.has("model")) return;
 		JSONObject ds 		= ensemble.getJSONObject("DS");
 		JSONObject opts 	= ensemble.getJSONObject("Opts");
 		JSONArray models 	= ensemble.getJSONArray("model");

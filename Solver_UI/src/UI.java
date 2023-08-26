@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -12,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -84,22 +86,25 @@ public class UI {
 	static int tab_Classify = 0;
 	static int tab_Train = 1;
 	static int tab_Distance = 1;
-	static int tab_3D = 1;
+	static int tab_Algo = 1;
+	static int tab_Accuracy = 4;
+	static int tab_3D = -1;
 	static int tab_Opts = 1;
 	static int tab_Summary = 0;
 	static int tab_Statistics = 0;
 	
-	public static 		JTabbedPane maintabbed = new JTabbedPane();
-	public static 		SP_PlotCanvas sp = new SP_PlotCanvas();
-	public static 		SP_PlotCanvas spDst = new SP_PlotCanvas();
-	public static 		SP_PlotCanvas sp1D = new SP_PlotCanvas();
-	
-	public static 		JTextArea txtOpts = new JTextArea();
-	public static 		JTextArea txtEnsemble = new JTextArea();
-	static 				JScrollPane scEnsemble= new JScrollPane(txtEnsemble);
-	public static 		JTextArea txtSummary = new JTextArea();
-	static 				JScrollPane scSummary= new JScrollPane(txtSummary);
+	public static 		JTabbedPane maintabbed 		= new JTabbedPane();
+	public static 		SP_PlotCanvas sp 			= new SP_PlotCanvas();
+	public static 		SP_PlotCanvas spDst 		= new SP_PlotCanvas();
+	public static 		SP_PlotCanvas sp1D 			= new SP_PlotCanvas();
+	public static 		SP_PlotCanvas sp2D 			= new SP_PlotCanvas();
+	public static 		JTextArea txtOpts 			= new JTextArea();
+	public static 		JTextArea txtEnsemble 		= new JTextArea();
+	static 				JScrollPane scEnsemble		= new JScrollPane(txtEnsemble);
+	public static 		JTextArea txtSummary 		= new JTextArea();
+	static 				JScrollPane scSummary		= new JScrollPane(txtSummary);
 	public static 		ThreeDee tab3D = new ThreeDee();
+	static 				JLabel iconAlgo = new Icon_Solver();
 	
 	static JButton jbLoad = new JButton();
 	static JButton jbTrain = new JButton();
@@ -108,6 +113,9 @@ public class UI {
 	static JButton jbClassify = new JButton();
 	static JButton jb_Stop = new JButton("Stop Training");
 	static JButton jb_DefaultOptions = new JButton("Default Options");
+	
+	static JPanel panLive = new JPanel();
+	static JPanel panLiveAcc = new JPanel();
 	
 	public UI() {
 
@@ -142,53 +150,13 @@ public class UI {
 		spDst.setOuterBackGroundColor(SolverStart.backColor);
 		spDst.setBaseColor(SolverStart.frontColor);
 		
-		
-//		JPanel panOpts = new JPanel();
-//		panOpts.setLayout(new GridLayout(1,2));
-//		JPanel panOptLeft = new JPanel();
-//		panOptLeft.setLayout(new BoxLayout(panOptLeft,BoxLayout.PAGE_AXIS));
-//		String[] txtdstType = {"GROUP","EGO"};
-//		JComboBox<String> cbodstType = new JComboBox<String>(txtdstType);
-//		panOptLeft.add(cbodstType);
-//		String[] txtnormType = {"MaxMinNorm", "Pareto", "None"};
-//		JComboBox<String> cbonormType = new JComboBox<String>(txtnormType);
-//		panOptLeft.add(cbonormType);
-//		String[] txtactivation = {"DxA", "A", "D"};
-//		JComboBox<String> cboactivation = new JComboBox<String>(txtactivation);
-//		panOptLeft.add(cboactivation);
-//		JSlider sldnumDIms = new JSlider(1,10,3);
-//		panOptLeft.add(sldnumDIms);
-//		JSlider sldtrainRatio = new JSlider(10,100,70);
-//		panOptLeft.add(sldtrainRatio);
-//		JSlider sldensemble = new JSlider(1,20,5);
-//		panOptLeft.add(sldensemble);
-//		JSlider sldnoBetterStop = new JSlider(100,3000,500);
-//		panOptLeft.add(sldnoBetterStop);
-//		JSlider sldplotTimer = new JSlider(0,1000,50);
-//		panOptLeft.add(sldplotTimer);
-//		JSlider sldlargeStep = new JSlider(0,100,20);
-//		panOptLeft.add(sldlargeStep);
-//		JPanel panOptRight = new JPanel();
-//		panOptRight.setLayout(new FlowLayout());
-//		panOptRight.add(txtOpts);
-//		panOpts.add(panOptLeft);
-//		panOpts.add(panOptRight);
-		
+		txtSummary.setEditable(false);
+
 		txtOpts.setOpaque(false);
 		txtOpts.setBackground(SolverStart.backColor);
 		txtOpts.setForeground(SolverStart.frontColor);
 		txtOpts.setFont(new Font("Consolas", Font.PLAIN, 20));
-//		 MouseListener mouseListenerHelp = new MouseAdapter() {
-//             
-//			public void mouseClicked(MouseEvent mouseEvent) {
-//            	  if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
-//            		  Tools.txtHelp(txtOpts.getSelectedText());
-//	              }
-//                
-//            }};
-//            txtOpts.addMouseListener(mouseListenerHelp);
-	 
-		
+	
 		txtEnsemble.setOpaque(false);
 		txtEnsemble.setEditable(false);
 		txtEnsemble.setBackground(SolverStart.backColor);
@@ -201,16 +169,13 @@ public class UI {
 		txtSummary.setForeground(SolverStart.frontColor);
 		txtSummary.setFont(new Font("Consolas", Font.PLAIN, 12));
 		
-		JPanel panLive = new JPanel();
 		panLive.setLayout(new GridLayout(2,1));
 		panLive.add(sp);
 		panLive.add(spDst);
 		
-		JPanel panLiveAcc = new JPanel();
-		panLiveAcc.setLayout(new GridLayout(1,1));
+		panLiveAcc.setLayout(new GridLayout(2,1));
 		panLiveAcc.add(sp1D);
-		
-	
+		panLiveAcc.add(sp2D);
 		
 		JPanel panOptions = new JPanel();
 		panOptions.setLayout(new BorderLayout());
@@ -220,29 +185,32 @@ public class UI {
 			txtOpts.setText(SolverStart.defOptions.toString(3));
 		}});
 		
-		
 		maintabbed.add("Data",scSummary);
 		maintabbed.add("Options",panOptions);
 		maintabbed.add("Live", panLive);
-		//maintabbed.addTab("3D",tab3D);
 		maintabbed.add("Validation",scStat);
-		maintabbed.add("Accuracy development", panLiveAcc);
-		maintabbed.add("Ensemble",scEnsemble);
+		maintabbed.add("Trends", panLiveAcc);
 		maintabbed.add("Classification", sc);
-		maintabbed.add("Algorithm", new Icon_Solver());
-		sp1D.setTitle("Accuracy development");
-		sp1D.setXAxis("# cylce");
-		sp1D.setYAxis("accuracy");
+		maintabbed.addTab("3D",tab3D);
+		maintabbed.add("Ensemble",scEnsemble);
+		maintabbed.add("Algorithm", iconAlgo);
+		sp1D.setTitle("Accuracy Development");
+		sp1D.setXAxis("# cycle");
+		sp1D.setYAxis("accuracy [%]");
+		sp2D.setTitle("Sum of Loadings");
+		sp2D.setXAxis("# variable");
+		sp2D.setYAxis("loadings ");
 		
 		
-		tab_Classify 	= 6;
+		tab_Classify 	= 5;
 		tab_Train 		= 2;
 		tab_Distance 	= 2;
-//		tab_3D 			= 3;
+		tab_Accuracy 	= 4;
+		tab_Algo		= 7;
+		tab_3D 			= 6;
 		tab_Opts 		= 1;
 		tab_Summary 	= 0;
 		tab_Statistics 	= 3;
-		
 		
 		txtOpts.setWrapStyleWord(true);
 		txtOpts.setLineWrap(true);
@@ -280,16 +248,14 @@ public class UI {
 		}});
 		labStatusIcon = new JLabel(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
 		
-		panL.add(labAccuracy);
 		panL.add(labRun);
-		panR.add(labTimePerRun);
+		panL.add(labAccuracy);
 		panL.add(labSamples);
 		panL.add(labVars);
 		panL.add(labClasses);
 		
-		
+		panR.add(labTimePerRun);		
 		panR.add(proStatus);
-		//pan.add(labStatus);
 		panR.add(jb_Stop);
 		panR.add(labStatusIcon);
 		
@@ -299,7 +265,7 @@ public class UI {
 	}
 	static boolean refreshOptions() {
 
-		JSONObject jo_Opts = null; //new JSONObject(txtOpts.getText());
+		JSONObject jo_Opts = null; 
 		 try {
 			 jo_Opts = new JSONObject(txtOpts.getText());
 		    } catch (JSONException e) {
@@ -307,26 +273,16 @@ public class UI {
 		        return false;
 		    }
 		 try {
-//			Opts.dstType 		= jo_Opts.getString("dstType");
 			if (jo_Opts.has("normType")) 	Opts.normType 		= jo_Opts.getString("normType");
 			if (jo_Opts.has("numDims")) 	Opts.numDims 		= jo_Opts.getInt("numDims");
 			if (jo_Opts.has("trainRatio"))	Opts.trainRatio 	= jo_Opts.getDouble("trainRatio");
-			if (jo_Opts.has("numCyles")) 	Opts.numCyles 		= jo_Opts.getInt("numCyles");
-			if (jo_Opts.has("noBetterStop")) 	Opts.noBetterStop 	= jo_Opts.getInt("noBetterStop");
+			if (jo_Opts.has("numCycles")) 	Opts.numCycles 		= jo_Opts.getInt("numCycles");
+			if (jo_Opts.has("noBetterStop"))Opts.noBetterStop 	= jo_Opts.getInt("noBetterStop");
 			if (jo_Opts.has("minBetter")) 	Opts.minBetter 		= jo_Opts.getDouble("minBetter");
 			if (jo_Opts.has("plotTimer")) 	Opts.plotTimer 		= jo_Opts.getInt("plotTimer");
-			if (jo_Opts.has("fixTrainSet")) 	Opts.fixTrainSet 	= jo_Opts.getBoolean("fixTrainSet");
-//			Opts.doTheLeft 		= jo_Opts.getBoolean("doTheLeft");
-//			Opts.kickStart 		= jo_Opts.getBoolean("kickStart");
+			if (jo_Opts.has("fixTrainSet")) Opts.fixTrainSet 	= jo_Opts.getBoolean("fixTrainSet");
 			if (jo_Opts.has("activation")) 	Opts.activation		= jo_Opts.getString("activation");
-//			int newBootstarpSamples		= jo_Opts.getInt("minBootstarpSamples");
-//			if ( Opts.minBootstarpSamples != newBootstarpSamples) {
-//				Opts.minBootstarpSamples = newBootstarpSamples;
-//				JOptionPane.showConfirmDialog(jF, "You need to reload dataset to apply changes", "Options changed",  JOptionPane.INFORMATION_MESSAGE);
-//			}
-			
-//			Opts.doBoost		= jo_Opts.getBoolean("doBoost");
-//			Opts.largeStep		= jo_Opts.getDouble("largeStep");
+
 		  } catch (JSONException e) {
 			  txtOpts.setText(Opts.getOptsAsJson().toString(3));
 		        return false;
@@ -335,7 +291,6 @@ public class UI {
 		return true;
 	}
 	public static void refreshStatus() {
-		
 		
 		menuActionClassify.setEnabled(true);
 		menuFileSaveEnsemble.setEnabled(true);
@@ -469,10 +424,7 @@ public class UI {
 		tmtableStat.addColumn("FN_Test");
 		tmtableStat.addColumn("Sensitivity_Test");
 		tmtableStat.addColumn("Speciticity_Test");
-		
-//		tmtableStat.addColumn("area");
-		
-	  
+
 		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 	        /**
 			 * 
@@ -571,23 +523,16 @@ public class UI {
 	}
 	private static JMenuBar setMyMenu(){
 		mBar = new JMenuBar();
-		
-		
-
 		JMenuItem menuFileLoadDsFormat = new JMenuItem(" Load Dataset"); 
 		menuFileLoadDsFormat.setAccelerator(KeyStroke.getKeyStroke('L',InputEvent.CTRL_DOWN_MASK));
 		menuFile.add(menuFileLoadDsFormat);
 		JMenuItem menuFileLoadClip = new JMenuItem(" Import from Clipboard"); 
-		//menuFileLoadClip.setToolTipText("TOOLTIP not yet set"); 
-		menuFileLoadClip.setEnabled(false);
+		menuFileLoadClip.setAccelerator(KeyStroke.getKeyStroke('V',InputEvent.CTRL_DOWN_MASK));
 		menuFile.add(menuFileLoadClip);
 		menuFile.add(new JSeparator());
 		menuFile.add(menuFileSplitData);
 		menuFile.add(new JSeparator());
-		
-		//menuFileLoadEnsemble.setToolTipText("TOOLTIP not yet set"); 
 		menuFile.add(menuFileLoadEnsemble);
-		//menuFileSaveEnsemble.setToolTipText("TOOLTIP not yet set"); 
 		menuFile.add(menuFileSaveEnsemble);
 		menuFileSaveEnsemble.setAccelerator(KeyStroke.getKeyStroke('S',InputEvent.CTRL_DOWN_MASK));
 		menuFile.add(new JSeparator());
@@ -601,24 +546,19 @@ public class UI {
 		menuActionTrainImmediateStop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CANCEL, InputEvent.CTRL_DOWN_MASK));
 		menuAction.add(new JSeparator());
 		menuAction.add(menuActionClassify);	
-//		menuAction.add(new JSeparator());
-//		menuAction.add(new JSeparator());
-//		JMenuItem menuActionOptions = new JMenuItem(" Options"); 
-//		menuAction.add(menuActionOptions);
 		// ---------------------------------------------------------------------
 		
 		JMenuItem menuExportVectors = new JMenuItem(" Vectors"); 
 		menuExport.add(menuExportVectors);
-		JMenuItem menuExportVectorsWeight = new JMenuItem(" Weighed Vectors (VIP Scores)"); 
-		//menuExportVectorsWeight.setEnabled(false);
-		menuExport.add(menuExportVectorsWeight);
 		JMenuItem menuExportClassification = new JMenuItem(" Classification"); 
 		menuExport.add(menuExportClassification);
 		JMenuItem menuExportTP_FP_TN_FN = new JMenuItem(" Validation"); 
 		menuExport.add(menuExportTP_FP_TN_FN);
 		JMenuItem menuExportDistances = new JMenuItem(" 1D Scores"); 
 		menuExport.add(menuExportDistances);
-		
+		menuExport.addSeparator();
+		JMenuItem menuExportPlot = new JMenuItem(" Copy current plot "); 
+		menuExport.add(menuExportPlot);
 		// ---------------------------------------------------------------------
 		JMenu menuAbout = new JMenu( " About");
 		JMenuItem menuAboutAbout = new JMenuItem(" About "+SolverStart.app); 
@@ -628,7 +568,6 @@ public class UI {
 		JMenuItem menuAboutCredits = new JMenuItem(" Credits"); 
 		menuAbout.add(menuAboutCredits);
 		// ---------------------------------------------------------------------
-		// -------------------------------------------------------------------------------------
 		mBar.add(menuFile);
 		mBar.add(menuAction);
 		mBar.add(menuExport);
@@ -638,10 +577,21 @@ public class UI {
 			loadData();
 		}});
 		menuFileLoadClip.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
-			if ( !SolverStart.importDataFromClipboard()) return;
+			SolverStart.importDataCSV(null);
 			new DS();												// INITS
 			DS.normParas = Tools.doNormData ();				// Daten Normalisieren
 
+			
+			DS.txtSummary = null;
+			DS.fileName =  "Clipboard";
+			tmtable.setColumnCount(0);
+			tmtable.setRowCount(0);
+			
+			new DS();												// INITS
+			
+			DS.normParas = Tools.doNormData ();				// Daten Normalisieren
+		
+			UI.maintabbed.setSelectedIndex(UI.tab_Summary);
 			refreshStatus();
 			SolverStart.analyzeRawData("Clipboard");
 			UI.maintabbed.setSelectedIndex(UI.tab_Summary);
@@ -843,51 +793,7 @@ public class UI {
 		    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		    clipboard.setContents( stringSelection, stringSelection );
 		}});
-		menuExportVectorsWeight.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
-			JSONObject ensemble = DS.js_Ensemble;
-			if (ensemble== null )return;
-			JSONArray models = ensemble.getJSONArray("model");
-			JSONObject ds = ensemble.getJSONObject("DS");
-			JSONObject opts = ensemble.getJSONObject("Opts");
-			String VariableNames = ds.getString("VariableNames");
-			String[] varNames = VariableNames.split(",");
-			int numDims = opts.getInt("numDims");
-			
-			double[][] weight = new double[varNames.length][DS.numClasses];
-			for (int i=0;i<models.length(); i++) {
-				JSONObject in = models.getJSONObject(i);
-				int index = in.getInt("targetColorIndex");
-				int index0 = Tools.getIndexOfTarget(index);
-				for (int p=0;p<numDims; p++) {
-					String vTemp = in.getString(		"Vector"+p);
-					String[] line = vTemp.split(","); 
-					for (int a=0; a<line.length;a++) {
-						weight[a][index0] += Math.abs(Double.parseDouble(line[a].trim()));
-					}
-				}
-
-			}
-			
-			StringBuffer out = new StringBuffer();
-			out.append("Weighted Vectors" );
-			for (int c=0; c<DS.numClasses;c++) {
-				out.append("\t" + Tools.getClassNameOfIndex(c));
-			}
-			out.append("\n");
-			for (int a=0; a<weight.length;a++) {
-				for (int c=0; c<DS.numClasses;c++) {	
-					if ( c == 0) {
-						out.append(varNames[a]+"\t"+weight[a][c] +"\t");
-					}else {
-						out.append(weight[a][c] +"\t");
-					}
-				}
-				out.append("\n");
-			}
-			StringSelection stringSelection = new StringSelection( out.toString() );
-		    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-		    clipboard.setContents( stringSelection, stringSelection );
-		}});
+	
 		menuExportClassification.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 			
 			StringBuffer out = new StringBuffer();
@@ -955,7 +861,42 @@ public class UI {
 		    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		    clipboard.setContents( stringSelection, stringSelection );
 		}});
-		
+		menuExportPlot.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
+			BufferedImage img=null;
+			if(maintabbed.getSelectedIndex()==tab_Distance ){
+				 img = new BufferedImage(panLive.getWidth(), panLive.getHeight(), BufferedImage.TYPE_INT_RGB);
+			    Graphics g = img.getGraphics();
+			    g.setColor(panLive.getForeground());
+			    g.setFont(panLive.getFont());
+			    panLive.paintAll(g);
+			 }
+			if(maintabbed.getSelectedIndex()==tab_Accuracy ){
+				 img = new BufferedImage(panLiveAcc.getWidth(), panLiveAcc.getHeight(), BufferedImage.TYPE_INT_RGB);
+			    Graphics g = img.getGraphics();
+			    g.setColor(panLiveAcc.getForeground());
+			    g.setFont(panLiveAcc.getFont());
+			    panLiveAcc.paintAll(g);
+			 }
+			if(maintabbed.getSelectedIndex()==tab_Algo ){
+				 img = new BufferedImage(iconAlgo.getWidth(), iconAlgo.getHeight(), BufferedImage.TYPE_INT_RGB);
+			    Graphics g = img.getGraphics();
+			    g.setColor(iconAlgo.getForeground());
+			    g.setFont(iconAlgo.getFont());
+			    iconAlgo.paintAll(g);
+			 }
+			if(maintabbed.getSelectedIndex()==tab_3D ){
+				 img = new BufferedImage(tab3D.getWidth(), tab3D.getHeight(), BufferedImage.TYPE_INT_RGB);
+			    Graphics g = img.getGraphics();
+			    g.setColor(tab3D.getForeground());
+			    g.setFont(tab3D.getFont());
+			    tab3D.paintAll(g);
+			 }
+			 if(img!=null){
+				    ImageTransferable it = new ImageTransferable(img);
+			        Clipboard clip=Toolkit.getDefaultToolkit().getSystemClipboard();
+			        clip.setContents(it,null);
+				 }
+		}});
 		
 		// *******************************
 		menuAboutAbout.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		

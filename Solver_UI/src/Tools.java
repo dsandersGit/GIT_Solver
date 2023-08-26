@@ -1,4 +1,11 @@
+import java.awt.Image;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -308,4 +315,25 @@ public class Tools {
 
 		
 	} 
+}
+class ImageTransferable implements Transferable, ClipboardOwner
+{
+  Image image;
+  ImageTransferable(Image img)
+  {
+    this.image = img;
+  }
+  public DataFlavor[] getTransferDataFlavors()
+  {
+    return new DataFlavor[]{DataFlavor.imageFlavor};
+  }
+  public boolean isDataFlavorSupported(DataFlavor flavor)
+  {
+    return DataFlavor.imageFlavor.equals(flavor);
+  }
+  public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException
+  {
+    return image;
+  }
+  public void lostOwnership(Clipboard clipboard, Transferable contents) {}
 }
