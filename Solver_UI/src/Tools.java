@@ -1,9 +1,14 @@
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -211,6 +216,10 @@ public class Tools {
     	}
 		return -1;
 	}
+	public static Color getClassColor ( int index) {
+		if ( index < DS.classCols.length) return DS.classCols[index];
+		return Color.black;
+	}
 	public static String getClassNameOfIndex ( int index) {
 		return DS.classAllIndNme[index];
 	}
@@ -223,6 +232,28 @@ public class Tools {
 	public static double myRound(double wert,int digits){
 		double fak = Math.pow(10, digits);
 		return Math.round(wert * fak)/fak;
+	}
+	public static BufferedImage getLegendImage(int index, String name) {
+		BufferedImage legendImage = new BufferedImage(1, 1,BufferedImage.TYPE_INT_RGB );
+		Font font24 = legendImage.getGraphics().getFont().deriveFont(16.0f);
+		FontMetrics fm = legendImage.getGraphics().getFontMetrics(font24);
+		
+		int width = fm.stringWidth(name);
+		legendImage = new BufferedImage(13+width,15,BufferedImage.TYPE_INT_RGB );
+		Graphics g = legendImage.getGraphics();
+		g.setFont(font24);
+		g.setColor(Color.WHITE);
+		g.fillRect(0,0,legendImage.getWidth(),legendImage.getHeight());
+		g.setColor(Color.BLACK);
+		
+		g.drawString(name,13,13);
+		g.setColor(getClassColor(index));
+		g.fillRect(2, 2, 10,10);
+		g.setColor(Color.gray);
+		g.drawLine(1, 2, 1, 12);
+		g.drawLine(1, 12, 11, 12);
+		g.dispose();
+		return legendImage;
 	}
 	public static File getFile(String title, String folder, String[] fileType, String[] shortFileType, boolean forSave){
 		

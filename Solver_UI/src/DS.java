@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
@@ -39,8 +40,9 @@ public class DS {
 		new Color(60,180,75),new Color(70,240,240),new Color(0,130,200),new Color(145,30,180),
 		new Color(240,50,230),new Color(128,128,128),new Color(250,190,212),new Color(255,215,180),
 		new Color(255,250,200),new Color(170,255,195),new Color(220,190,255)
-	};
+	};	// 20 Colors = Max Count for Classes
 	
+	public static BufferedImage[] legendImage = null;
 	
 	public DS () {
 		 UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
@@ -67,19 +69,21 @@ public class DS {
 			}
 		}
 		numClasses = clasIndex.size();
-//		classCols = new Color[numClasses];
-//		for (int i=0;i<numClasses;i++) {
-//			Color col = classCols[]
-//			classCols[i] = col; 
-//		}
+
 		classAllIndices = new int[numClasses];
 		classAllIndPop = new int[numClasses];
 		classAllIndNme = new String[numClasses];
-		for ( int i=0;i<clasIndex.size();i++) {
+		for ( int i=0;i<numClasses;i++) {
 			classAllIndices[i] 	= clasIndex.get(i);
 			classAllIndPop[i] 	= clasIndexCount.get(i);
 			classAllIndNme[i]	= clasIndexName.get(i);
 		}
+		
+		legendImage = new BufferedImage[numClasses];
+		for ( int i=0;i<numClasses;i++) {
+			legendImage[i] = Tools.getLegendImage(i, classAllIndNme[i]) ;
+		}
+			
 		
 		if ( Opts.fixTrainSet ) {
 			getFixedTrainSet();

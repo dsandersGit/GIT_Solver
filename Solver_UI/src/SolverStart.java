@@ -28,10 +28,9 @@ public class SolverStart {
 	 */
 	
 	/*
+	 * THOUGHTS:
 	 * Reduce Variable Count via SPPEARMAN Reduktion ?
-	 */
-	/*
-	 * Might be benefitial to do bootstrapping for small sample sizes (resampling with duplicates )
+	 * Might be beneficial to do bootstrapping for small sample sizes (resampling with duplicates )
 	 */
 	
 	/*
@@ -67,16 +66,17 @@ public class SolverStart {
 	 * 63: Low Prune Probability ( Opts )
 	 * 64: Added: Accuracy Development per cycles > Start with unnecessary many classes, stop when accuracy does not increase
 	 * 65: Major Changes: +Export Plots, + Import, +3D View, + Live Classification Change, + Trends & Loadings
+	 * 66: ClassColors > 
 	 * 	 */
  
 	
 	public static String 	app 			= "solver";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 65";
+	public static String 	revision 		= " 66";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
-	public static boolean 	darkMode 		= false;
+//	public static boolean 	darkMode 		= false;
 	public static Color 	backColor 		= Color.DARK_GRAY;
 	public static Color 	frontColor 		= Color.LIGHT_GRAY;
 	public static JSONObject defOptions     = null;
@@ -119,11 +119,14 @@ public class SolverStart {
 	public static void trainPattern() throws IOException {
 
 		ArrayList<Float> rollingAccuracy = new ArrayList<Float>();
+		@SuppressWarnings("unchecked")
+		ArrayList<Float>[] rAClass = new ArrayList[DS.numClasses];
+		  // Array Init
+        for (int i = 0; i < DS.numClasses; i++) {
+        	rAClass[i] = new ArrayList<Float>();
+        }
 		ArrayList<Float> rollingAccuracyX = new ArrayList<Float>();
-		
-//		rollingAccuracy.add( 0f);
-//		rollingAccuracyX.add( 0f);
-		
+
 		int rACount = 0;
 		immediateStop = false;
 		isRunning = true;
@@ -142,8 +145,6 @@ public class SolverStart {
 		UI.refreshStatus();
 		Runner.cleanRunner();
 		
-
-		
 		// Preparing Ensemble JSON
 		JSONObject main = new JSONObject();
 		main.put("creator", SolverStart.app + SolverStart.appAdd + " r" + SolverStart.revision);
@@ -152,15 +153,15 @@ public class SolverStart {
 		out.append(DS.getDSsAsJson().toString(3));
 		main.put("Opts", Opts.getOptsAsJson());
 		main.put("DS", DS.getDSsAsJson());
-
-		// Time / run estimation
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 	    LocalDateTime now = LocalDateTime.now();
 	    main.put("DateOfCreation"				, ""+dtf.format(now));
-	    main.put(	"ObjectType"				, "ML_Ensemble");
-	    main.put(	"ObjectVersion"				, "01.00"); 
-	    main.put(	"Support"					,"N/A");
-		long tme = System.currentTimeMillis();
+	    main.put("ObjectType"					, "ML_Ensemble");
+	    main.put("ObjectVersion"				, "01.00"); 
+	    main.put("Support"						,"N/A");
+
+		// Time / run estimation
+	    long tme = System.currentTimeMillis();
 		long tmeStart = System.currentTimeMillis();
 		double tmeCount = 0;
 		double timeSum = 0;
@@ -172,10 +173,7 @@ public class SolverStart {
 		boolean activationBoth = false;
 		if ( Opts.activation.equals("DxA") )activationIsDst = true;		
 		if ( Opts.activation.equals("D+A") )activationBoth = true;
-		
 
-		
-		
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));
 		for (int i=0;i<Opts.numCycles;i++) {
 			UI.proStatus.setValue(100*i/Opts.numCycles);
@@ -241,20 +239,26 @@ public class SolverStart {
 				new Classify();
 				rACount++;
 				rollingAccuracy.add( (float)Classify.accuracy);
+				for (int l=0;l<Classify.matchCountTarget.length;l++) {
+					rAClass[l].add(100 * Classify.matchCountTarget[l]/Classify.allCountTarget[l]);
+					//System.out.println(100 * Classify.matchCountTarget[l]/Classify.allCountTarget[l]);
+				}
 				rollingAccuracyX.add( (float)rACount);
 				
-				float[] rA = new float[rollingAccuracy.size()];
-				float[] rAx = new float[rollingAccuracy.size()];
+				float[] rA 			= new float[rollingAccuracy.size()];
+				float[][] rAC 		= new float[DS.numClasses][rollingAccuracy.size()];
+				float[] rAx 		= new float[rollingAccuracy.size()];
 				for (int j=0;j<rA.length;j++) {
 					rA[j] 	= rollingAccuracy.get(j);
 					rAx[j] 	= rollingAccuracyX.get(j);
+					for (int l=0;l<Classify.matchCountTarget.length;l++) {
+						rAC[l][j] = rAClass[l].get(j);
+					}
 				}
-				
-				
-				   if ( SolverStart.darkMode)
-					   UI.sp1D.setXY(rAx, rA, 15, Color.cyan, "accuracy", true, true, true);
-		            if ( !SolverStart.darkMode)
-		            	UI.sp1D.setXY(rAx, rA, 15, Color.blue, "accuracy", true, true, true);
+	            	UI.sp1D.setXY(rAx, rA, 19, Color.blue, "accuracy", true, true, true);
+		            for (int l=0;l<DS.numClasses;l++) {
+		            	UI.sp1D.setXY(rAx, rAC[l], 13,  Tools.getClassColor(l), DS.classAllIndNme[l], false, true, false);
+		            }
 					UI.sp1D.refreshPlot();
 
 					// Loadings
@@ -275,8 +279,7 @@ public class SolverStart {
 					}
 					UI.sp2D.dats.clear();
 					for (int a=0; a<weight.length;a++) {
-
-						UI.sp2D.setXY(wx, weight[a], 12, DS.classCols[a], DS.classAllIndNme[a], true, true, true);
+						UI.sp2D.setXY(wx, weight[a], 12,  Tools.getClassColor(a), DS.classAllIndNme[a], true, true, true);
 					}
 					UI.sp2D.refreshPlot();
 			}
@@ -364,6 +367,10 @@ public class SolverStart {
 			}
 		}
 		Tools.sumryAdd ("\n");
+		
+//		if ( DS.numClasses > 20) {
+//			Tools.sumryAdd ("\n");	
+//		}
 				
 		if ( DS.numClasses < 2) {
 			Tools.sumryAdd ("Low Class number, Training is not possible. ");

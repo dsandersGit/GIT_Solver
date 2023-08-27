@@ -16,6 +16,8 @@ import java.util.ArrayList;
 public class Classify {
 	
 	public static double accuracy = 0;
+	public static float[] matchCountTarget 	= null; //new float[DS.numClasses];
+	public static float[] allCountTarget 		= null; //new float[DS.numClasses];
 	
 	public  Classify() {
 		
@@ -135,9 +137,10 @@ public class Classify {
 		}
 		Object[][] row = new Object[DS.numSamples][DS.numClasses+6];
 		
-		float matchCount = 0;
-		float allCount = 0;
-		
+		float matchCount 			= 0;
+		float allCount 				= 0;
+		matchCountTarget 	= new float[DS.numClasses];
+		allCountTarget 		= new float[DS.numClasses];
 		
 		for (int f=0;f<DS.numSamples;f++){
 			
@@ -150,11 +153,8 @@ public class Classify {
 			 row[f][3] = DS.ClassNames[f];
 			 
 			 for (int i=0;i<DS.classAllIndices.length;i++) {
-				
 				 double val = sumUpClassification[f][i]/fullBonusClassification[i]; 
-
 				 row[f][i+6] = Tools.myRound(val,6);
-				 
 				 if ( max <  val) {
 					 max = val;
 					 all.clear();
@@ -181,14 +181,15 @@ public class Classify {
 				 finalClassIndex[f] = -1;
 			 }
 			 row[f][4] = finalClass[f];
-			 
 			 if (finalClass[f].equals(DS.ClassNames[f])) {						// contains
 				 matchCount++;
+				 matchCountTarget[Tools.getIndexOfTarget(DS.classIndex[f])]++;
 				 row[f][5] = "++++++";
 			 }else {
 				 row[f][5] = "------";
 			 }
 			 allCount++;
+			 allCountTarget[Tools.getIndexOfTarget(DS.classIndex[f])]++;
 		 }
 
 		UI.tmtable.setDataVector(row, header);

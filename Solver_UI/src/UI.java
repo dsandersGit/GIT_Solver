@@ -932,7 +932,7 @@ public class UI {
 		Runner.cleanRunner ();
 		tmtable.setColumnCount(0);
 		tmtable.setRowCount(0);
-		//maintabbed.setSelectedIndex(tab_Statistics);
+		maintabbed.setSelectedIndex(tab_Distance);
 		jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
 		refreshStatus();
 		

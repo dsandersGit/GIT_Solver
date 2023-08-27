@@ -232,6 +232,7 @@ public class Runner {
 	
 	private void doStreamPlot(boolean doDraw){
 	   	if ( doDraw || (UI.maintabbed.getSelectedIndex()==UI.tab_Distance || UI.maintabbed.getSelectedIndex()==UI.tab_Train)) {
+	   		int index = Classify.getTargetColorIndexPos (targetColorIndex);
             float[] yDst = new float[dstTrain.size()];
             float[] yTrain = new float[accuracyTrain.size()];
             float[] yTest = new float[accuracyTrain.size()];
@@ -243,10 +244,7 @@ public class Runner {
             	x[i] = i;
             }
             UI.sp.dats.clear();
-            if ( SolverStart.darkMode)
-            	UI.sp.setXY(x, yDst, 4, Color.white, "gain", false, true, false);
-            if ( !SolverStart.darkMode)
-            	UI.sp.setXY(x, yDst, 4, Color.DARK_GRAY, "gain", false, true, false);
+           	UI.sp.setXY(x, yDst, 4, Color.DARK_GRAY, "gain", false, true, false);
             UI.sp.setXY(x, yTrain, 4, Color.orange, "accuracyTrain", false, true, false);
             UI.sp.setXY(x, yTest, 4, Color.LIGHT_GRAY, "accuracyTest", false, true, false);
             UI.sp.refreshPlot();
@@ -317,7 +315,8 @@ public class Runner {
 		            
 		            UI.spDst.setXY(xTest,yTest, pSize, Color.LIGHT_GRAY, null, true, false, false);
 		            UI.spDst.setXY(xOTest,yOTest, pSize, Color.orange, null, true, false, false);
-		            UI.spDst.setXY(xTrain,yTrain, pSize, new Color(0, 130, 0), "Train: " + DS.classAllIndNme[Classify.getTargetColorIndexPos (targetColorIndex)], true, false, false);
+		            //UI.spDst.setXY(xTrain,yTrain, pSize, new Color(0, 130, 0), "Train: " + DS.classAllIndNme[Classify.getTargetColorIndexPos (targetColorIndex)], true, false, false);
+		            UI.spDst.setXY(xTrain,yTrain, pSize, Tools.getClassColor(index), "Train: " + DS.classAllIndNme[index], true, false, false);
 		            UI.spDst.setXY(xOTrain,yOTrain, pSize, new Color(220,54,39), "OtherTrain", true, false, false);
 		            UI.spDst.setXY(xSigmoid,ySigmoid, pSize, Color.DARK_GRAY, null, false, true, false);
 		            UI.spDst.refreshPlot();
@@ -395,7 +394,7 @@ public class Runner {
 	            	fx[i] = (float)(i/100.);
 	            	
 	            }
-	            if ( fiendTrainCount > 0) 	UI.spDst.setXY(fx ,fiendRatio, 6, Color.magenta, null, false, true, false);
+	            if ( fiendTrainCount > 0) 	UI.spDst.setXY(fx ,fiendRatio, 6, Tools.getClassColor(index), null, false, true, false);
 	            if ( foeTrainCount > 0) 	UI.spDst.setXY(fx,foeRatio, 6, new Color(220,54,39), null, false, true, false);
 	            if ( fiendTstCount > 0) 	UI.spDst.setXY(fx,fiendRatioTst, 6, Color.LIGHT_GRAY, null, false, true, false);
 	            if ( foeTstCount > 0) 		UI.spDst.setXY(fx,foeRatioTst, 6, Color.orange, null, false, true, false);
@@ -923,6 +922,11 @@ public class Runner {
 		if (Opts.numDims < 3) return;
 		UI.tab3D.clearAll();
 		
+		for(int i=0;i<DS.numClasses;i++){
+			UI.tab3D.setLegend(DS.legendImage[i])	;
+		}
+	
+		
 		double[] avg = getAverageTarget();
 		int max = 0;
         for(int i=0;i<mcPCA[0].length;i++){
@@ -979,11 +983,12 @@ public class Runner {
 			int x = (int)(mcPCA[0][i]-avg[0]);
 			int y = (int)(mcPCA[1][i]-avg[1]);
 			int z = (int)(mcPCA[2][i]-avg[2]);
-			if ( targetColorIndex == DS.classIndex[i]) {
-				cn = Color.green;
-			}else {
-				cn = Color.orange;
-			}
+//			if ( targetColorIndex == DS.classIndex[i]) {
+//				cn = Color.green;
+//			}else {
+//				cn = Color.orange;
+//			}
+			cn = Tools.getClassColor(Classify.getTargetColorIndexPos(DS.classIndex[i]));
     		UI.tab3D.setCube(x, y, z, pointSize*5, cn, null);
         }
 
