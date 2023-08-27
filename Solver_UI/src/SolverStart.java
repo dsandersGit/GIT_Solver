@@ -67,12 +67,13 @@ public class SolverStart {
 	 * 64: Added: Accuracy Development per cycles > Start with unnecessary many classes, stop when accuracy does not increase
 	 * 65: Major Changes: +Export Plots, + Import, +3D View, + Live Classification Change, + Trends & Loadings
 	 * 66: ClassColors > 
+	 * 67: Remove individual Models in Validation-Tab by InPOP (context menu)
 	 * 	 */
  
 	
 	public static String 	app 			= "solver";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 66";
+	public static String 	revision 		= " 67";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -103,8 +104,8 @@ public class SolverStart {
 					File f = new File(args[0]);
 					DS.txtSummary = null;
 					DS.fileName =  f.getName();
-					UI.tmtable.setColumnCount(0);
-					UI.tmtable.setRowCount(0);
+					UI.tmtableClassify.setColumnCount(0);
+					UI.tmtableClassify.setRowCount(0);
 					new DS();										
 					DS.normParas = Tools.doNormData ();				
 					SolverStart.dataFileName = f.getName();
@@ -459,13 +460,13 @@ public class SolverStart {
 	
 	public static void importDataCSV(String datei){								// nur ClassenName und Daten
 		
-		 String split = ",";
+		 String split = ","; char cSplit = ',';
 		 boolean fromClip = false;
 		 boolean commaAsDecimalSep = false;
 		 
 		 if ( datei == null) {
 			 fromClip = true;
-			 split = "\t";
+			 split = "\t";cSplit = '\t';
 		 }
 		 
 		 boolean fail = false;
@@ -525,6 +526,30 @@ public class SolverStart {
 	        for (int i=0;i<test.length;i++) {
 	        	if ( Tools.isNumeric(test[i]) )c0++;
 	        }
+	        
+	        // Header with split chars within quotes
+	    	String head = lines[0];
+	    	StringBuffer newLine = new StringBuffer ();
+	    	boolean inQuote = false;										// Check if Split-Characters are embedded in quotes, replace if is
+	    	char cQuote = '"';
+	    	for (int i=0;i<head.length();i++) {
+	    		char tst = head.charAt(i); 
+	    		if(Character.compare(tst, cQuote) == 0){
+	    			if (inQuote ) {
+	    				inQuote=false;
+	    			}else {
+	    				inQuote=true;
+	    			}
+	    		}
+	    		if ( Character.compare(tst, cSplit) == 0 && inQuote){
+	    			newLine.append("_");
+	    		}else {
+	    			newLine.append(tst);
+	    		}
+	    	}
+	    	lines[0] = newLine.toString();
+
+	        
 	        test = lines[0].split(split);
 	        int c1 = 0;
 	        for (int i=0;i<test.length;i++) {
@@ -561,6 +586,7 @@ public class SolverStart {
 			    int c = 0;
 			    
 			    if ( hasHeader) {
+
 			    	test = lines[0].split(split);
 			    	for (int i=0;i<test.length; i++) {
 		        		 if ( i!= classNamesPos) { DS.AreaNames [c] = test[i];

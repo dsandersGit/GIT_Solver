@@ -281,6 +281,21 @@ public class Tools {
 		String tmp 					= ds.getString("VariableNames");
 		return tmp.split(",");
 	}
+	public static void compileModels() {
+		JSONObject main = DS.js_Ensemble;
+		main.remove("model");
+		main.remove("FingerPrints");
+		for (int j=0;j<DS.freezs.size();j++) {
+			JSONObject modl = DS.freezs.get(j).getModelAsJson();
+			main.append("model", modl);
+			main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
+		}
+		DS.setEnsemble(main);
+		if ( DS.js_Ensemble != null ) {
+			Classify.setOptions();
+			UI.txtEnsemble.setText(DS.js_Ensemble.toString(3));
+		}
+	}
 	static double getSpearman_Rank_Correlation(double[] x, double[] y){
 		//https://en.wikipedia.org/wiki/Spearman's_rank_correlation_coefficient
 		        float [] sortX = new float[  x.length];

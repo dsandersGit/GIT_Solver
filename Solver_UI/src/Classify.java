@@ -192,7 +192,7 @@ public class Classify {
 			 allCountTarget[Tools.getIndexOfTarget(DS.classIndex[f])]++;
 		 }
 
-		UI.tmtable.setDataVector(row, header);
+		UI.tmtableClassify.setDataVector(row, header);
 		accuracy = Tools.myRound(100* (matchCount/allCount),1);
 		
 		UI.labAccuracy.setText("Accuracy: " + Tools.myRound(100* (matchCount/allCount),1) + "%");

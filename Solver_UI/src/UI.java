@@ -13,6 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,6 +33,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -53,9 +56,9 @@ import javax.swing.table.DefaultTableModel;
 
 public class UI {
 	public static 		JFrame jF = new JFrame();
-	public static 		JTable table = new JTable();
-	static 				JScrollPane sc= new JScrollPane(table);
-	public static 		DefaultTableModel tmtable;
+	public static 		JTable tableClassify = new JTable();
+	static 				JScrollPane sc= new JScrollPane(tableClassify);
+	public static 		DefaultTableModel tmtableClassify;
 	
 	public static 		JTable tableStat = new JTable();
 	static 				JScrollPane scStat= new JScrollPane(tableStat);
@@ -124,7 +127,7 @@ public class UI {
 		
 		
 		initTables();
-		sc = new JScrollPane(table);
+		sc = new JScrollPane(tableClassify);
 		sc.setOpaque(false);
 		sc.setBackground(SolverStart.backColor);
 		sc.setPreferredSize(new Dimension (800,600));
@@ -377,21 +380,21 @@ public class UI {
 	
 	private static void initTables() {
 		
-		table = new JTable() {
+		tableClassify = new JTable() {
 	        private static final long serialVersionUID = 1L;
 	        public boolean isCellEditable(int row, int column) {                
 	                return false;               
 	        };
 	    };
-		tmtable =(DefaultTableModel) table.getModel();
-		table.getTableHeader().setOpaque(false);
-		table.getTableHeader().setBackground(SolverStart.backColor);
-		Font fnt = table.getTableHeader().getFont(); 
-		table.getTableHeader().setFont(fnt.deriveFont(Font.BOLD));
+	    tmtableClassify =(DefaultTableModel) tableClassify.getModel();
+		tableClassify.getTableHeader().setOpaque(false);
+		tableClassify.getTableHeader().setBackground(SolverStart.backColor);
+		Font fnt = tableClassify.getTableHeader().getFont(); 
+		tableClassify.getTableHeader().setFont(fnt.deriveFont(Font.BOLD));
 		
-		table.getTableHeader().setReorderingAllowed(false);
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		table.setAutoCreateRowSorter(true);
+		tableClassify.getTableHeader().setReorderingAllowed(false);
+		tableClassify.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		tableClassify.setAutoCreateRowSorter(true);
 		
 		tableStat= new JTable() {
 	        private static final long serialVersionUID = 1L;
@@ -407,7 +410,7 @@ public class UI {
 		
 		tableStat.getTableHeader().setReorderingAllowed(false);
 		tableStat.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		tableStat.setAutoCreateRowSorter(true);
+		//tableStat.setAutoCreateRowSorter(true);
 		tmtableStat.addColumn("run");
 		tmtableStat.addColumn("type");
 		tmtableStat.addColumn("Target");
@@ -425,7 +428,7 @@ public class UI {
 		tmtableStat.addColumn("Sensitivity_Test");
 		tmtableStat.addColumn("Speciticity_Test");
 
-		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+		tableClassify.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 	        /**
 			 * 
 			 */
@@ -459,9 +462,46 @@ public class UI {
 	            }
 	            return this;
 	        }
-			
-	
 	    });
+		
+		tableStat.addMouseListener(new MouseAdapter() {
+//	          public void mouseClicked(MouseEvent e) {
+//	              for (int i=0;i<tableStat.getSelectedRows().length;i++) {
+//	              	boolean[] kill = new boolean[tableStat.getSelectedRows().length]
+//	              	int val = tableStat.getSelectedRows()[i];
+//	              	System.out.println(tmtableStat.getValueAt(val, 0));
+//	              }
+//	          }
+	          public void mouseReleased(MouseEvent e){
+	        	  if(e.getModifiers()!=InputEvent.BUTTON3_MASK) return;
+	        	  int selCount = tableStat.getSelectedRows().length;
+	        	  JPopupMenu inPOP = new JPopupMenu();
+	        	  JMenuItem item=null;
+	        	  item = new JMenuItem("Delete selected models");
+	        	  if(selCount==0)item.setEnabled(false);
+	        	  inPOP.add(item);
+				  item.addActionListener(new ActionListener(){
+					  public void actionPerformed(ActionEvent e) {
+						  boolean[] killList = new boolean [DS.freezs.size()];
+						  for (int j= DS.freezs.size()-1;j>=0;j--) {
+								if(tableStat.isRowSelected(j)) {
+									killList[j] = true;
+								}else {
+									killList[j] = false;
+								}
+						  }
+						  for (int j= DS.freezs.size()-1;j>=0;j--) {
+							  if ( killList[j] ) {
+								  DS.freezs.remove(j);
+								  tmtableStat.removeRow(j);
+							  }
+						  }
+						  Tools.compileModels();
+						  tableStat.repaint();
+					  }});
+				  inPOP.show(e.getComponent(), e.getX(), e.getY());
+	          	}
+	      });
 	}
 	
 	private JToolBar getControlToolBar(){
@@ -584,8 +624,8 @@ public class UI {
 			
 			DS.txtSummary = null;
 			DS.fileName =  "Clipboard";
-			tmtable.setColumnCount(0);
-			tmtable.setRowCount(0);
+			tmtableClassify.setColumnCount(0);
+			tmtableClassify.setRowCount(0);
 			
 			new DS();												// INITS
 			
@@ -797,15 +837,15 @@ public class UI {
 		menuExportClassification.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 			
 			StringBuffer out = new StringBuffer();
-			for (int i=0;i<table.getColumnCount();i++) {
+			for (int i=0;i<tableClassify.getColumnCount();i++) {
 				if ( i>0 ) out.append("\t");
-				out.append(table.getColumnName(i));
+				out.append(tableClassify.getColumnName(i));
 			}
 			out.append("\n");
-			for (int y=0;y<table.getRowCount();y++) {
-				for (int x=0;x<table.getColumnCount();x++) {	
+			for (int y=0;y<tableClassify.getRowCount();y++) {
+				for (int x=0;x<tableClassify.getColumnCount();x++) {	
 					if ( x>0 ) out.append("\t");
-					out.append(table.getValueAt(y, x));
+					out.append(tableClassify.getValueAt(y, x));
 				}
 				out.append("\n");
 			}
@@ -930,8 +970,8 @@ public class UI {
 		
 		SolverStart.immediateStop = false;
 		Runner.cleanRunner ();
-		tmtable.setColumnCount(0);
-		tmtable.setRowCount(0);
+		tmtableClassify.setColumnCount(0);
+		tmtableClassify.setRowCount(0);
 		maintabbed.setSelectedIndex(tab_Distance);
 		jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
 		refreshStatus();
@@ -1048,8 +1088,8 @@ public class UI {
 		
 		DS.txtSummary = null;
 		DS.fileName =  f.getName();
-		tmtable.setColumnCount(0);
-		tmtable.setRowCount(0);
+		tmtableClassify.setColumnCount(0);
+		tmtableClassify.setRowCount(0);
 		
 		new DS();												// INITS
 		
