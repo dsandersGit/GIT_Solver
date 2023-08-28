@@ -1,7 +1,4 @@
 import java.awt.Color;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -620,7 +617,7 @@ public class Runner {
        }
        return dstOther/OtherCount - dstTarget/targetCount;
     }
-    private double getDistancesBAK(double[] avg){
+    private double getDistances(double[] avg){
     	maxDist = 0;
         float dstTarget = 0;
         float dstOther = 0;
@@ -665,7 +662,7 @@ public class Runner {
        return getMappedSigmoid(dstOther) - getMappedSigmoid(dstTarget);
        
     }
-    private double getDistances(double[] avg){
+    private double getDistancesDDBAK(double[] avg){
     	maxDist = 0;
         float[] dstPerClass = new float[DS.classAllIndices.length];
         float[] classCount = new float[DS.classAllIndices.length];
