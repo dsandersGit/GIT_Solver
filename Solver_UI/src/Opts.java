@@ -17,7 +17,7 @@ public class Opts {
 	//
 	public static int 		numDims			 		= 3; 					// Number of Neurons / Dimensions
 	public static double 	trainRatio				= 0.7;					// test / train > ratio of training to sample data  0 = full target 1 - no rget
-	public static int 		numCycles				= 25;					// Count of runs per index
+	public static int 		numCycles				= 5;					// Count of runs per index
 	public static int 		noBetterStop 			= 2500;					// Akzeptierte Fehlversuche
 	public static double	minBetter 				= 0.999d;				// Mindest Verbesserung nach akzeptierten Fehlveruchen
 	public static int		plotTimer				= 50;					// Plot wird gezeigt alle NNN Millisekunden
@@ -26,7 +26,7 @@ public class Opts {
 //	public static double	largeStep	 			= 0.2;					// Random step
 	public static boolean	useMedian	 			= false;				// Median / Average for Center of Target
 	
-	public static int  		minPopulation 			= 15;					// No User Option! minimal Population of classes for split
+	public static int  		minPopulation 			= 10;					// No User Option! minimal Population of classes for split
 	public static int  		minVariableCount		= 2;					// No User Option! minimal number of variables
 	public static int  		retainModelNum 			= 5;					// Model per class in reduced ensemble
 	

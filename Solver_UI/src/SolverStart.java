@@ -68,12 +68,14 @@ public class SolverStart {
 	 * 65: Major Changes: +Export Plots, + Import, +3D View, + Live Classification Change, + Trends & Loadings
 	 * 66: ClassColors > 
 	 * 67: Remove individual Models in Validation-Tab by InPOP (context menu)
+	 * 68: Fork problem
+	 * 69: allCountTarget bug fixed: unknown classes < 0
 	 * 	 */
  
 	
 	public static String 	app 			= "solver";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 67";
+	public static String 	revision 		= " 69";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;

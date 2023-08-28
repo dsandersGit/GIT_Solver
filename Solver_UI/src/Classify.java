@@ -189,7 +189,9 @@ public class Classify {
 				 row[f][5] = "------";
 			 }
 			 allCount++;
-			 allCountTarget[Tools.getIndexOfTarget(DS.classIndex[f])]++;
+			 int val = Tools.getIndexOfTarget(DS.classIndex[f]);
+             if ( val > - 1)
+                 allCountTarget[val]++;
 		 }
 
 		UI.tmtableClassify.setDataVector(row, header);

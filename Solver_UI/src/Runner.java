@@ -917,9 +917,9 @@ public class Runner {
     public void set3D() {
 	
 		UI.tab3D.clearAll();
-		UI.tab3D.set2DText(10, 20, "Not enough data available");
+		UI.tab3D.set2DText(10, 20, "pseudo 3D can only be plotted for three dimensions (numDims = 3)");
 		
-		if (Opts.numDims < 3) return;
+		if (Opts.numDims != 3) return;
 		UI.tab3D.clearAll();
 		
 		for(int i=0;i<DS.numClasses;i++){
