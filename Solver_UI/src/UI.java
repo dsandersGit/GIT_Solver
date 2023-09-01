@@ -402,6 +402,7 @@ public class UI {
 		tableClassify.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		tableClassify.setAutoCreateRowSorter(true);
 		
+		
 		tableStat= new JTable() {
 	        private static final long serialVersionUID = 1L;
 	        public boolean isCellEditable(int row, int column) {                
@@ -427,13 +428,13 @@ public class UI {
 		tmtableStat.addColumn("Sensitivity_Train");
 		tmtableStat.addColumn("Speciticity_Train");
 		
-		tmtableStat.addColumn("TP_Test");
-		tmtableStat.addColumn("FP_Test");
-		tmtableStat.addColumn("TN_Test");
-		tmtableStat.addColumn("FN_Test");
-		tmtableStat.addColumn("Sensitivity_Test");
-		tmtableStat.addColumn("Speciticity_Test");
-		tmtableStat.addColumn("Accuracy_Test");
+		tmtableStat.addColumn("TP_Validation");
+		tmtableStat.addColumn("FP_Validation");
+		tmtableStat.addColumn("TN_Validation");
+		tmtableStat.addColumn("FN_Validation");
+		tmtableStat.addColumn("Sensitivity_Validation");
+		tmtableStat.addColumn("Speciticity_Validation");
+		tmtableStat.addColumn("Accuracy_Validation");
 
 		tableClassify.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 	        /**
@@ -1092,7 +1093,7 @@ public class UI {
 		if ( f.getName().toLowerCase().endsWith(".csv"))
 			SolverStart.importDataCSV(f.getAbsolutePath());
 		
-		
+		DS.fixedTrainSet = null;
 		DS.txtSummary = null;
 		DS.fileName =  f.getName();
 		tmtableClassify.setColumnCount(0);

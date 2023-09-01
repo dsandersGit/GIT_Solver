@@ -131,6 +131,9 @@ public class Classify {
 		// Test Train/
 		int add = 7; // sonst 6
 		
+		UI.tmtableClassify.setRowCount(0);
+		UI.tmtableClassify.setColumnCount(0);
+		
 		//new UI();
 		Object[] header = new Object[DS.numClasses+add];
 		header[0] = ("run");
@@ -139,7 +142,7 @@ public class Classify {
 		header[3] = ("classname");
 		header[4] = ("classification");
 		header[5] = ("match");
-		header[6] = ("train/test");
+		header[6] = ("train/validation");
 		for (int j=0;j<DS.numClasses;j++) {
 			header[add+j] = (DS.classAllIndNme[j]);
 		}
@@ -158,10 +161,8 @@ public class Classify {
 			
 			 double max=-1;
 			 ArrayList<Integer> all = new ArrayList<Integer>();
-			 
 			 int index = Tools.getIndexOfTarget (DS.classIndex[f]);
-		     
-			 
+		 
 			 row[f][0] = (f+1);
 			 row[f][1] = DS.SampleNames[f];
 			 row[f][2] = DS.classIndex[f];
@@ -215,7 +216,7 @@ public class Classify {
 				 if (DS.fixedTrainSet[index][f]) {
 					 row[f][6] = "training";
 				 }else {
-					 row[f][6] = "testing";
+					 row[f][6] = "validation";
 				 }
 			 }else {
 				 row[f][6] = " - - - ";
@@ -241,7 +242,7 @@ public class Classify {
 			accuracyTrain = Tools.myRound(100* (matchCountTrain/allCountTrain),1);
 			accuracyTest = accuracyTrain;
 		}
-		UI.labAccuracy.setText("Accuracy [Train/Test %]: " + Tools.myRound(100* (matchCountTrain/allCountTrain),1) + " / " + Tools.myRound(100* (matchCountTest/allCountTest),1));	
+		UI.labAccuracy.setText("Accuracy [Train/Validation %]: " + Tools.myRound(100* (matchCountTrain/allCountTrain),1) + " / " + Tools.myRound(100* (matchCountTest/allCountTest),1));	
 
 		
 	

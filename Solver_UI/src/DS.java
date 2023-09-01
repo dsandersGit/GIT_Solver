@@ -86,10 +86,10 @@ public class DS {
 			legendImage[i] = Tools.getLegendImage(i, classAllIndNme[i]) ;
 		}
 			
-		
-		if ( Opts.fixTrainSet ) {
-			getFixedTrainSet();
-		}
+//		75: Fixed Trainset Init moved from DS to SolverStart
+//		if ( Opts.fixTrainSet ) {
+//			getFixedTrainSet();
+//		}
 		
 		// ***
 	}

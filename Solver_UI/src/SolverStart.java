@@ -74,12 +74,14 @@ public class SolverStart {
 	 * 71: ClassColor in LIVE
 	 * 72: Train/Test change only cycle wise
 	 * 73: Accuracy Train and Test, Classify: Train / Testing when fixed, Opts adapted
+	 * 74: Re-lable Test > Validation
+	 * 75: Fixed Trainset Init moved from DS to SolverStart
 	 * 	 */
  
 	
 	public static String 	app 			= "solver";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 73";
+	public static String 	revision 		= " 75";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -191,7 +193,8 @@ public class SolverStart {
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));
 		for (int i=0;i<Opts.numCycles;i++) {
 			//72: Train/Test change only cycle wise
-			DS.getFixedTrainSet();
+			//75: Fixed Trainset Init moved from DS to SolverStart
+			if ( !Opts.fixTrainSet || i==0) DS.getFixedTrainSet();
 			UI.proStatus.setValue(100*i/Opts.numCycles);
 			for (int j=0;j<DS.classAllIndices.length;j++) {
 				if ( !SolverStart.immediateStop ) {	
@@ -276,7 +279,7 @@ public class SolverStart {
 //								}
 				}
 				UI.sp1D.setXY(rAx, rATrain, 13, Color.red, "Train", true, true, true);	
-				UI.sp1D.setXY(rAx, rATest, 13, Color.blue, "Test", true, true, true);
+				UI.sp1D.setXY(rAx, rATest, 13, Color.blue, "Validation", true, true, true);
 	            	
 //					            for (int l=0;l<DS.numClasses;l++) {
 //					            	UI.sp1D.setXY(rAx, rAC[l], 13,  Tools.getClassColor(l), DS.classAllIndNme[l], false, true, false);
