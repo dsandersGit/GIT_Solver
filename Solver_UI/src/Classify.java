@@ -15,7 +15,8 @@ import java.util.ArrayList;
 
 public class Classify {
 	
-	public static double accuracy = 0;
+	public static double accuracyTest = 0;
+	public static double accuracyTrain = 0;
 	public static float[] matchCountTarget 	= null; //new float[DS.numClasses];
 	public static float[] allCountTarget 		= null; //new float[DS.numClasses];
 	
@@ -28,12 +29,11 @@ public class Classify {
 		JSONObject opts 	= ensemble.getJSONObject("Opts");
 		JSONArray models 	= ensemble.getJSONArray("model");
 		
-		
-		
+
 		int targetColorIndex 	= -1;
 		String targetName 		= "";
-		double accuracyTest 	= 0;
-		double accuracyTrain 	= 0;
+		accuracyTest 	= 0;
+		accuracyTrain 	= 0;
 		double split 			= -1;
 		double maxDst			= 0;
 		int numVars				= -1;
@@ -92,6 +92,7 @@ public class Classify {
 			targetName			= in.getString(		"targetLabel");
 			split				= in.getDouble(		"split");
 			maxDst				= in.getDouble(		"maxDistance");
+			
 			for (int p=0;p<Opts.numDims; p++) {
 				String vTemp = in.getString(		"Vector"+p);
 				line = vTemp.split(","); 
@@ -105,17 +106,20 @@ public class Classify {
 			}
 			int trainCount = 0;int targetCount = 0;
 			itmp  		= in.getString(		"TrainSet").split(",");
-			for (int p=0;p<Opts.numDims; p++) {
-				if ( itmp[p].trim().equals("1"))
+			for (int f=0;f<itmp.length; f++) {
+				if ( itmp[f].trim().equals("1")) {
 						trainCount++;
+				
+				}
 				targetCount++;
 			}
+			
 			
 			double bonus = accuracyTest * accuracyTest; 													
 			if ( trainCount == targetCount)
 				bonus = accuracyTrain * accuracyTrain; 														/// Training ohne TestDaten
 			fullBonusClassification[getTargetColorIndexPos (targetColorIndex)] += 1;						//; + bonus ?
-			doClassify (mc, split, avgs, targetColorIndex, sumUpClassification, bonus, maxDst);
+			doClassify (mc, split, avgs, targetColorIndex, sumUpClassification, bonus, maxDst );
 		}
 
 		
@@ -124,21 +128,29 @@ public class Classify {
 		int[] finalClassIndex = new int[DS.numSamples];
 		double[] finalClassBonus = new double[DS.numSamples];
 		
+		// Test Train/
+		int add = 7; // sonst 6
+		
 		//new UI();
-		Object[] header = new Object[DS.numClasses+6];
+		Object[] header = new Object[DS.numClasses+add];
 		header[0] = ("run");
 		header[1] = ("sample");
 		header[2] = ("classindex");
 		header[3] = ("classname");
 		header[4] = ("classification");
 		header[5] = ("match");
+		header[6] = ("train/test");
 		for (int j=0;j<DS.numClasses;j++) {
-			header[6+j] = (DS.classAllIndNme[j]);
+			header[add+j] = (DS.classAllIndNme[j]);
 		}
-		Object[][] row = new Object[DS.numSamples][DS.numClasses+6];
+
+		Object[][] row = new Object[DS.numSamples][DS.numClasses+add];
 		
-		float matchCount 			= 0;
-		float allCount 				= 0;
+		float matchCountTest		= 0;
+		float matchCountTrain		= 0;
+		float allCountTest			= 0;
+		float allCountTrain			= 0;
+		
 		matchCountTarget 	= new float[DS.numClasses];
 		allCountTarget 		= new float[DS.numClasses];
 		
@@ -147,6 +159,9 @@ public class Classify {
 			 double max=-1;
 			 ArrayList<Integer> all = new ArrayList<Integer>();
 			 
+			 int index = Tools.getIndexOfTarget (DS.classIndex[f]);
+		     
+			 
 			 row[f][0] = (f+1);
 			 row[f][1] = DS.SampleNames[f];
 			 row[f][2] = DS.classIndex[f];
@@ -154,7 +169,7 @@ public class Classify {
 			 
 			 for (int i=0;i<DS.classAllIndices.length;i++) {
 				 double val = sumUpClassification[f][i]/fullBonusClassification[i]; 
-				 row[f][i+6] = Tools.myRound(val,6);
+				 row[f][i+add] = Tools.myRound(val,6);
 				 if ( max <  val) {
 					 max = val;
 					 all.clear();
@@ -182,22 +197,53 @@ public class Classify {
 			 }
 			 row[f][4] = finalClass[f];
 			 if (finalClass[f].equals(DS.ClassNames[f])) {						// contains
-				 matchCount++;
+				 if ( (Opts.fixTrainSet && DS.fixedTrainSet != null)) {
+					 if (DS.fixedTrainSet[index][f]) {
+						 matchCountTrain++;
+					 }else {
+						 matchCountTest++;
+					 }
+				 }else {
+					 matchCountTrain++;
+				 }
 				 matchCountTarget[Tools.getIndexOfTarget(DS.classIndex[f])]++;
 				 row[f][5] = "++++++";
 			 }else {
 				 row[f][5] = "------";
 			 }
-			 allCount++;
+			 if ( Opts.fixTrainSet && DS.fixedTrainSet != null) {
+				 if (DS.fixedTrainSet[index][f]) {
+					 row[f][6] = "training";
+				 }else {
+					 row[f][6] = "testing";
+				 }
+			 }else {
+				 row[f][6] = " - - - ";
+			 }
+			 if ( (Opts.fixTrainSet && DS.fixedTrainSet != null)) {
+				 if (DS.fixedTrainSet[index][f]) {
+					 allCountTrain++;
+				 }else {
+					 allCountTest++;
+				 }
+			 }else {
+				 allCountTrain++;
+			 }
 			 int val = Tools.getIndexOfTarget(DS.classIndex[f]);
              if ( val > - 1)
                  allCountTarget[val]++;
 		 }
 
 		UI.tmtableClassify.setDataVector(row, header);
-		accuracy = Tools.myRound(100* (matchCount/allCount),1);
+		accuracyTrain = Tools.myRound(100* (matchCountTrain/allCountTrain),1);
+		accuracyTest = Tools.myRound(100* (matchCountTest/allCountTest),1);
+		if (  allCountTest == 0) {
+			accuracyTrain = Tools.myRound(100* (matchCountTrain/allCountTrain),1);
+			accuracyTest = accuracyTrain;
+		}
+		UI.labAccuracy.setText("Accuracy [Train/Test %]: " + Tools.myRound(100* (matchCountTrain/allCountTrain),1) + " / " + Tools.myRound(100* (matchCountTest/allCountTest),1));	
+
 		
-		UI.labAccuracy.setText("Accuracy: " + Tools.myRound(100* (matchCount/allCount),1) + "%");
 	
 	}
 	public static int getTargetColorIndexPos (int target) {

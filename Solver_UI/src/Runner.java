@@ -90,14 +90,18 @@ public class Runner {
         	doAccur = true;
 			doDistxAccur = false;
         }
-        if  (Opts.fixTrainSet) {
-        	int i = Tools.getIndexOfTarget (target);
-        	if ( DS.fixedTrainSet == null)
-        		DS.getFixedTrainSet();
-        	trainSet = DS.fixedTrainSet[i];
-        }else {
-        	trainSet = getTrainSet();
-        }
+        
+      //72: Train/Test change only cycle wise
+//        if  (Opts.fixTrainSet) {
+//        	int i = Tools.getIndexOfTarget (target);
+//        	if ( DS.fixedTrainSet == null)
+//        		DS.getFixedTrainSet();
+//        	trainSet = DS.fixedTrainSet[i];
+//        }else {
+//        	trainSet = getTrainSet();
+//        }
+        int i = Tools.getIndexOfTarget (target);
+        trainSet = DS.fixedTrainSet[i];
 
         int step = 100;
         while ( reDo( -1 ) && !SolverStart.immediateStop ) {
@@ -232,10 +236,12 @@ public class Runner {
 	   		int index = Classify.getTargetColorIndexPos (targetColorIndex);
             float[] yDst = new float[dstTrain.size()];
             float[] yTrain = new float[accuracyTrain.size()];
+            
             float[] yTest = new float[accuracyTrain.size()];
             float[] x = new float[accuracyTrain.size()];
             for (int i=0;i<yTrain.length;i++) {
             	yTrain[i] = accuracyTrain.get(i);
+            	
             	yTest[i] = accuracyTest.get(i);
             	yDst[i] = dstTrain.get(i);
             	x[i] = i;
@@ -254,6 +260,7 @@ public class Runner {
 		            float[] xTest = null;
 		            yTest = null;
 		            float[] xOTrain = null;
+		            Color[] yTrainCol = null;
 		            float[] yOTrain = null;
 		            float[] xOTest = null;
 		            float[] yOTest = null;
@@ -265,6 +272,7 @@ public class Runner {
 			            yTest = new float[distances.length];
 			            xOTrain = new float[distances.length];
 			            yOTrain = new float[distances.length];
+			            yTrainCol = new Color[distances.length];
 			            xOTest = new float[distances.length];
 			            yOTest = new float[distances.length];
             		}else {
@@ -274,6 +282,7 @@ public class Runner {
 			            yTest = new float[numTest];
 			            xOTrain = new float[numElseTrain];
 			            yOTrain = new float[numElseTrain];
+			            yTrainCol = new Color[numElseTrain];
 			            xOTest = new float[numElseTest];
 			            yOTest = new float[numElseTest];
             		}
@@ -292,6 +301,7 @@ public class Runner {
 		                }else {
 		                	if ( trainSet[f]) {
 			                	xOTrain[oCTr] = (float)distances[f];
+			                	yTrainCol[oCTr] = Tools.getClassColor(Classify.getTargetColorIndexPos(DS.classIndex[f]));
 			                	yOTrain[oCTr] = f;
 			                	oCTr++;
 		                	}else{
@@ -307,14 +317,18 @@ public class Runner {
 		            numElseTrain = oCTr;
 		            numElseTest = oCTe;
 		            UI.spDst.dats.clear();
-		            int pSize = 6;
+		            int pSize = 8;
 		            if ( DS.numSamples>1000)pSize = 4;
 		            
 		            UI.spDst.setXY(xTest,yTest, pSize, Color.LIGHT_GRAY, null, true, false, false);
-		            UI.spDst.setXY(xOTest,yOTest, pSize, Color.orange, null, true, false, false);
+		            UI.spDst.setXY(xOTest,yOTest, pSize, Color.LIGHT_GRAY, null, true, false, false);
+		            //71: ClassColor in LIVE
 		            //UI.spDst.setXY(xTrain,yTrain, pSize, new Color(0, 130, 0), "Train: " + DS.classAllIndNme[Classify.getTargetColorIndexPos (targetColorIndex)], true, false, false);
+		            //71: ClassColor in LIVE
 		            UI.spDst.setXY(xTrain,yTrain, pSize, Tools.getClassColor(index), "Train: " + DS.classAllIndNme[index], true, false, false);
-		            UI.spDst.setXY(xOTrain,yOTrain, pSize, new Color(220,54,39), "OtherTrain", true, false, false);
+		           // UI.spDst.setXY(xOTrain,yOTrain, pSize, new Color(220,54,39), "OtherTrain", true, false, false);
+		            UI.spDst.setXY(xOTrain,yOTrain, pSize, yTrainCol, "OtherTrain", true, false, false);
+		            
 		            UI.spDst.setXY(xSigmoid,ySigmoid, pSize, Color.DARK_GRAY, null, false, true, false);
 		            UI.spDst.refreshPlot();
 
@@ -413,7 +427,7 @@ public class Runner {
         
         if  ( again > -1)a = again;
        
-        if ( absCount < Opts.noBetterStop &&  absCount < 100 ) z0 = 99;
+        if ( absCount < Opts.noBetterStop &&  absCount < 100 ) z0 = 99;			// Max Variation on StartUp, first noBetterStop just gambling
         
         switch(z0) {
         case 0:                                                            // EIN Area, ALLE PCA's Zufallswert

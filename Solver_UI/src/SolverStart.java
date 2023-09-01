@@ -70,12 +70,16 @@ public class SolverStart {
 	 * 67: Remove individual Models in Validation-Tab by InPOP (context menu)
 	 * 68: Fork problem
 	 * 69: allCountTarget bug fixed: unknown classes < 0
+	 * 70: variableID
+	 * 71: ClassColor in LIVE
+	 * 72: Train/Test change only cycle wise
+	 * 73: Accuracy Train and Test, Classify: Train / Testing when fixed, Opts adapted
 	 * 	 */
  
 	
 	public static String 	app 			= "solver";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 69";
+	public static String 	revision 		= " 73";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -118,10 +122,14 @@ public class SolverStart {
 				}
 			}
 		}
+		
+		if(args.length>1)
+			DS.variableID = args[1]; 
 	}
 	public static void trainPattern() throws IOException {
 
-		ArrayList<Float> rollingAccuracy = new ArrayList<Float>();
+		ArrayList<Float> rollingAccuracyTest = new ArrayList<Float>();
+		ArrayList<Float> rollingAccuracyTrain = new ArrayList<Float>();
 		@SuppressWarnings("unchecked")
 		ArrayList<Float>[] rAClass = new ArrayList[DS.numClasses];
 		  // Array Init
@@ -143,7 +151,10 @@ public class SolverStart {
 		UI.menuFile.setEnabled(false);
 		UI.txtEnsemble.setText("");
 		UI.tmtableStat.setRowCount(0);
-		DS.fixedTrainSet = null;
+		//72: Train/Test change only cycle wise
+		//DS.fixedTrainSet = null;
+		
+		
 		UI.labTimePerRun.setText("Process: THIS MIGHT TAKE SOME TIME");
 		UI.refreshStatus();
 		Runner.cleanRunner();
@@ -179,6 +190,8 @@ public class SolverStart {
 
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));
 		for (int i=0;i<Opts.numCycles;i++) {
+			//72: Train/Test change only cycle wise
+			DS.getFixedTrainSet();
 			UI.proStatus.setValue(100*i/Opts.numCycles);
 			for (int j=0;j<DS.classAllIndices.length;j++) {
 				if ( !SolverStart.immediateStop ) {	
@@ -228,6 +241,7 @@ public class SolverStart {
 				
 			}
 			// Cycle wise Classification
+			// 73
 			if ( !SolverStart.immediateStop && Opts.showDevelopment) {	
 				UI.sp1D.dats.clear();
 				main.remove("model");
@@ -241,27 +255,32 @@ public class SolverStart {
 				DS.setEnsemble(main);
 				new Classify();
 				rACount++;
-				rollingAccuracy.add( (float)Classify.accuracy);
+				rollingAccuracyTest.add( (float)Classify.accuracyTest);
+				rollingAccuracyTrain.add( (float)Classify.accuracyTrain);
 				for (int l=0;l<Classify.matchCountTarget.length;l++) {
 					rAClass[l].add(100 * Classify.matchCountTarget[l]/Classify.allCountTarget[l]);
 					//System.out.println(100 * Classify.matchCountTarget[l]/Classify.allCountTarget[l]);
 				}
 				rollingAccuracyX.add( (float)rACount);
 				
-				float[] rA 			= new float[rollingAccuracy.size()];
-				float[][] rAC 		= new float[DS.numClasses][rollingAccuracy.size()];
-				float[] rAx 		= new float[rollingAccuracy.size()];
-				for (int j=0;j<rA.length;j++) {
-					rA[j] 	= rollingAccuracy.get(j);
+				float[] rATest 			= new float[rollingAccuracyTest.size()];
+				float[] rATrain 			= new float[rollingAccuracyTest.size()];
+//							float[][] rAC 		= new float[DS.numClasses][rollingAccuracyTest.size()];
+				float[] rAx 		= new float[rollingAccuracyTest.size()];
+				for (int j=0;j<rATest.length;j++) {
+					rATest[j] 	= rollingAccuracyTest.get(j);
+					rATrain[j] 	= rollingAccuracyTrain.get(j);
 					rAx[j] 	= rollingAccuracyX.get(j);
-					for (int l=0;l<Classify.matchCountTarget.length;l++) {
-						rAC[l][j] = rAClass[l].get(j);
-					}
+//								for (int l=0;l<Classify.matchCountTarget.length;l++) {
+//									rAC[l][j] = rAClass[l].get(j);
+//								}
 				}
-	            	UI.sp1D.setXY(rAx, rA, 19, Color.blue, "accuracy", true, true, true);
-		            for (int l=0;l<DS.numClasses;l++) {
-		            	UI.sp1D.setXY(rAx, rAC[l], 13,  Tools.getClassColor(l), DS.classAllIndNme[l], false, true, false);
-		            }
+				UI.sp1D.setXY(rAx, rATrain, 13, Color.red, "Train", true, true, true);	
+				UI.sp1D.setXY(rAx, rATest, 13, Color.blue, "Test", true, true, true);
+	            	
+//					            for (int l=0;l<DS.numClasses;l++) {
+//					            	UI.sp1D.setXY(rAx, rAC[l], 13,  Tools.getClassColor(l), DS.classAllIndNme[l], false, true, false);
+//					            }
 					UI.sp1D.refreshPlot();
 
 					// Loadings
@@ -316,25 +335,25 @@ public class SolverStart {
 	
 		
 		//	FILL STATISTICS
-		Object[] row = new Object[15];
+		Object[] row = new Object[16];
 		MC_Freeze mc = DS.freezs.get(DS.freezs.size()-1);
 		String val = ""+DS.freezs.size();
 		while (val.length()<6) {
 			val = "0"+val;
 		}
 		
-		row[0] 		= val; //DS.freezs.size();
-		row[1] 		= type;
-		row[2] 		= DS.classAllIndNme[Tools.getIndexOfTarget(mc.targetColorIndex)];
-		row[3] 		= mc.tp_fp_tn_fn[0][0];
-		row[4] 		= mc.tp_fp_tn_fn[1][0];
-		row[5] 		= mc.tp_fp_tn_fn[2][0];
-		row[6] 		= mc.tp_fp_tn_fn[3][0];
-		double sens = (double)(mc.tp_fp_tn_fn[0][0])/(double)(mc.tp_fp_tn_fn[0][0]+mc.tp_fp_tn_fn[3][0]);
-		row[7] 		= Tools.myRound(sens,4);
-		double spes = (double)(mc.tp_fp_tn_fn[2][0])/(double)(mc.tp_fp_tn_fn[2][0]+mc.tp_fp_tn_fn[1][0]);
-		row[8] 		= Tools.myRound(spes,4);
-		row[9] 		= mc.tp_fp_tn_fn[0][1];
+		row[0] 			= val; //DS.freezs.size();
+		row[1] 			= type;
+		row[2] 			= DS.classAllIndNme[Tools.getIndexOfTarget(mc.targetColorIndex)];
+		row[3] 			= mc.tp_fp_tn_fn[0][0];
+		row[4] 			= mc.tp_fp_tn_fn[1][0];
+		row[5] 			= mc.tp_fp_tn_fn[2][0];
+		row[6] 			= mc.tp_fp_tn_fn[3][0];
+		double sens 	= (double)(mc.tp_fp_tn_fn[0][0])/(double)(mc.tp_fp_tn_fn[0][0]+mc.tp_fp_tn_fn[3][0]);
+		row[7] 			= Tools.myRound(sens,4);
+		double spes 	= (double)(mc.tp_fp_tn_fn[2][0])/(double)(mc.tp_fp_tn_fn[2][0]+mc.tp_fp_tn_fn[1][0]);
+		row[8] 			= Tools.myRound(spes,4);
+		row[9] 			= mc.tp_fp_tn_fn[0][1];
 		row[10] 		= mc.tp_fp_tn_fn[1][1];
 		row[11] 		= mc.tp_fp_tn_fn[2][1];
 		row[12] 		= mc.tp_fp_tn_fn[3][1];
@@ -342,7 +361,7 @@ public class SolverStart {
 		row[13] 		= Tools.myRound(sens,4);
 		spes = (double)(mc.tp_fp_tn_fn[2][1])/(double)(mc.tp_fp_tn_fn[2][1]+mc.tp_fp_tn_fn[1][1]);
 		row[14] 		= Tools.myRound(spes,4);
-//		row[15] 		= (int)mc.area;
+		row[15] 		= Tools.myRound(((float)(mc.tp_fp_tn_fn[0][1]+ mc.tp_fp_tn_fn[2][1]))/ ((float)(mc.tp_fp_tn_fn[0][1]+mc.tp_fp_tn_fn[1][1]+mc.tp_fp_tn_fn[2][1]+mc.tp_fp_tn_fn[3][1])),4);
 		
 		UI.tmtableStat.addRow(row);
 	}

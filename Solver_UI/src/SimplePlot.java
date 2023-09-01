@@ -702,6 +702,10 @@ class SP_PlotCanvas extends JPanel{
 		repaint();
 	}
 	
+	public void setXY(float[] x, float[] y, int size,Color[] cols,String name,boolean ShowDots, boolean ShowLines, boolean Dots3D){
+		dats.add(new SP_PlotData(x,y, size,cols,name,ShowDots,ShowLines,Dots3D));
+		//refreshPlot();
+	}
 	public void setXY(float[] x, float[] y, int size,Color col,String name,boolean ShowDots, boolean ShowLines, boolean Dots3D){
 		dats.add(new SP_PlotData(x,y, size,col,name,ShowDots,ShowLines,Dots3D));
 		//refreshPlot();
@@ -895,6 +899,8 @@ class SP_PlotCanvas extends JPanel{
 					for(int x = 0; x < pd.xdat.length;x++){
 						if(pd.ok[x]){
 							g.setColor(pd.col);
+							if ( pd.cols != null)				// NEW
+								g.setColor(pd.cols[x]);	
 							if(activeData != i && activeData>-1) g.setColor(Color.LIGHT_GRAY);
 							g.fillOval(getX(pd.xdat[x])-pd.dotSize/2, getY(pd.ydat[x])-pd.dotSize/2, pd.dotSize, pd.dotSize);
 							if(pd.dots3D)g.setColor(new Color(255,255,255));
@@ -1155,14 +1161,29 @@ class SP_PlotData{
 	
 	
 	Color col = Color.white;
+	Color[] cols = null;
 	String label;
-	
+
 	public SP_PlotData(float[] Xdat,float[] Ydat, boolean[] OK, int dS ,Color Col, String Label, boolean ShowDots, boolean ShowLines, boolean Dots3D){
 		xdat = Xdat;
 		ydat = Ydat;
 		ok = OK;
 		dotSize = dS;
 		col = Col;
+		label = Label;
+		dots3D = Dots3D;
+		showLines = ShowLines;
+		showDots = ShowDots;
+	}
+	public SP_PlotData(float[] Xdat,float[] Ydat, int dS ,Color[] Cols, String Label, boolean ShowDots, boolean ShowLines, boolean Dots3D){
+		xdat = Xdat;
+		ydat = Ydat;
+		ok = new boolean [Xdat.length];
+		for(int i=0;i<Xdat.length;i++){
+			ok[i] = true;
+		}
+		dotSize = dS;
+		cols = Cols;
 		label = Label;
 		dots3D = Dots3D;
 		showLines = ShowLines;

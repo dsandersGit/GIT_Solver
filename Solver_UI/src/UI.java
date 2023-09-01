@@ -331,7 +331,13 @@ public class UI {
 					if ( !DS.AreaNames[i].equals(ensVarNames[i]))ensMatchData = false;	
 				}
 			}
-			
+			JSONObject ds 		= DS.js_Ensemble.getJSONObject("DS");
+			if (ds.has("variableID")) {
+			String modelVarID = ds.getString("variableID");
+			if ( DS.variableID.length() > 0)
+				if ( !DS.variableID.equals(modelVarID))
+					ensMatchData = false;	
+			}
 		}else {
 			noEns = true;
 			menuActionClassify.setEnabled(false);
@@ -427,6 +433,7 @@ public class UI {
 		tmtableStat.addColumn("FN_Test");
 		tmtableStat.addColumn("Sensitivity_Test");
 		tmtableStat.addColumn("Speciticity_Test");
+		tmtableStat.addColumn("Accuracy_Test");
 
 		tableClassify.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 	        /**

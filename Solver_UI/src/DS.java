@@ -43,6 +43,8 @@ public class DS {
 	};	// 20 Colors = Max Count for Classes
 	
 	public static BufferedImage[] legendImage = null;
+
+	public static String variableID = "-no_ID-";
 	
 	public DS () {
 		 UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
@@ -143,6 +145,7 @@ public class DS {
 //	
 	public static JSONObject getDSsAsJson() {
 		JSONObject out = new JSONObject();
+		out.put("variableID", 	variableID);
 		out.put("fileName", 	DS.fileName);
 		StringBuffer tmp = new StringBuffer();
 		for ( int i=0;i<classAllIndices.length; i++) {
