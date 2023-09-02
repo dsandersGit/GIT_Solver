@@ -76,12 +76,13 @@ public class SolverStart {
 	 * 73: Accuracy Train and Test, Classify: Train / Testing when fixed, Opts adapted
 	 * 74: Re-lable Test > Validation
 	 * 75: Fixed Trainset Init moved from DS to SolverStart
+	 * 76: + random probability in accuracy plot
 	 * 	 */
  
 	
 	public static String 	app 			= "solver";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 75";
+	public static String 	revision 		= " 76";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -156,10 +157,19 @@ public class SolverStart {
 		//72: Train/Test change only cycle wise
 		//DS.fixedTrainSet = null;
 		
+		// Basic probaility of classification
+		double prob = 0;
+		for (int c=0;c<DS.numClasses;c++) {
+			prob += (double)DS.classAllIndPop[c] * ((double)DS.classAllIndPop[c] / (double)DS.numSamples);
+		}
+		prob /= (double) DS.numSamples; 
+		
 		
 		UI.labTimePerRun.setText("Process: THIS MIGHT TAKE SOME TIME");
 		UI.refreshStatus();
 		Runner.cleanRunner();
+		
+		
 		
 		// Preparing Ensemble JSON
 		JSONObject main = new JSONObject();
@@ -267,19 +277,26 @@ public class SolverStart {
 				rollingAccuracyX.add( (float)rACount);
 				
 				float[] rATest 			= new float[rollingAccuracyTest.size()];
-				float[] rATrain 			= new float[rollingAccuracyTest.size()];
-//							float[][] rAC 		= new float[DS.numClasses][rollingAccuracyTest.size()];
+				float[] rATrain 		= new float[rollingAccuracyTest.size()];
+				float[] basicProb 		= new float[rollingAccuracyTest.size()];
+
+				
 				float[] rAx 		= new float[rollingAccuracyTest.size()];
 				for (int j=0;j<rATest.length;j++) {
 					rATest[j] 	= rollingAccuracyTest.get(j);
 					rATrain[j] 	= rollingAccuracyTrain.get(j);
 					rAx[j] 	= rollingAccuracyX.get(j);
-//								for (int l=0;l<Classify.matchCountTarget.length;l++) {
-//									rAC[l][j] = rAClass[l].get(j);
-//								}
+					basicProb[j] = (float)prob*100; 
 				}
+				
+				// Basic Probability
+				
+				
+				
+				
 				UI.sp1D.setXY(rAx, rATrain, 13, Color.red, "Train", true, true, true);	
 				UI.sp1D.setXY(rAx, rATest, 13, Color.blue, "Validation", true, true, true);
+				UI.sp1D.setXY(rAx, basicProb, 13, Color.black, "random", false, true, false);
 	            	
 //					            for (int l=0;l<DS.numClasses;l++) {
 //					            	UI.sp1D.setXY(rAx, rAC[l], 13,  Tools.getClassColor(l), DS.classAllIndNme[l], false, true, false);
@@ -775,6 +792,5 @@ public class SolverStart {
 	        UI.proStatus.setValue(0);
 	        if (fail) JOptionPane.showConfirmDialog(null, "<HTML><H3>Import of data failed</H3>", SolverStart.app, JOptionPane.OK_OPTION, JOptionPane.WARNING_MESSAGE);
 	}
-	
 	
 }

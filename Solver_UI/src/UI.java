@@ -452,21 +452,26 @@ public class UI {
 	            Font font = label.getFont();
 	            label.setFont(font.deriveFont(Font.PLAIN));
 	            setBackground(SolverStart.backColor);setForeground(SolverStart.frontColor);
-	            
-	            if ( column>5) {
+	           
+	            if ( column>6) {
 		            double val =  0;
 		            try {
 		            	val = Double.parseDouble((String)(""+value));
 		            }catch(NumberFormatException ee){
 		        	}
+		            int red = 0;
 		            int green = (int) (val * 255);
 		            if ( green > 255) green = 255;
+		            if ( green < 0 ) {
+		            	green = 0;red = -green;
+		            	if ( red>255)red = 255;
+		            }
 		            if ( val < 0.5) {
 		            	setForeground(Color.WHITE);
 		            }else {
 		            	setForeground(Color.BLACK);
 		            }
-		            setBackground(new Color(100,green, 100));
+		            setBackground(new Color(red,green, 100));
 	            }
 	            return this;
 	        }

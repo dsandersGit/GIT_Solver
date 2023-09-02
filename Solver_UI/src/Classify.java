@@ -22,6 +22,20 @@ public class Classify {
 	
 	public  Classify() {
 		
+		
+		UI.tmtableClassify.setRowCount(0);
+		UI.tmtableClassify.setColumnCount(0);
+		UI.tmtableClassify.addColumn("run");
+		UI.tmtableClassify.addColumn("sample");
+		UI.tmtableClassify.addColumn("classindex");
+		UI.tmtableClassify.addColumn("classname");
+		UI.tmtableClassify.addColumn("classification");
+		UI.tmtableClassify.addColumn("match");
+		UI.tmtableClassify.addColumn("train/validation");
+		for (int j=0;j<DS.numClasses;j++) {
+			UI.tmtableClassify.addColumn(DS.classAllIndNme[j]);
+		}
+		
 		JSONObject ensemble = DS.js_Ensemble;
 		if (ensemble== null )return;
 		if ( !ensemble.has("model")) return;
@@ -132,22 +146,21 @@ public class Classify {
 		int add = 7; // sonst 6
 		
 		UI.tmtableClassify.setRowCount(0);
-		UI.tmtableClassify.setColumnCount(0);
 		
-		//new UI();
-		Object[] header = new Object[DS.numClasses+add];
-		header[0] = ("run");
-		header[1] = ("sample");
-		header[2] = ("classindex");
-		header[3] = ("classname");
-		header[4] = ("classification");
-		header[5] = ("match");
-		header[6] = ("train/validation");
-		for (int j=0;j<DS.numClasses;j++) {
-			header[add+j] = (DS.classAllIndNme[j]);
-		}
+//		//new UI();
+//		Object[] header = new Object[DS.numClasses+add];
+//		header[0] = ("run");
+//		header[1] = ("sample");
+//		header[2] = ("classindex");
+//		header[3] = ("classname");
+//		header[4] = ("classification");
+//		header[5] = ("match");
+//		header[6] = ("train/validation");
+//		for (int j=0;j<DS.numClasses;j++) {
+//			header[add+j] = (DS.classAllIndNme[j]);
+//		}
 
-		Object[][] row = new Object[DS.numSamples][DS.numClasses+add];
+		
 		
 		float matchCountTest		= 0;
 		float matchCountTrain		= 0;
@@ -158,20 +171,20 @@ public class Classify {
 		allCountTarget 		= new float[DS.numClasses];
 		
 		for (int f=0;f<DS.numSamples;f++){
-			
-			 double max=-1;
+			Object[] row = new Object[DS.numClasses+add];
+			 double max=-5;
 			 ArrayList<Integer> all = new ArrayList<Integer>();
 			 int index = Tools.getIndexOfTarget (DS.classIndex[f]);
 		 
-			 row[f][0] = (f+1);
-			 row[f][1] = DS.SampleNames[f];
-			 row[f][2] = DS.classIndex[f];
-			 row[f][3] = DS.ClassNames[f];
+			 row[0] = (f+1);
+			 row[1] = DS.SampleNames[f];
+			 row[2] = DS.classIndex[f];
+			 row[3] = DS.ClassNames[f];
 			 
 			 for (int i=0;i<DS.classAllIndices.length;i++) {
 				 double val = sumUpClassification[f][i]/fullBonusClassification[i]; 
-				 row[f][i+add] = Tools.myRound(val,6);
-				 if ( max <  val) {
+				 row[i+add] = Tools.myRound(val,6);
+				 if ( max <  val || i==0) {
 					 max = val;
 					 all.clear();
 					 all.add(i);
@@ -182,7 +195,7 @@ public class Classify {
 				 }
 			 }
 			 
-			 if ( max > 0 ) {
+			 if ( max > -5 ) {
 				 finalClass[f] = "";
 				 finalClassIndex[f] = -1;
 				 for (int i=0;i<all.size();i++) {
@@ -196,7 +209,7 @@ public class Classify {
 				 finalClassBonus[f] = 0;
 				 finalClassIndex[f] = -1;
 			 }
-			 row[f][4] = finalClass[f];
+			 row[4] = finalClass[f];
 			 if (finalClass[f].equals(DS.ClassNames[f])) {						// contains
 				 if ( (Opts.fixTrainSet && DS.fixedTrainSet != null)) {
 					 if (DS.fixedTrainSet[index][f]) {
@@ -208,18 +221,18 @@ public class Classify {
 					 matchCountTrain++;
 				 }
 				 matchCountTarget[Tools.getIndexOfTarget(DS.classIndex[f])]++;
-				 row[f][5] = "++++++";
+				 row[5] = "++++++";
 			 }else {
-				 row[f][5] = "------";
+				 row[5] = "------";
 			 }
 			 if ( Opts.fixTrainSet && DS.fixedTrainSet != null) {
 				 if (DS.fixedTrainSet[index][f]) {
-					 row[f][6] = "training";
+					 row[6] = "training";
 				 }else {
-					 row[f][6] = "validation";
+					 row[6] = "validation";
 				 }
 			 }else {
-				 row[f][6] = " - - - ";
+				 row[6] = " - - - ";
 			 }
 			 if ( (Opts.fixTrainSet && DS.fixedTrainSet != null)) {
 				 if (DS.fixedTrainSet[index][f]) {
@@ -233,9 +246,11 @@ public class Classify {
 			 int val = Tools.getIndexOfTarget(DS.classIndex[f]);
              if ( val > - 1)
                  allCountTarget[val]++;
+             UI.tmtableClassify.addRow(row);
+             
 		 }
 
-		UI.tmtableClassify.setDataVector(row, header);
+		
 		accuracyTrain = Tools.myRound(100* (matchCountTrain/allCountTrain),1);
 		accuracyTest = Tools.myRound(100* (matchCountTest/allCountTest),1);
 		if (  allCountTest == 0) {
@@ -290,6 +305,7 @@ public class Classify {
                 sumUpClass[f][indexPos] += bonus;
             }else {
                 classification[f] = -1;
+                sumUpClass[f][indexPos] -= bonus;
             }
         }
        
