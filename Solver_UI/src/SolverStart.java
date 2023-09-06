@@ -34,6 +34,23 @@ public class SolverStart {
 	 */
 	
 	/*
+	 * MINDMAP Algo Name: 
+	 * Center Same, Disperse Others   CS-DO
+	 * Disperse Non Target
+	 * Unique Center Distance Disperse UC-DD
+	 * Unique Separate by Distance US_D  
+	 * Iterate Disperse from Some ID-S
+	 * Iterating Geometrical Dispersion IGD
+	 * Iterative Spatial Dispersion ISD
+	 * Iterating Spatial expulsion ISE
+	 * Iterating Spatial adjustment ISA
+	 * Iterating Spatial Class Discrimination ISCD
+	 * Iterating Spatial Segregation ISS
+	 * Iterating Spatial Partitioning ISP * 
+	 * Iterative Spatial Isolation ISI *****
+	 */
+	
+	/*
 	 * 34: Fingerprint Model und Opts
 	 * 35: Vieles
 	 * 36: Validation in Table
@@ -77,12 +94,15 @@ public class SolverStart {
 	 * 74: Re-lable Test > Validation
 	 * 75: Fixed Trainset Init moved from DS to SolverStart
 	 * 76: + random probability in accuracy plot
+	 * 77: Color reshuffle
+	 * 78: void
+	 * 79: UC.addColumn swaped
 	 * 	 */
  
 	
-	public static String 	app 			= "solver";
+	public static String 	app 			= "solver [ISI]";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 76";
+	public static String 	revision 		= " 79";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -384,6 +404,47 @@ public class SolverStart {
 		row[15] 		= Tools.myRound(((float)(mc.tp_fp_tn_fn[0][1]+ mc.tp_fp_tn_fn[2][1]))/ ((float)(mc.tp_fp_tn_fn[0][1]+mc.tp_fp_tn_fn[1][1]+mc.tp_fp_tn_fn[2][1]+mc.tp_fp_tn_fn[3][1])),4);
 		
 		UI.tmtableStat.addRow(row);
+		
+		UI.spSpread.dats.clear();
+		
+		float avgX = 0;
+		float avgY = 0;
+		for (int f=0;f<DS.numSamples;f++) {
+			avgX += DS.sepaX[f];
+			avgY += DS.sepaY[f];
+		}
+		avgX /= DS.numSamples;
+		avgY /= DS.numSamples;
+		for (int f=0;f<DS.numSamples;f++) {
+			DS.sepaX[f] -= avgX;
+			DS.sepaY[f] -= avgY;
+		}
+		
+		double angle = Math.PI/DS.numClasses;
+		for (int c=0;c<DS.numClasses;c++) {
+			float[] x = new float[DS.classAllIndPop[c]];
+			float[] y = new float[DS.classAllIndPop[c]];
+			int inRun = 0;
+		
+			for (int f=0;f<DS.numSamples;f++) {
+				int t = Tools.getIndexOfTarget(mc.targetColorIndex);
+				DS.sepaX[f] += Math.sin(angle*t)*(1-mc.distances[f]);
+				DS.sepaY[f] += Math.cos(angle*t)*(1-mc.distances[f]);
+		
+			}
+
+			for (int f=0;f<DS.numSamples;f++) {
+				if ( Tools.getIndexOfTarget(DS.classIndex[f]) == c) {
+					x[inRun] = DS.sepaX[f];
+					y[inRun] = DS.sepaY[f];
+					inRun ++;
+				}
+			}
+			UI.spSpread.setXY(x, y, 12, Tools.getClassColor(c), DS.classAllIndNme[c], true, false, false);
+		}
+		
+		UI.spSpread.refreshPlot();
+		//UI.heatMap.repaint();
 	}
 	public static void classify() {
 		new Classify();

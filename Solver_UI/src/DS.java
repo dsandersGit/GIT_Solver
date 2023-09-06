@@ -28,18 +28,38 @@ public class DS {
 	public static int			numSamples		= 0;
 	public static int			numClasses		= 0;
 	
+	public static float[] 		sepaX 	= null;
+	public static float[] 		sepaY 	= null;
+	
 	public static JSONObject	js_Ensemble		= null;
 	
 	//public static String 	    TP_FP_TN_FN		= null;
 	
 	public static StringBuffer 	txtSummary		= null;
 	//public static Color[]		classCols 		= null;
-	public static Color[]		classCols 		= {new Color(128,0,0),
-		new Color(170,110,40),new Color(128,128,0),new Color(0,128,128),new Color(0,0,128),
-		new Color(0,0,0),new Color(230,25,75),new Color(255,255,25),new Color(210,245,60),
-		new Color(60,180,75),new Color(70,240,240),new Color(0,130,200),new Color(145,30,180),
-		new Color(240,50,230),new Color(128,128,128),new Color(250,190,212),new Color(255,215,180),
-		new Color(255,250,200),new Color(170,255,195),new Color(220,190,255)
+	public static Color[]		classCols 		= 
+		{
+			new Color(230,25,75),	// rot
+			new Color(60,180,75),	// grün
+			new Color(0,130,200),	// marineblau
+			new Color(0,0,128),		// dunkelblau
+			new Color(170,110,40), //hellbraun
+			new Color(0,0,0),		// schwarz
+			new Color(70,240,240),	// cyan
+			new Color(170,255,195),	// damped green
+			new Color(220,190,255),	// damped violett
+			new Color(128,0,0),		//dunkelbraun
+			new Color(128,128,0),	// grünbraun
+			new Color(0,128,128),	// olive
+			new Color(255,255,25),	// gelb
+			new Color(210,245,60),	// hellgruen
+			new Color(145,30,180),	// violett
+			new Color(240,50,230),	// pink
+			new Color(128,128,128),	// erde
+			new Color(250,190,212),	// damped pink
+			new Color(255,215,180),	// damped orange
+			new Color(255,250,200)	// damped yellow
+
 	};	// 20 Colors = Max Count for Classes
 	
 	public static BufferedImage[] legendImage = null;
@@ -86,6 +106,8 @@ public class DS {
 			legendImage[i] = Tools.getLegendImage(i, classAllIndNme[i]) ;
 		}
 			
+		sepaX = new float[DS.numSamples];
+		sepaY = new float[DS.numSamples];
 //		75: Fixed Trainset Init moved from DS to SolverStart
 //		if ( Opts.fixTrainSet ) {
 //			getFixedTrainSet();

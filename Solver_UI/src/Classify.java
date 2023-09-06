@@ -23,18 +23,7 @@ public class Classify {
 	public  Classify() {
 		
 		
-		UI.tmtableClassify.setRowCount(0);
-		UI.tmtableClassify.setColumnCount(0);
-		UI.tmtableClassify.addColumn("run");
-		UI.tmtableClassify.addColumn("sample");
-		UI.tmtableClassify.addColumn("classindex");
-		UI.tmtableClassify.addColumn("classname");
-		UI.tmtableClassify.addColumn("classification");
-		UI.tmtableClassify.addColumn("match");
-		UI.tmtableClassify.addColumn("train/validation");
-		for (int j=0;j<DS.numClasses;j++) {
-			UI.tmtableClassify.addColumn(DS.classAllIndNme[j]);
-		}
+		
 		
 		JSONObject ensemble = DS.js_Ensemble;
 		if (ensemble== null )return;
@@ -91,6 +80,19 @@ public class Classify {
 		// ***
 		numVars = DS.normParas[0].length;
 		DS.numClasses = DS.classAllIndices.length;
+		
+		UI.tmtableClassify.setRowCount(0);
+		UI.tmtableClassify.setColumnCount(0);
+		UI.tmtableClassify.addColumn("run");
+		UI.tmtableClassify.addColumn("sample");
+		UI.tmtableClassify.addColumn("classindex");
+		UI.tmtableClassify.addColumn("classname");
+		UI.tmtableClassify.addColumn("classification");
+		UI.tmtableClassify.addColumn("match");
+		UI.tmtableClassify.addColumn("train/validation");
+		for (int j=0;j<DS.numClasses;j++) {
+			UI.tmtableClassify.addColumn(DS.classAllIndNme[j]);
+		}
 		
 		double[][] mc 						= new double[DS.numVars][Opts.numDims];
 		double[] avgs 						= new double[Opts.numDims];

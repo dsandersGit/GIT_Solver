@@ -101,6 +101,8 @@ public class UI {
 	public static 		SP_PlotCanvas spDst 		= new SP_PlotCanvas();
 	public static 		SP_PlotCanvas sp1D 			= new SP_PlotCanvas();
 	public static 		SP_PlotCanvas sp2D 			= new SP_PlotCanvas();
+	public static 		SP_PlotCanvas spSpread 		= new SP_PlotCanvas();
+//	public static 		HeatMap heatMap				= new HeatMap();
 	public static 		JTextArea txtOpts 			= new JTextArea();
 	public static 		JTextArea txtEnsemble 		= new JTextArea();
 	static 				JScrollPane scEnsemble		= new JScrollPane(txtEnsemble);
@@ -197,6 +199,10 @@ public class UI {
 		maintabbed.addTab("3D",tab3D);
 		maintabbed.add("Ensemble",scEnsemble);
 		maintabbed.add("Algorithm", iconAlgo);
+		maintabbed.add("spSpread", spSpread);
+		
+//		maintabbed.add("[Exp.] HeatMap", heatMap);
+		
 		sp1D.setTitle("Accuracy Development");
 		sp1D.setXAxis("# cycle");
 		sp1D.setYAxis("accuracy [%]");
