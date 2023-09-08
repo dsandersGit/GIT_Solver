@@ -101,8 +101,8 @@ public class UI {
 	public static 		SP_PlotCanvas spDst 		= new SP_PlotCanvas();
 	public static 		SP_PlotCanvas sp1D 			= new SP_PlotCanvas();
 	public static 		SP_PlotCanvas sp2D 			= new SP_PlotCanvas();
-	public static 		SP_PlotCanvas spSpread 		= new SP_PlotCanvas();
-//	public static 		HeatMap heatMap				= new HeatMap();
+	//public static 		SP_PlotCanvas spSpread 		= new SP_PlotCanvas();
+	public static 		HeatMap heatMap				= new HeatMap();
 	public static 		JTextArea txtOpts 			= new JTextArea();
 	public static 		JTextArea txtEnsemble 		= new JTextArea();
 	static 				JScrollPane scEnsemble		= new JScrollPane(txtEnsemble);
@@ -199,9 +199,9 @@ public class UI {
 		maintabbed.addTab("3D",tab3D);
 		maintabbed.add("Ensemble",scEnsemble);
 		maintabbed.add("Algorithm", iconAlgo);
-		maintabbed.add("spSpread", spSpread);
+//		maintabbed.add("spSpread", spSpread);
 		
-//		maintabbed.add("[Exp.] HeatMap", heatMap);
+		maintabbed.add("[Exp.] HeatMap", heatMap);
 		
 		sp1D.setTitle("Accuracy Development");
 		sp1D.setXAxis("# cycle");
@@ -463,13 +463,15 @@ public class UI {
 		            double val =  0;
 		            try {
 		            	val = Double.parseDouble((String)(""+value));
+		            	
 		            }catch(NumberFormatException ee){
 		        	}
 		            int red = 0;
 		            int green = (int) (val * 255);
+		            
 		            if ( green > 255) green = 255;
 		            if ( green < 0 ) {
-		            	green = 0;red = -green;
+		            	red = -green/2;green = 0;
 		            	if ( red>255)red = 255;
 		            }
 		            if ( val < 0.5) {

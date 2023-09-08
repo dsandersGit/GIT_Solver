@@ -274,13 +274,24 @@ public class Tools {
 	   			return chooser.getSelectedFile();
 		    return null;
 	}
+	// 80
+//	static String[] getvarNamesFromEnsemble ( ) {
+//		
+//		JSONObject ensemble = DS.js_Ensemble;
+//		JSONObject ds = ensemble.getJSONObject("DS");
+//		String tmp 					= ds.getString("VariableNames");
+//		return tmp.split(",");
+//	}
 	static String[] getvarNamesFromEnsemble ( ) {
-		
-		JSONObject ensemble = DS.js_Ensemble;
-		JSONObject ds = ensemble.getJSONObject("DS");
-		String tmp 					= ds.getString("VariableNames");
-		return tmp.split(",");
-	}
+        if ( DS.js_Ensemble == null ) return null;
+        if ( !DS.js_Ensemble.has("DS") ) return null;
+        JSONObject ensemble = DS.js_Ensemble;
+        JSONObject ds = ensemble.getJSONObject("DS");
+        String tmp                     = ds.getString("VariableNames");
+       
+        String[] elms = tmp.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
+        return elms;
+    }
 	public static void compileModels() {
 		JSONObject main = DS.js_Ensemble;
 		main.remove("model");

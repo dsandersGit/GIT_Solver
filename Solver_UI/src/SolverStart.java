@@ -97,12 +97,13 @@ public class SolverStart {
 	 * 77: Color reshuffle
 	 * 78: void
 	 * 79: UC.addColumn swaped
+	 * 80: Bug comma in Variable Names, Background Color
 	 * 	 */
  
 	
 	public static String 	app 			= "solver [ISI]";
 	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 79";
+	public static String 	revision 		= " 80";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -405,46 +406,46 @@ public class SolverStart {
 		
 		UI.tmtableStat.addRow(row);
 		
-		UI.spSpread.dats.clear();
-		
-		float avgX = 0;
-		float avgY = 0;
-		for (int f=0;f<DS.numSamples;f++) {
-			avgX += DS.sepaX[f];
-			avgY += DS.sepaY[f];
-		}
-		avgX /= DS.numSamples;
-		avgY /= DS.numSamples;
-		for (int f=0;f<DS.numSamples;f++) {
-			DS.sepaX[f] -= avgX;
-			DS.sepaY[f] -= avgY;
-		}
-		
-		double angle = Math.PI/DS.numClasses;
-		for (int c=0;c<DS.numClasses;c++) {
-			float[] x = new float[DS.classAllIndPop[c]];
-			float[] y = new float[DS.classAllIndPop[c]];
-			int inRun = 0;
-		
-			for (int f=0;f<DS.numSamples;f++) {
-				int t = Tools.getIndexOfTarget(mc.targetColorIndex);
-				DS.sepaX[f] += Math.sin(angle*t)*(1-mc.distances[f]);
-				DS.sepaY[f] += Math.cos(angle*t)*(1-mc.distances[f]);
-		
-			}
-
-			for (int f=0;f<DS.numSamples;f++) {
-				if ( Tools.getIndexOfTarget(DS.classIndex[f]) == c) {
-					x[inRun] = DS.sepaX[f];
-					y[inRun] = DS.sepaY[f];
-					inRun ++;
-				}
-			}
-			UI.spSpread.setXY(x, y, 12, Tools.getClassColor(c), DS.classAllIndNme[c], true, false, false);
-		}
-		
-		UI.spSpread.refreshPlot();
-		//UI.heatMap.repaint();
+//		UI.spSpread.dats.clear();
+//		
+//		float avgX = 0;
+//		float avgY = 0;
+//		for (int f=0;f<DS.numSamples;f++) {
+//			avgX += DS.sepaX[f];
+//			avgY += DS.sepaY[f];
+//		}
+//		avgX /= DS.numSamples;
+//		avgY /= DS.numSamples;
+//		for (int f=0;f<DS.numSamples;f++) {
+//			DS.sepaX[f] -= avgX;
+//			DS.sepaY[f] -= avgY;
+//		}
+//		
+//		double angle = Math.PI/DS.numClasses;
+//		for (int c=0;c<DS.numClasses;c++) {
+//			float[] x = new float[DS.classAllIndPop[c]];
+//			float[] y = new float[DS.classAllIndPop[c]];
+//			int inRun = 0;
+//		
+//			for (int f=0;f<DS.numSamples;f++) {
+//				int t = Tools.getIndexOfTarget(mc.targetColorIndex);
+//				DS.sepaX[f] += Math.sin(angle*t)*(1-mc.distances[f]);
+//				DS.sepaY[f] += Math.cos(angle*t)*(1-mc.distances[f]);
+//		
+//			}
+//
+//			for (int f=0;f<DS.numSamples;f++) {
+//				if ( Tools.getIndexOfTarget(DS.classIndex[f]) == c) {
+//					x[inRun] = DS.sepaX[f];
+//					y[inRun] = DS.sepaY[f];
+//					inRun ++;
+//				}
+//			}
+//			UI.spSpread.setXY(x, y, 12, Tools.getClassColor(c), DS.classAllIndNme[c], true, false, false);
+//		}
+//		
+//		UI.spSpread.refreshPlot();
+		UI.heatMap.repaint();
 	}
 	public static void classify() {
 		new Classify();
@@ -677,7 +678,7 @@ public class SolverStart {
 	         
 	        if ( !hasHeader ) {
 	        	for (int i=0;i<noAreas; i++) {
-	        		 DS.AreaNames [i] = "VAR:"+i;
+	        		 DS.AreaNames [i] = '\"'+"VAR:"+i+'\"';
 	        	}
 	        }else {
 	        	noFiles--;
@@ -691,13 +692,13 @@ public class SolverStart {
 
 			    	test = lines[0].split(split);
 			    	for (int i=0;i<test.length; i++) {
-		        		 if ( i!= classNamesPos) { DS.AreaNames [c] = test[i];
+		        		 if ( i!= classNamesPos) { DS.AreaNames [c] = '\"'+test[i]+'\"';
 			        		 c++;
 		        		 }
 		        	}
 			    }else {
 			    	for (int i=0;i< DS.AreaNames.length; i++) {
-			    		 DS.AreaNames[i] = "var_"+1;
+			    		 DS.AreaNames[i] = '\"'+"var_"+i+'\"';
 			    	}
 			    }
 			    
@@ -816,7 +817,7 @@ public class SolverStart {
 	        int ac = 0;
 	        for(int i=4;i<test.length;i++){
 	        	if ( !areaIsLabel[i-4]) {
-	        		DS.AreaNames[ac] = test[i];
+	        		DS.AreaNames[ac] = '\"'+test[i]+'\"';
 	        		ac++;
 	        	}
 	        }

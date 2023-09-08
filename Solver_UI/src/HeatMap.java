@@ -16,11 +16,13 @@ public class HeatMap extends JPanel {
 	{
 		int w = this.getWidth();
 		int h = this.getHeight();
+		int step = 30;
+		int blk = 10;
 		
 		super.paintComponent( g);
 		//Graphics2D g2 = (Graphics2D) g;
 		
-		int histo[][] = new int[100][DS.freezs.size()];
+		int histo[][] = new int[step][DS.freezs.size()];
 		int maxHisto = 0;
 		int minHisto = 0;
 		int clsList[] = new int[DS.freezs.size()];
@@ -35,9 +37,9 @@ public class HeatMap extends JPanel {
 				MC_Freeze mc = DS.freezs.get(i);
 				int cls = Tools.getIndexOfTarget(mc.targetColorIndex);				// 0, 1, 2 ..
 				clsList[i] = cls;
-				int pos = (int)(mc.distances[j]*100);
+				int pos = (int)(mc.distances[j]*step);
 				if ( pos < 0 )pos = 0;
-				if ( pos > 99 )pos = 99;
+				if ( pos > step-1 )pos = step-1;
 				if (  mc.targetColorIndex == DS.classIndex[j] ) {
 					histo[pos][i]++;
 				}else {
@@ -48,12 +50,12 @@ public class HeatMap extends JPanel {
 			}
 		}
 		for (int c=0;c<DS.freezs.size(); c++) {
-			for (int i=0;i<100; i++) {
+			for (int i=0;i<step; i++) {
 				g.setColor(getGasRGB(histo[i][c],minHisto,maxHisto, false));
-				g.fillRect(i*5, c*5, 5, 5);
+				g.fillRect(i*blk, c*blk, blk, blk);
 			}
 			g.setColor(Tools.getClassColor(Tools.getIndexOfTarget(DS.freezs.get(c).targetColorIndex)));
-			g.fillRect(105*5, c*5, 5, 5);
+			g.fillRect(105*blk, c*blk, blk, blk);
 		}
 		
 		for (int c=0;c<DS.classCols.length; c++) {
