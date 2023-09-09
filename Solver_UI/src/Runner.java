@@ -419,7 +419,7 @@ public class Runner {
     	
 		double large = 0.2;
 		double small = large*0.1;
-        int z0     = (int)Math.floor(Math.random()*10);                // zufi
+        int z0     = (int)Math.floor(Math.random()*11);                // zufi
         Random random = ThreadLocalRandom.current();
         int a = random.nextInt(DS.numVars);
         int pc = random.nextInt(Opts.numDims);
@@ -482,7 +482,13 @@ public class Runner {
         			if (a!=i)mcEigenVec [i][j] = 0;
         		}
             }
-        	break;        	
+        	break;      
+        case 9: 
+    		for (int j=0;j<Opts.numDims;j++) {
+    			mcEigenVec [a][j] *= 0.1;
+    		}
+
+        	break;      
         default:
             for (int sa=0;sa<DS.numVars;sa++){
                   for (int i=0;i<Opts.numDims;i++) {

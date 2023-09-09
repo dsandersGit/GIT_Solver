@@ -102,7 +102,7 @@ public class UI {
 	public static 		SP_PlotCanvas sp1D 			= new SP_PlotCanvas();
 	public static 		SP_PlotCanvas sp2D 			= new SP_PlotCanvas();
 	//public static 		SP_PlotCanvas spSpread 		= new SP_PlotCanvas();
-	public static 		HeatMap heatMap				= new HeatMap();
+//	public static 		HeatMap heatMap				= new HeatMap();
 	public static 		JTextArea txtOpts 			= new JTextArea();
 	public static 		JTextArea txtEnsemble 		= new JTextArea();
 	static 				JScrollPane scEnsemble		= new JScrollPane(txtEnsemble);
@@ -201,7 +201,7 @@ public class UI {
 		maintabbed.add("Algorithm", iconAlgo);
 //		maintabbed.add("spSpread", spSpread);
 		
-		maintabbed.add("[Exp.] HeatMap", heatMap);
+//		maintabbed.add("[Exp.] HeatMap", heatMap);
 		
 		sp1D.setTitle("Accuracy Development");
 		sp1D.setXAxis("# cycle");
@@ -334,7 +334,7 @@ public class UI {
 				ensMatchData = false;
 			}else {
 				for (int i=0;i<DS.numVars;i++) {
-					if ( !DS.AreaNames[i].equals(ensVarNames[i]))ensMatchData = false;	
+					if ( !DS.AreaNames[i].equals(ensVarNames[i]) && !DS.AreaNames[i].equals('\"'+ensVarNames[i]+'\"'))ensMatchData = false;	
 				}
 			}
 			JSONObject ds 		= DS.js_Ensemble.getJSONObject("DS");
