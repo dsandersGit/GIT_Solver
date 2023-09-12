@@ -247,9 +247,9 @@ public class Runner {
             	x[i] = i;
             }
             UI.sp.dats.clear();
-           	UI.sp.setXY(x, yDst, 4, Color.DARK_GRAY, "gain", false, true, false);
-            UI.sp.setXY(x, yTrain, 4, Color.orange, "accuracyTrain", false, true, false);
-            UI.sp.setXY(x, yTest, 4, Color.LIGHT_GRAY, "accuracyTest", false, true, false);
+           	UI.sp.setXY(x, yDst, 4, SolverStart.frontColor, "gain", false, true, false);
+            UI.sp.setXY(x, yTrain, 4, Color.red, "accuracyTrain", false, true, false);
+            UI.sp.setXY(x, yTest, 4, Color.orange, "accuracyTest", false, true, false);
             UI.sp.refreshPlot();
     	//}
         plotTime = System.currentTimeMillis();
@@ -327,9 +327,9 @@ public class Runner {
 		            //71: ClassColor in LIVE
 		            UI.spDst.setXY(xTrain,yTrain, pSize, Tools.getClassColor(index), "Train: " + DS.classAllIndNme[index], true, false, false);
 		           // UI.spDst.setXY(xOTrain,yOTrain, pSize, new Color(220,54,39), "OtherTrain", true, false, false);
-		            UI.spDst.setXY(xOTrain,yOTrain, pSize, yTrainCol, "OtherTrain", true, false, false);
+		            UI.spDst.setXY(xOTrain,yOTrain, pSize, yTrainCol, "Testing", true, false, false);
 		            
-		            UI.spDst.setXY(xSigmoid,ySigmoid, pSize, Color.DARK_GRAY, null, false, true, false);
+		            UI.spDst.setXY(xSigmoid,ySigmoid, pSize, Color.black, null, false, true, false);
 		            UI.spDst.refreshPlot();
 
 	            }

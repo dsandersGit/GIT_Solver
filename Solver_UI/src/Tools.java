@@ -45,12 +45,19 @@ public class Tools {
         return str != null && str.matches("[-+]?\\d*\\.?\\d+");
     }
 	public static String txtLen (String txt) {
-		while (txt.length()<16) {
-			txt = txt + ".";
+		if (Tools.isNumeric(txt)) {
+			while (txt.length()<16) {
+				txt = "." + txt ;
+			}
+		}else {
+			while (txt.length()<16) {
+				txt = txt + ".";
+			}
+			while (txt.length()>16) {
+				txt = txt.substring(0,txt.length()-1);
+			}	
 		}
-		while (txt.length()>16) {
-			txt = txt.substring(0,txt.length()-1);
-		}
+		
 		return txt;
 	}
 	public  static double[] calculateSD(double numArray[])
@@ -242,9 +249,9 @@ public class Tools {
 		legendImage = new BufferedImage(13+width,15,BufferedImage.TYPE_INT_RGB );
 		Graphics g = legendImage.getGraphics();
 		g.setFont(font24);
-		g.setColor(Color.WHITE);
+		g.setColor(SolverStart.backColor);
 		g.fillRect(0,0,legendImage.getWidth(),legendImage.getHeight());
-		g.setColor(Color.BLACK);
+		g.setColor(SolverStart.frontColor);
 		
 		g.drawString(name,13,13);
 		g.setColor(getClassColor(index));

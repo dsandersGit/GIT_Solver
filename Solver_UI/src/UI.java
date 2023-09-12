@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -57,7 +58,7 @@ import javax.swing.table.DefaultTableModel;
 public class UI {
 	public static 		JFrame jF = new JFrame();
 	public static 		JTable tableClassify = new JTable();
-	static 				JScrollPane sc= new JScrollPane(tableClassify);
+	static 				JScrollPane scClassify= new JScrollPane(tableClassify);
 	public static 		DefaultTableModel tmtableClassify;
 	
 	public static 		JTable tableStat = new JTable();
@@ -76,7 +77,7 @@ public class UI {
 	static 		JLabel			labRun				= new JLabel("RUN: ---");
 	
 	
-	static JMenu menuFile = new JMenu( " File"); 
+	static JMenu 		menuFile = new JMenu( " File"); 
 	static JMenu 		menuAction = new JMenu( " Action"); 
 	static JMenuItem 	menuActionClassify = new JMenuItem(" Classify"); 
 	static JMenuItem 	menuActionTrainImmediateStop = new JMenuItem(" Stop Training Now");
@@ -104,12 +105,15 @@ public class UI {
 	//public static 		SP_PlotCanvas spSpread 		= new SP_PlotCanvas();
 //	public static 		HeatMap heatMap				= new HeatMap();
 	public static 		JTextArea txtOpts 			= new JTextArea();
+	public static 		JTextArea txtClassify		= new JTextArea();
+	static 				JScrollPane scTxtClassify	= new JScrollPane(txtClassify);
 	public static 		JTextArea txtEnsemble 		= new JTextArea();
 	static 				JScrollPane scEnsemble		= new JScrollPane(txtEnsemble);
 	public static 		JTextArea txtSummary 		= new JTextArea();
 	static 				JScrollPane scSummary		= new JScrollPane(txtSummary);
 	public static 		ThreeDee tab3D = new ThreeDee();
 	static 				JLabel iconAlgo = new Icon_Solver();
+	static 				JLabel iconClassify = null;
 	
 	static JButton jbLoad = new JButton();
 	static JButton jbTrain = new JButton();
@@ -129,10 +133,15 @@ public class UI {
 		
 		
 		initTables();
-		sc = new JScrollPane(tableClassify);
-		sc.setOpaque(false);
-		sc.setBackground(SolverStart.backColor);
-		sc.setPreferredSize(new Dimension (800,600));
+		scClassify = new JScrollPane(tableClassify);
+		scClassify.setOpaque(false);
+		scClassify.setBackground(SolverStart.backColor);
+		//scClassify.setPreferredSize(new Dimension (500,400));
+		JPanel pan_classify = new JPanel();
+		pan_classify.setLayout(new BoxLayout(pan_classify,BoxLayout.Y_AXIS));
+		pan_classify.add(scClassify);
+		pan_classify.add(scTxtClassify);
+		
 		scStat = new JScrollPane(tableStat);
 		scStat.setOpaque(false);
 		scStat.setBackground(SolverStart.backColor);
@@ -155,12 +164,29 @@ public class UI {
 		spDst.setOuterBackGroundColor(SolverStart.backColor);
 		spDst.setBaseColor(SolverStart.frontColor);
 		
+		sp1D.setInnerBackGroundColor(SolverStart.backColor);
+		sp1D.setOuterBackGroundColor(SolverStart.backColor);
+		sp1D.setBaseColor(SolverStart.frontColor);
+		sp2D.setInnerBackGroundColor(SolverStart.backColor);
+		sp2D.setOuterBackGroundColor(SolverStart.backColor);
+		sp2D.setBaseColor(SolverStart.frontColor);
+		
 		txtSummary.setEditable(false);
+		txtClassify.setEditable(false);
 
 		txtOpts.setOpaque(false);
 		txtOpts.setBackground(SolverStart.backColor);
 		txtOpts.setForeground(SolverStart.frontColor);
 		txtOpts.setFont(new Font("Consolas", Font.PLAIN, 20));
+		
+		txtClassify.setOpaque(false);
+		txtClassify.setBackground(SolverStart.backColor);
+		txtClassify.setForeground(SolverStart.frontColor);
+		txtClassify.setFont(new Font("Consolas", Font.PLAIN, 12));
+		
+		ThreeDee.genBackColor 	=	 SolverStart.backColor;
+		ThreeDee.genFrontColor 	= SolverStart.frontColor;
+		tab3D.setOpaque(true);
 	
 		txtEnsemble.setOpaque(false);
 		txtEnsemble.setEditable(false);
@@ -195,7 +221,7 @@ public class UI {
 		maintabbed.add("Live", panLive);
 		maintabbed.add("Validation",scStat);
 		maintabbed.add("Trends", panLiveAcc);
-		maintabbed.add("Classification", sc);
+		maintabbed.add("Classification", pan_classify);
 		maintabbed.addTab("3D",tab3D);
 		maintabbed.add("Ensemble",scEnsemble);
 		maintabbed.add("Algorithm", iconAlgo);
@@ -432,14 +458,14 @@ public class UI {
 		tmtableStat.addColumn("TN_Train");
 		tmtableStat.addColumn("FN_Train");
 		tmtableStat.addColumn("Sensitivity_Train");
-		tmtableStat.addColumn("Speciticity_Train");
+		tmtableStat.addColumn("Specificity_Train");
 		
 		tmtableStat.addColumn("TP_Validation");
 		tmtableStat.addColumn("FP_Validation");
 		tmtableStat.addColumn("TN_Validation");
 		tmtableStat.addColumn("FN_Validation");
 		tmtableStat.addColumn("Sensitivity_Validation");
-		tmtableStat.addColumn("Speciticity_Validation");
+		tmtableStat.addColumn("Specificity_Validation");
 		tmtableStat.addColumn("Accuracy_Validation");
 
 		tableClassify.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
@@ -606,7 +632,10 @@ public class UI {
 		menuAction.add(menuActionTrainImmediateStop);
 		menuActionTrainImmediateStop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CANCEL, InputEvent.CTRL_DOWN_MASK));
 		menuAction.add(new JSeparator());
-		menuAction.add(menuActionClassify);	
+		menuAction.add(menuActionClassify);
+		menuAction.add(new JSeparator());
+		JMenuItem menuActionTheme = new JMenuItem(" Theme"); 
+		menuAction.add(menuActionTheme);
 		// ---------------------------------------------------------------------
 		
 		JMenuItem menuExportVectors = new JMenuItem(" Vectors"); 
@@ -766,6 +795,29 @@ public class UI {
 			maintabbed.setSelectedIndex(tab_Classify);
 			SolverStart.classify();
 		}});
+		menuActionTheme.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent be){	
+			if ( SolverStart.darkMode) {
+				 try {
+					    for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+					      if ("Nimbus".equals(info.getName())) {
+					          javax.swing.UIManager.setLookAndFeel(info.getClassName());
+					          break;
+					      }
+					    } 
+					    } catch (ClassNotFoundException e) {
+						    e.printStackTrace();
+						  } catch (InstantiationException e) {
+						    e.printStackTrace();
+						  } catch (IllegalAccessException e) {
+						    e.printStackTrace();
+						  } catch (javax.swing.UnsupportedLookAndFeelException e) {
+						    e.printStackTrace();
+						  } catch (Exception e) {
+						    e.printStackTrace();
+						  }
+			}
+		}});
+		
 		
 //		menuActionOptions.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 //		

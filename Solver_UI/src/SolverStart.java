@@ -1,8 +1,10 @@
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -12,7 +14,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 
 public class SolverStart {
@@ -29,7 +34,7 @@ public class SolverStart {
 	
 	/*
 	 * THOUGHTS:
-	 * Reduce Variable Count via SPPEARMAN Reduktion ?
+	 * Reduce Variable Count via SPEARMAN Reduktion ?
 	 * Might be beneficial to do bootstrapping for small sample sizes (resampling with duplicates )
 	 */
 	
@@ -99,6 +104,7 @@ public class SolverStart {
 	 * 79: UC.addColumn swaped
 	 * 80: Bug 'comma in Variable Names' fixed, Classification background color adapted 
 	 * 81: refreshStatus: ensMatchData checks for varName and '\"'+varName+'\"'
+	 * 82: Speci(t)ficity Easter Egg
 	 * 	 */
  
 	
@@ -108,7 +114,7 @@ public class SolverStart {
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
-//	public static boolean 	darkMode 		= false;
+	public static boolean 	darkMode 		= false;
 	public static Color 	backColor 		= Color.DARK_GRAY;
 	public static Color 	frontColor 		= Color.LIGHT_GRAY;
 	public static JSONObject defOptions     = null;
@@ -116,7 +122,62 @@ public class SolverStart {
 	
 	public static float[] rollingAccuracy			= null;    // gain / class
 	public static float[] rollingAccuracyX			= null;
+	static String[] uiColorKeys = {"control","info","nimbusBase","nimbusAlertYellow","nimbusDisabledText"+
+			"nimbusFocus","nimbusGreen","nimbusInfoBlue","nimbusLightBackground","nimbusOrange","nimbusRed"+
+			"nimbusSelectedText","nimbusSelectionBackground","text"	};
+	static Color[] uiBaseColors = new Color[uiColorKeys.length];
+	static Color[] uiDarkColors = {new Color( 128, 128, 128),new Color(128,128,128),new Color( 18, 30, 49),
+			 new Color( 248, 187, 0), new Color( 128, 128, 128),new Color(115,164,209),new Color(176,179,50),
+			 new Color( 66, 139, 221),new Color( 18, 30, 49),new Color(191,98,4),new Color(169,46,34),
+			 new Color( 255, 255, 255), new Color( 104, 93, 156),new Color( 230, 230, 230)};
+	
 	public static void main(String[] args) {
+		
+//		// taken from https://stackoverflow.com/questions/36128291/how-to-make-a-swing-application-have-dark-nimbus-theme-netbeans
+//		for (int i=0;i<uiColorKeys.length;i++) {
+//			uiBaseColors[i] = UIManager.getColor(uiColorKeys[i]);
+//		}
+//		if (darkMode) {
+//			frontColor 	= new Color(255,255,253);
+//			backColor 	= Color.DARK_GRAY;
+//			for (int i=0;i<uiColorKeys.length;i++) {
+//				UIManager.put(uiColorKeys[i],uiDarkColors[i]);
+//			}
+//		}
+//		
+//		
+////		  UIManager.put( "control", new Color( 128, 128, 128) );
+////		  UIManager.put( "info", new Color(128,128,128) );
+////		  UIManager.put( "nimbusBase", new Color( 18, 30, 49) );
+////		  UIManager.put( "nimbusAlertYellow", new Color( 248, 187, 0) );
+////		  UIManager.put( "nimbusDisabledText", new Color( 128, 128, 128) );
+////		  UIManager.put( "nimbusFocus", new Color(115,164,209) );
+////		  UIManager.put( "nimbusGreen", new Color(176,179,50) );
+////		  UIManager.put( "nimbusInfoBlue", new Color( 66, 139, 221) );
+////		  UIManager.put( "nimbusLightBackground", new Color( 18, 30, 49) );
+////		  UIManager.put( "nimbusOrange", new Color(191,98,4) );
+////		  UIManager.put( "nimbusRed", new Color(169,46,34) );
+////		  UIManager.put( "nimbusSelectedText", new Color( 255, 255, 255) );
+////		  UIManager.put( "nimbusSelectionBackground", new Color( 104, 93, 156) );
+////		  UIManager.put( "text", new Color( 230, 230, 230) );
+//		  try {
+//		    for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//		      if ("Nimbus".equals(info.getName())) {
+//		          javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//		          break;
+//		      }
+//		    }
+//		  } catch (ClassNotFoundException e) {
+//		    e.printStackTrace();
+//		  } catch (InstantiationException e) {
+//		    e.printStackTrace();
+//		  } catch (IllegalAccessException e) {
+//		    e.printStackTrace();
+//		  } catch (javax.swing.UnsupportedLookAndFeelException e) {
+//		    e.printStackTrace();
+//		  } catch (Exception e) {
+//		    e.printStackTrace();
+//		  }
 		
 		try {
 			backColor 	= new Color(255,255,253);
@@ -153,19 +214,15 @@ public class SolverStart {
 	}
 	public static void trainPattern() throws IOException {
 
+		// populates with running the accuracy of train / test results
 		ArrayList<Float> rollingAccuracyTest = new ArrayList<Float>();
 		ArrayList<Float> rollingAccuracyTrain = new ArrayList<Float>();
 		@SuppressWarnings("unchecked")
-		ArrayList<Float>[] rAClass = new ArrayList[DS.numClasses];
-		  // Array Init
-        for (int i = 0; i < DS.numClasses; i++) {
-        	rAClass[i] = new ArrayList<Float>();
-        }
 		ArrayList<Float> rollingAccuracyX = new ArrayList<Float>();
 
-		int rACount = 0;
-		immediateStop = false;
-		isRunning = true;
+		int rACount = 0;													// running counter
+		immediateStop = false;												// flag for user interrupting current training session
+		isRunning = true;													// flag for running current training session
 		
 		// cleaning stuff
 		UI.labAccuracy.setText("Accuracy: ---");
@@ -176,10 +233,11 @@ public class SolverStart {
 		UI.menuFile.setEnabled(false);
 		UI.txtEnsemble.setText("");
 		UI.tmtableStat.setRowCount(0);
+		UI.txtClassify.setText("");
 		//72: Train/Test change only cycle wise
 		//DS.fixedTrainSet = null;
 		
-		// Basic probaility of classification
+		// Basic probability of classification based on class number and population (two equal classes same population = 50% of random correct draw)
 		double prob = 0;
 		for (int c=0;c<DS.numClasses;c++) {
 			prob += (double)DS.classAllIndPop[c] * ((double)DS.classAllIndPop[c] / (double)DS.numSamples);
@@ -188,10 +246,8 @@ public class SolverStart {
 		
 		
 		UI.labTimePerRun.setText("Process: THIS MIGHT TAKE SOME TIME");
-		UI.refreshStatus();
-		Runner.cleanRunner();
-		
-		
+		UI.refreshStatus();													// fills status and determines user interface UI options 
+		Runner.cleanRunner();												// reset Runner > training session module
 		
 		// Preparing Ensemble JSON
 		JSONObject main = new JSONObject();
@@ -222,11 +278,11 @@ public class SolverStart {
 		if ( Opts.activation.equals("DxA") )activationIsDst = true;		
 		if ( Opts.activation.equals("D+A") )activationBoth = true;
 
-		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));
+		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));	// UI button color
 		for (int i=0;i<Opts.numCycles;i++) {
 			//72: Train/Test change only cycle wise
 			//75: Fixed Trainset Init moved from DS to SolverStart
-			if ( !Opts.fixTrainSet || i==0) DS.getFixedTrainSet();
+			if ( !Opts.fixTrainSet || i==0) DS.getFixedTrainSet();									// fetch the (initial) training set
 			UI.proStatus.setValue(100*i/Opts.numCycles);
 			for (int j=0;j<DS.classAllIndices.length;j++) {
 				if ( !SolverStart.immediateStop ) {	
@@ -292,10 +348,9 @@ public class SolverStart {
 				rACount++;
 				rollingAccuracyTest.add( (float)Classify.accuracyTest);
 				rollingAccuracyTrain.add( (float)Classify.accuracyTrain);
-				for (int l=0;l<Classify.matchCountTarget.length;l++) {
-					rAClass[l].add(100 * Classify.matchCountTarget[l]/Classify.allCountTarget[l]);
-					//System.out.println(100 * Classify.matchCountTarget[l]/Classify.allCountTarget[l]);
-				}
+				
+				//
+				
 				rollingAccuracyX.add( (float)rACount);
 				
 				float[] rATest 			= new float[rollingAccuracyTest.size()];
@@ -319,10 +374,7 @@ public class SolverStart {
 				UI.sp1D.setXY(rAx, rATrain, 13, Color.red, "Train", true, true, true);	
 				UI.sp1D.setXY(rAx, rATest, 13, Color.blue, "Validation", true, true, true);
 				UI.sp1D.setXY(rAx, basicProb, 13, Color.black, "random", false, true, false);
-	            	
-//					            for (int l=0;l<DS.numClasses;l++) {
-//					            	UI.sp1D.setXY(rAx, rAC[l], 13,  Tools.getClassColor(l), DS.classAllIndNme[l], false, true, false);
-//					            }
+
 					UI.sp1D.refreshPlot();
 
 					// Loadings

@@ -17,8 +17,8 @@ public class Classify {
 	
 	public static double accuracyTest = 0;
 	public static double accuracyTrain = 0;
-	public static float[] matchCountTarget 	= null; //new float[DS.numClasses];
-	public static float[] allCountTarget 		= null; //new float[DS.numClasses];
+	public static int[] matchCountTarget 	= null; //new float[DS.numClasses];
+	public static int[] allCountTarget 		= null; //new float[DS.numClasses];
 	
 	public  Classify() {
 		
@@ -169,8 +169,8 @@ public class Classify {
 		float allCountTest			= 0;
 		float allCountTrain			= 0;
 		
-		matchCountTarget 	= new float[DS.numClasses];
-		allCountTarget 		= new float[DS.numClasses];
+		matchCountTarget 	= new int[DS.numClasses];
+		allCountTarget 		= new int[DS.numClasses];
 		
 		for (int f=0;f<DS.numSamples;f++){
 			Object[] row = new Object[DS.numClasses+add];
@@ -252,7 +252,21 @@ public class Classify {
              
 		 }
 
-		
+		StringBuffer out = new StringBuffer();
+		out.append("SUMMARY:"+"\n");
+		out.append(Tools.txtLen ("CLASS") + "\t");
+		out.append(Tools.txtLen ("MATCHES") + "\t");
+		out.append(Tools.txtLen ("MISSES") + "\t");
+		out.append(Tools.txtLen ("RATIO") + "\n");
+		out.append("________________\t________________\t________________\t________________"+"\n");
+		for (int i=0;i<matchCountTarget.length;i++) {
+			out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
+			out.append(Tools.txtLen (""+matchCountTarget[i])+"\t");
+			out.append(Tools.txtLen (""+(allCountTarget[i]-matchCountTarget[i]))+"\t");
+			out.append(Tools.txtLen (""+((100*matchCountTarget[i])/allCountTarget[i]))+"%\t");
+			out.append("\n");
+		}
+		UI.txtClassify.setText(out.toString());
 		accuracyTrain = Tools.myRound(100* (matchCountTrain/allCountTrain),1);
 		accuracyTest = Tools.myRound(100* (matchCountTest/allCountTest),1);
 		if (  allCountTest == 0) {
