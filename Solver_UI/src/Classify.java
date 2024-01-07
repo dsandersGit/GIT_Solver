@@ -143,26 +143,13 @@ public class Classify {
 		String[] finalClass = new String[DS.numSamples];
 		int[] finalClassIndex = new int[DS.numSamples];
 		double[] finalClassBonus = new double[DS.numSamples];
+		int[][] confusionMatrixTrain = new int[DS.numClasses][DS.numClasses];
+		int[][] confusionMatrixTest = new int[DS.numClasses][DS.numClasses];
 		
 		// Test Train/
 		int add = 7; // sonst 6
 		
 		UI.tmtableClassify.setRowCount(0);
-		
-//		//new UI();
-//		Object[] header = new Object[DS.numClasses+add];
-//		header[0] = ("run");
-//		header[1] = ("sample");
-//		header[2] = ("classindex");
-//		header[3] = ("classname");
-//		header[4] = ("classification");
-//		header[5] = ("match");
-//		header[6] = ("train/validation");
-//		for (int j=0;j<DS.numClasses;j++) {
-//			header[add+j] = (DS.classAllIndNme[j]);
-//		}
-
-		
 		
 		float matchCountTest		= 0;
 		float matchCountTrain		= 0;
@@ -183,11 +170,13 @@ public class Classify {
 			 row[2] = DS.classIndex[f];
 			 row[3] = DS.ClassNames[f];
 			 
+			 int maxClassNum = -1;
 			 for (int i=0;i<DS.classAllIndices.length;i++) {
 				 double val = sumUpClassification[f][i]/fullBonusClassification[i]; 
 				 row[i+add] = Tools.myRound(val,6);
 				 if ( max <  val || i==0) {
 					 max = val;
+					 maxClassNum = i;
 					 all.clear();
 					 all.add(i);
 				 }else {
@@ -211,6 +200,15 @@ public class Classify {
 				 finalClassBonus[f] = 0;
 				 finalClassIndex[f] = -1;
 			 }
+			 
+			 if ( maxClassNum > -1) 
+				 if ( DS.fixedTrainSet != null)
+					 if (!DS.fixedTrainSet[index][f]) {
+						 confusionMatrixTest [Tools.getIndexOfTarget(DS.classIndex[f])][maxClassNum] ++;
+					 }else {
+						 confusionMatrixTrain [Tools.getIndexOfTarget(DS.classIndex[f])][maxClassNum] ++;
+					 }
+			 
 			 row[4] = finalClass[f];
 			 if (finalClass[f].equals(DS.ClassNames[f])) {						// contains
 				 if ( (Opts.fixTrainSet && DS.fixedTrainSet != null)) {
@@ -266,6 +264,38 @@ public class Classify {
 			out.append(Tools.txtLen (""+((100*matchCountTarget[i])/allCountTarget[i]))+"%\t");
 			out.append("\n");
 		}
+		out.append("________________\t________________\t________________\t________________"+"\n");
+		out.append("\n");
+		if ( DS.fixedTrainSet != null) {
+			out.append("ConfusionMatrix:\n");
+			out.append(Tools.txtLen ("Training")+"\t");
+			for (int i=0;i<DS.numClasses;i++) {
+				out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
+			}
+			out.append("\n");
+			for (int i=0;i<DS.numClasses;i++) {
+				out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
+				for (int j=0;j<DS.numClasses;j++) {
+					out.append(Tools.txtLen ("" + confusionMatrixTrain [i][j])+"\t");	
+				}
+				out.append("\n");
+			}
+			out.append(""+"\n");
+			out.append(Tools.txtLen ("Validation")+"\t");
+			for (int i=0;i<DS.numClasses;i++) {
+				out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
+			}
+			out.append("\n");
+			for (int i=0;i<DS.numClasses;i++) {
+				out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
+				for (int j=0;j<DS.numClasses;j++) {
+					out.append(Tools.txtLen ("" + confusionMatrixTest [i][j])+"\t");	
+				}
+				out.append("\n");
+			}
+			out.append(""+"\n");
+		}
+		
 		UI.txtClassify.setText(out.toString());
 		accuracyTrain = Tools.myRound(100* (matchCountTrain/allCountTrain),1);
 		accuracyTest = Tools.myRound(100* (matchCountTest/allCountTest),1);

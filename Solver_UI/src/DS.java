@@ -13,6 +13,7 @@ public class DS {
 	public static String[]		AreaNames 		= null;
 	public static String[]		ClassNames 		= null;
 	public static int[]			classIndex 		= null;					// Color per sample
+	public static int[]			listClassIndex 		= null;					// Color per sample
 	public static double 		normData [][] 	= null;
 	
 	public static int[]			classAllIndices	= null;					// [] Index of present Classes
@@ -67,7 +68,7 @@ public class DS {
 	public static String variableID = "-no_ID-";
 	
 	public DS () {
-		 UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
+		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
 		DS.numVars 	= AreaNames.length;
 		DS.numSamples = SampleNames.length;
 		
@@ -100,6 +101,11 @@ public class DS {
 			classAllIndPop[i] 	= clasIndexCount.get(i);
 			classAllIndNme[i]	= clasIndexName.get(i);
 		}
+		listClassIndex = new int[numSamples];
+		for (int f=0;f<numSamples; f++) {
+			listClassIndex	[f] = Tools.getIndexOfTarget(classIndex[f]);
+		}
+		
 		
 		legendImage = new BufferedImage[numClasses];
 		for ( int i=0;i<numClasses;i++) {
@@ -113,7 +119,145 @@ public class DS {
 //			getFixedTrainSet();
 //		}
 		
+		
+		//bootsStrapp(10000, 500);
+		
+		
 		// ***
+	}
+	private static void bootsStrapp(int bsBoost, int bsSet) {
+		/*
+		 * Array Histogrammit Daten Klasse[], Feature[], 
+		 */
+		
+		StringBuffer collect = new StringBuffer();
+		
+		double[] aMin = new double[DS.numVars];
+		double[] aMax = new double[DS.numVars];
+		for (int a=0;a<DS.numVars;a++){
+			 for (int f=0;f<DS.numSamples;f++){
+				 if ( f==0 || aMin[a] > DS.rawData[f][a] )  aMin[a] = DS.rawData[f][a];
+				 if ( f==0 || aMax[a] < DS.rawData[f][a] )  aMax[a] = DS.rawData[f][a];
+			 }
+        }
+		for (int a=0;a<DS.numVars;a++){
+			System.out.println(a+"\t"+aMin[a]+"\t"+aMax[a]);
+		}
+		System.out.println("----------------------------------------------------");
+		// -----------------------------------
+		 
+		System.out.print("path\tclass\tindex\tsample\trun");										// HEADER
+		for (int a=0;a<DS.numVars;a++){
+			System.out.print("\t"+AreaNames[a]);	
+		}
+		System.out.print("\n");
+		
+		
+		for (int c=0;c<classAllIndices.length;c++) {										// Durch die Klassen
+			float count = 0;
+			int histoAvg[][] =new int[numVars][101];
+			int histoSd[][] =new int[numVars][101];
+			
+			
+			ArrayList<Integer> classMembers = new ArrayList<Integer> ();					// Nur Elemente der aktuellen Klasse
+			for (int f=0;f<DS.numSamples;f++){					
+				if ( listClassIndex[f] == c) {											// Je Klasse					
+					classMembers.add(f);
+				}
+			}
+			int classMemberCount = classMembers.size();
+			
+			for (int b=0;b<bsBoost;b++) {													// Bootsstapping Cycles
+				
+				int[] newSamplingMembers =  new int[classMemberCount];						// Re-Sampling
+				for (int f=0;f<classMemberCount;f++){
+					int pos = (int) (Math.random()*classMemberCount);
+					newSamplingMembers[f] = classMembers.get(pos);
+				}
+				
+//				for (int a=0;a<DS.numVars;a++){
+//					double sum = 0;double sCount=0;
+//					for (int f=0;f<classMemberCount;f++){										// Bootsstapping Average
+//						int val = (int) (100*(rawData[newSamplingMembers[f]][a]-aMin[a])/(aMax[a]-aMin[a]));
+//						sum+=val;sCount++;
+//					}
+//					histoAvg[a][(int)(sum/sCount)]++;
+//				}
+		
+				for(int a = 0;a<DS.numVars;a++){
+					
+					double[] vals = new double[classMemberCount];
+					double avg = 0;
+					double ce = 0;
+					for (int f=0;f<classMemberCount;f++){
+						int val = (int) (100*(rawData[newSamplingMembers[f]][a]-aMin[a])/(aMax[a]-aMin[a]));
+						vals[f] = 	val;
+						avg+=		val;
+						ce++;
+					}
+					double sd = Tools.calculateSD(vals)[1];
+					avg /= ce;
+					histoAvg[a][(int)avg]++;
+					histoSd[a][(int)sd]++;
+				}
+			}
+			
+			collect.append(classAllIndNme[c]);
+			
+			
+			double[] colAvg = new double[DS.numVars];
+			double[] colSd = new double[DS.numVars];
+			
+			for(int a = 0;a<DS.numVars;a++){
+				int posMaxAvg = 0;	int posValAvg= 0;
+				int posMaxSd = 0;	int posValSd= 0;
+				for (int i=0;i<101;i++) {
+					if ( posValAvg < histoAvg[a][i]) {
+						posValAvg = histoAvg[a][i]; 
+						posMaxAvg = i;
+						
+					}
+					if ( posValSd < histoSd[a][i]) {
+						posValSd = histoSd[a][i]; 
+						posMaxSd = i;
+					}
+				}
+				colAvg[a] = posMaxAvg;//((aMax[a]-aMin[a]) * posMaxAvg)/100+aMin[a];;
+				colSd[a] = posMaxSd;//((aMax[a]-aMin[a]) * posMaxSd)/100+aMin[a];;;
+				System.out.println(a+"\t"+colAvg[a]);
+				System.out.println(a+"\t"+colSd[a]);
+			}
+			// =(C$1/(C$3*(2*PI())^0.5))
+			for (int i=0;i<101;i++) {	
+				
+				// =F2*EXP(-((E2-C$2)^2)/(2*C$3^2))
+				for(int a = 0;a<DS.numVars;a++){
+					//System.out.print(((aMax[a]-aMin[a]) * i)/100+aMin[a]);
+					double normBase = bsSet/ (colSd[a]* Math.sqrt(2*Math.PI));
+					double erg = normBase * Math.exp(-Math.pow(i-colAvg[a],2)/(2*Math.pow(colSd[a], 2)));
+					//erg = ((aMax[a]-aMin[a]) * erg)/100+aMin[a];
+					System.out.print("\t"+erg);
+				}
+				System.out.print("\n");
+			}
+//			
+//			for (int i=0;i<101;i++) {															// Debug Ausgabe
+//				System.out.print("\t"+classAllIndNme[c]  +"\t"+ c+"\t"+i+"\t"+i);
+//				for (int a=0;a<DS.numVars;a++){
+//				//	histo[a][i] = (bsSet * histo[a][i] ) / bsBoost;	
+//					System.out.print("\t"+histoAvg[a][i]);
+//					System.out.print("\t"+histoSd[a][i]);
+//					for (int p=0;p<histoAvg[a][i];p++) {
+//						double val = ((aMax[a]-aMin[a]) * histoAvg[a][i])/100-aMin[a];
+//						collect.append("\t"+val);
+//					}
+//				}
+//				System.out.print("\n");
+//			}
+		}
+		
+		
+		
 	}
 	public static void getFixedTrainSet() {
 		

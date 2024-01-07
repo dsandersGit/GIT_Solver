@@ -105,12 +105,13 @@ public class SolverStart {
 	 * 80: Bug 'comma in Variable Names' fixed, Classification background color adapted 
 	 * 81: refreshStatus: ensMatchData checks for varName and '\"'+varName+'\"'
 	 * 82: Speci(t)ficity Easter Egg
+	 * 83: Correct Confusion Matrices
 	 * 	 */
  
 	
 	public static String 	app 			= "solver [ISI]";
-	public static String 	appAdd 			= " 0.1";
-	public static String 	revision 		= " 81";
+	public static String 	appAdd 			= " 0.1.83";
+	public static String 	revision 		= " 83";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
