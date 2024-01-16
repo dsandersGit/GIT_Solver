@@ -106,12 +106,13 @@ public class SolverStart {
 	 * 81: refreshStatus: ensMatchData checks for varName and '\"'+varName+'\"'
 	 * 82: Speci(t)ficity Easter Egg
 	 * 83: Correct Confusion Matrices
+	 * 84: (i+1)+"]"+DS.AreaNames
 	 * 	 */
  
 	
 	public static String 	app 			= "solver [ISI]";
-	public static String 	appAdd 			= " 0.1.83";
-	public static String 	revision 		= " 83";
+	public static String 	appAdd 			= " 0.1.84";
+	public static String 	revision 		= " 84";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -391,6 +392,7 @@ public class SolverStart {
 						for (int p=0;p<Opts.numDims; p++) {
 							for (int a=0; a<mc.eigenVec.length;a++) {
 								weight[index0][a] += Math.abs(mc.eigenVec[a][p]);
+								// TODO: normalize???
 							}
 						}
 					}
@@ -524,7 +526,7 @@ public class SolverStart {
 			 
 			for (int i=0;i< DS.numVars;i++) {
 				if ( aurocs != null) {
-					Tools.sumryAdd (Tools.txtLen(DS.AreaNames[i]) + "\t" + Tools.txtLen(""+Tools.myRound(ParetoScaleAvg[i],4))+ "\t" 
+					Tools.sumryAdd (Tools.txtLen("["+(i+1)+"] "+DS.AreaNames[i]) + "\t" + Tools.txtLen(""+Tools.myRound(ParetoScaleAvg[i],4))+ "\t" 
 				+ Tools.txtLen(""+Tools.myRound(ParetoScaleSd[i],4)) +"\t" + Tools.txtLen(DS.classAllIndNme[(int)aurocs[i][1]])+" | "+Tools.myRound(aurocs[i][0],4) + "\n");
 				}else{
 					Tools.sumryAdd (Tools.txtLen(DS.AreaNames[i]) + "\t" + Tools.txtLen(""+Tools.myRound(ParetoScaleAvg[i],4))+ "\t" 

@@ -21,9 +21,7 @@ public class Classify {
 	public static int[] allCountTarget 		= null; //new float[DS.numClasses];
 	
 	public  Classify() {
-		
-		
-		
+
 		
 		JSONObject ensemble = DS.js_Ensemble;
 		if (ensemble== null )return;
