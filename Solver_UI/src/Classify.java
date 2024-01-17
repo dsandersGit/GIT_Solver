@@ -22,7 +22,6 @@ public class Classify {
 	
 	public  Classify() {
 
-		
 		JSONObject ensemble = DS.js_Ensemble;
 		if (ensemble== null )return;
 		if ( !ensemble.has("model")) return;
@@ -74,7 +73,8 @@ public class Classify {
 			DS.classAllIndPop[i] = Integer.parseInt(line[i].trim());
 		}
 		// ***
-		doNormData ();
+		// 85
+		//
 		// ***
 		numVars = DS.normParas[0].length;
 		DS.numClasses = DS.classAllIndices.length;
@@ -356,43 +356,43 @@ public class Classify {
 	}
 	
 	
-	private static void doNormData () {
-
-		if ( Opts.normType.equals("MaxMinNorm")) {
-			
-		    for(int a = 0;a<DS.numVars;a++){
-		    	double dif = DS.normParas[1][a]-DS.normParas[0][a];
-		    	for(int f = 0;f<DS.numSamples;f++){
-		        	if(dif>0){
-	                    DS.normData[f][a] = 1000*(DS.rawData[f][a]-DS.normParas[0][a])/dif-500;
-	                }else{
-	                	DS.normData[f][a] = 0;
-	                }
-	            }
-	        }
-		    return;
-		}
-		
-		if ( Opts.normType.equals("Pareto")) {
-			for(int a = 0;a<DS.numVars;a++){
-				double sd = DS.normParas[1][a];
-				double avg = DS.normParas[0][a];
-				for(int f = 0;f<DS.numSamples;f++){
-					 DS.normData[f][a] = 1000 * (DS.rawData[f][a]-avg) / sd;
-				}
-			}
-			return;
-        }
-		if ( Opts.normType.equals("None")) {
-			for(int a = 0;a<DS.numVars;a++){
-	            for(int f = 0;f<DS.numSamples;f++){
-	            	 DS.normData[f][a] = DS.rawData[f][a];
-	            }
-	        }
-			return;
-		}
-		return;
-	}
+//	private static void doNormData () {
+//
+//		if ( Opts.normType.equals("MaxMinNorm")) {
+//			
+//		    for(int a = 0;a<DS.numVars;a++){
+//		    	double dif = DS.normParas[1][a]-DS.normParas[0][a];
+//		    	for(int f = 0;f<DS.numSamples;f++){
+//		        	if(dif>0){
+//	                    DS.normData[f][a] = 1000*(DS.rawData[f][a]-DS.normParas[0][a])/dif-500;
+//	                }else{
+//	                	DS.normData[f][a] = 0;
+//	                }
+//	            }
+//	        }
+//		    return;
+//		}
+//		
+//		if ( Opts.normType.equals("Pareto")) {
+//			for(int a = 0;a<DS.numVars;a++){
+//				double sd = DS.normParas[1][a];
+//				double avg = DS.normParas[0][a];
+//				for(int f = 0;f<DS.numSamples;f++){
+//					 DS.normData[f][a] = 1000 * (DS.rawData[f][a]-avg) / sd;
+//				}
+//			}
+//			return;
+//        }
+//		if ( Opts.normType.equals("None")) {
+//			for(int a = 0;a<DS.numVars;a++){
+//	            for(int f = 0;f<DS.numSamples;f++){
+//	            	 DS.normData[f][a] = DS.rawData[f][a];
+//	            }
+//	        }
+//			return;
+//		}
+//		return;
+//	}
 	public static JSONObject readEnsemble(String fileName) {
 		File file = new File(fileName);
         StringBuilder contents = new StringBuilder();

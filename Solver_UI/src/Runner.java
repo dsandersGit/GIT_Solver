@@ -146,7 +146,9 @@ public class Runner {
 				ndst = accuracy;
 
 	        
-	        if ( (ndst  > distanceOld)  ){
+	        // distanceOld!=0
+	        if ( (ndst  > distanceOld )  ){
+	        	//System.out.println(ndst+"\t"+distanceOld);
 	            accuracyTrain.add((float) accuracy);
 	            accuracyTest.add((float) doClassify(false, false));
 	            dstTrain.add((float) ndst);
@@ -161,7 +163,7 @@ public class Runner {
 	            }
 	            
 	        }else{
-
+	        	//System.out.println("out " + ndst+"\t"+distanceOld+"\t"+notBetterCount);
 	            zuFiAgain = -1;
 	            undoZufi();
 	            notBetterCount ++;

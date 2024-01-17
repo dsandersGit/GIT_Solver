@@ -150,12 +150,11 @@ public class Tools {
 		return aurocs;
 	}
 	static double[][] doNormData () {
-		
-
-		
+		// 85 System.out.println(Opts.normType);
 		DS.normData = new double[DS.numSamples][DS.numVars];
 		double[][] erg = null;
 		if ( Opts.normType.equals("MaxMinNorm")) {
+			
 			erg = new double[2][DS.numVars];
 	        double[] minRawData= new double[DS.numVars];
 	        double[] maxRawData= new double[DS.numVars];
@@ -164,6 +163,8 @@ public class Tools {
 	                if(minRawData[a]>DS.rawData[f][a] || f==0)minRawData[a] = DS.rawData[f][a];
 	                if(maxRawData[a]<DS.rawData[f][a] || f==0)maxRawData[a] = DS.rawData[f][a];
 	            }
+	            //85
+	            if ( maxRawData[a] == minRawData[a] ) maxRawData[a] =+ 1; 
 	        }
 		    for(int a = 0;a<DS.numVars;a++){
 		    	erg[0][a] = minRawData[a];
@@ -176,6 +177,8 @@ public class Tools {
 	                	DS.normData[f][a] = 0;
 	                }
 	            }
+		    	 //85
+	            if ( maxRawData[a] == minRawData[a] ) maxRawData[a] =+ 1; 
 	        }
 		    return erg; 
 		}
@@ -211,7 +214,8 @@ public class Tools {
 	            	 DS.normData[f][a] = DS.rawData[f][a];
 	            }
 	        }
-			return null;
+	
+			return new double[2][DS.numVars];
 		}
 		return erg;
 	}

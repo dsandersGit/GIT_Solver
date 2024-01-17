@@ -107,12 +107,13 @@ public class SolverStart {
 	 * 82: Speci(t)ficity Easter Egg
 	 * 83: Correct Confusion Matrices
 	 * 84: (i+1)+"]"+DS.AreaNames
+	 * 85: doNormData() position BUGFIX
 	 * 	 */
  
 	
 	public static String 	app 			= "solver [ISI]";
-	public static String 	appAdd 			= " 0.1.84";
-	public static String 	revision 		= " 84";
+	public static String 	appAdd 			= " 0.1.85";
+	public static String 	revision 		= " 85";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -246,6 +247,7 @@ public class SolverStart {
 		}
 		prob /= (double) DS.numSamples; 
 		
+		DS.normParas = Tools.doNormData ();	// 85
 		
 		UI.labTimePerRun.setText("Process: THIS MIGHT TAKE SOME TIME");
 		UI.refreshStatus();													// fills status and determines user interface UI options 
@@ -265,7 +267,9 @@ public class SolverStart {
 	    main.put("ObjectType"					, "ML_Ensemble");
 	    main.put("ObjectVersion"				, "01.00"); 
 	    main.put("Support"						,"N/A");
-
+	    
+	   
+	    
 		// Time / run estimation
 	    long tme = System.currentTimeMillis();
 		long tmeStart = System.currentTimeMillis();
@@ -392,7 +396,6 @@ public class SolverStart {
 						for (int p=0;p<Opts.numDims; p++) {
 							for (int a=0; a<mc.eigenVec.length;a++) {
 								weight[index0][a] += Math.abs(mc.eigenVec[a][p]);
-								// TODO: normalize???
 							}
 						}
 					}

@@ -581,6 +581,7 @@ public class UI {
 		}});
 		jbClassify.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			maintabbed.setSelectedIndex(tab_Classify);
+			Tools.doNormData ();
 			SolverStart.classify();
 			refreshStatus();
 		}});
