@@ -325,6 +325,7 @@ public class UI {
 		 
 		return true;
 	}
+	
 	public static void refreshStatus() {
 		
 		menuActionClassify.setEnabled(true);
@@ -1105,6 +1106,7 @@ public class UI {
 		}
 	}
 	static void loadEnsemble(boolean auto) {
+
 		Preferences prefs;
 	    prefs = Preferences.userRoot().node("Solver");
 	    File f = null;
@@ -1133,6 +1135,8 @@ public class UI {
 			DS.js_Ensemble = null;
 		}
 		refreshStatus();
+		UI.txtClassify.setText("");
+		
 		if ( DS.js_Ensemble != null ) {
 			Classify.setOptions();
 			UI.txtEnsemble.setText(DS.js_Ensemble.toString(3));
@@ -1154,10 +1158,17 @@ public class UI {
 		if ( f == null) return;
 		if ( !f.exists()) return;
 		prefs.put("path", f.getParent());
-		if ( f.getName().toLowerCase().endsWith(".dat"))
+		boolean loadSuccess = false;;
+		if ( f.getName().toLowerCase().endsWith(".dat")) {
 			SolverStart.importData(f.getAbsolutePath());
-		if ( f.getName().toLowerCase().endsWith(".csv"))
-			SolverStart.importDataCSV(f.getAbsolutePath());
+			loadSuccess = true;
+		}
+		if ( f.getName().toLowerCase().endsWith(".csv")) {
+			loadSuccess = SolverStart.importDataCSV(f.getAbsolutePath());
+		}
+		
+		
+		//if ( !loadSuccess )return;
 		
 		DS.fixedTrainSet = null;
 		DS.txtSummary = null;

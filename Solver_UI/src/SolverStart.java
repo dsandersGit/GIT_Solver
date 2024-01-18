@@ -108,12 +108,13 @@ public class SolverStart {
 	 * 83: Correct Confusion Matrices
 	 * 84: (i+1)+"]"+DS.AreaNames
 	 * 85: doNormData() position BUGFIX
+	 * 86: isNumeric: BUG scientific numbers fixed
 	 * 	 */
  
 	
 	public static String 	app 			= "solver [ISI]";
-	public static String 	appAdd 			= " 0.1.85";
-	public static String 	revision 		= " 85";
+	public static String 	appAdd 			= " 0.1.86";
+	public static String 	revision 		= " 86";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -582,7 +583,7 @@ public class SolverStart {
 	}
 
 	
-	public static void importDataCSV(String datei){								// nur ClassenName und Daten
+	public static boolean importDataCSV(String datei){								// nur ClassenName und Daten
 		
 		 String split = ","; char cSplit = ',';
 		 boolean fromClip = false;
@@ -630,7 +631,7 @@ public class SolverStart {
 
 				if(data==null) {
 					abbruch ("No data");
-					return ;
+					return false;
 				}
 				contents.append(data);
 		  }
@@ -643,7 +644,8 @@ public class SolverStart {
 	        
 	        int classNamesPos = -1;
 	        for (int i=0;i<test.length;i++) {
-	        	if (!Tools.isNumeric(test[i]) )classNamesPos = i;
+	        	if (!Tools.isNumeric(test[i]) ) 
+	        		classNamesPos = i;
 	        }
 	        
 	        int c0 = 0;
@@ -682,15 +684,18 @@ public class SolverStart {
 	        boolean hasHeader = true;
 	        if ( c0 == c1 )hasHeader = false;
 	        // ',' as decimal separator
-	        if ( c0 < noAreas) {
-	        	commaAsDecimalSep = true;
-	        	test = lines[1].replace(",", ".").split(split);
-	        	c0 = 0;
-		        for (int i=0;i<test.length;i++) {
-		        	if ( Tools.isNumeric(test[i]) )c0++;
-		        }
-		        if ( c0 < noAreas) return;
-	        }
+	        // 86
+//		        if ( c0 < noAreas) {
+//		        	commaAsDecimalSep = true;
+//		        	test = lines[1].replace(",", ".").split(split);
+//		        	c0 = 0;
+//			        for (int i=0;i<test.length;i++) {
+//			        	if ( Tools.isNumeric(test[i]) )c0++;
+//			        }
+//			        if ( c0 < noAreas) return false;
+//		        }
+		        
+	        
 	        DS.rawData = new double[noFiles][noAreas];
 	        DS.AreaNames = new String[noAreas];
 	        DS.SampleNames = new String[noFiles];
@@ -700,6 +705,7 @@ public class SolverStart {
 	        if ( !hasHeader ) {
 	        	for (int i=0;i<noAreas; i++) {
 	        		 DS.AreaNames [i] = '\"'+"VAR:"+i+'\"';
+	        		 
 	        	}
 	        }else {
 	        	noFiles--;
@@ -763,7 +769,12 @@ public class SolverStart {
     				 if (DS.ClassNames[i].equals(allClassNames.get(k)))DS.classIndex[i] = k;
     			 }
 	        }
-	        if (fail) JOptionPane.showConfirmDialog(null, "<HTML><H3>Import of (some) data failed</H3>", SolverStart.app, JOptionPane.OK_OPTION, JOptionPane.WARNING_MESSAGE);
+	        if (fail) {
+	        	JOptionPane.showMessageDialog(null, "<HTML><H3>Import of (some) data failed</H3>", SolverStart.app, JOptionPane.WARNING_MESSAGE);
+	        	return false;
+	        }
+
+        return true;
 	}
 	
 	

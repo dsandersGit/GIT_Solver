@@ -69,6 +69,9 @@ public class DS {
 	
 	public DS () {
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
+		
+		if ( AreaNames == null) System.out.println("AreaNames is null");
+		
 		DS.numVars 	= AreaNames.length;
 		DS.numSamples = SampleNames.length;
 		

@@ -42,7 +42,13 @@ public class Tools {
 	    return String.format("%032x", new BigInteger(1, digest));
 	 }
 	public static boolean isNumeric(String str) {
-        return str != null && str.matches("[-+]?\\d*\\.?\\d+");
+        //return str != null && str.matches("[-+]?\\d*\\.?\\d+");
+        try {  
+            Double.parseDouble(str);  
+            return true;
+          } catch(NumberFormatException e){  
+            return false;  
+          }  
     }
 	public static String txtLen (String txt) {
 		if (Tools.isNumeric(txt)) {
