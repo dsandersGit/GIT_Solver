@@ -1016,7 +1016,7 @@ public class UI {
 		// *******************************
 		menuAboutAbout.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			JOptionPane.showMessageDialog(jF, "<HTML><H3>"+SolverStart.app+" rev."+SolverStart.revision+"</H3>"
-					+ "<I>Copyright 2009-2023 Daniel Sanders</I><BR>Check for updates:<BR>"
+					+ "<I>Copyright 2009-2024 Daniel Sanders</I><BR>Check for updates:<BR>"
 					+ "https://github.com/dsandersGit/GIT_Solver/tags");
 		}});
 		menuAboutLicense.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
@@ -1122,7 +1122,6 @@ public class UI {
 			if ( f == null) return;
 			if ( !f.exists()) return;
 	    }
-		
 		
 		DS.setEnsemble(Classify.readEnsemble(f.getAbsolutePath()));
 		if ( DS.js_Ensemble == null ) {

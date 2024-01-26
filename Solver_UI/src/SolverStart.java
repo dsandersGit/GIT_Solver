@@ -109,12 +109,12 @@ public class SolverStart {
 	 * 84: (i+1)+"]"+DS.AreaNames
 	 * 85: doNormData() position BUGFIX
 	 * 86: isNumeric: BUG scientific numbers fixed
+	 * 87: redo: normData inClassify
 	 * 	 */
  
-	
 	public static String 	app 			= "solver [ISI]";
-	public static String 	appAdd 			= " 0.1.86";
-	public static String 	revision 		= " 86";
+	public static String 	appAdd 			= " 0.1.87";
+	public static String 	revision 		= " 87";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -533,7 +533,7 @@ public class SolverStart {
 					Tools.sumryAdd (Tools.txtLen("["+(i+1)+"] "+DS.AreaNames[i]) + "\t" + Tools.txtLen(""+Tools.myRound(ParetoScaleAvg[i],4))+ "\t" 
 				+ Tools.txtLen(""+Tools.myRound(ParetoScaleSd[i],4)) +"\t" + Tools.txtLen(DS.classAllIndNme[(int)aurocs[i][1]])+" | "+Tools.myRound(aurocs[i][0],4) + "\n");
 				}else{
-					Tools.sumryAdd (Tools.txtLen(DS.AreaNames[i]) + "\t" + Tools.txtLen(""+Tools.myRound(ParetoScaleAvg[i],4))+ "\t" 
+					Tools.sumryAdd (Tools.txtLen("["+(i+1)+"] "+DS.AreaNames[i]) + "\t" + Tools.txtLen(""+Tools.myRound(ParetoScaleAvg[i],4))+ "\t" 
 							+ Tools.txtLen(""+Tools.myRound(ParetoScaleSd[i],4)) + "\n");
 				}
 			}

@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * data-model-application 
  *  + data classification based on trained/loaded model 
  *  
- *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
+ *  Copyright(c) 2009-2024, Daniel Sanders, All rights reserved.
  *  https://github.com/dsandersGit/GIT_Solver
  */
 
@@ -72,12 +72,15 @@ public class Classify {
 		for (int i=0; i<line.length;i++) {
 			DS.classAllIndPop[i] = Integer.parseInt(line[i].trim());
 		}
-		// ***
-		// 85
-		//
+	
 		// ***
 		numVars = DS.normParas[0].length;
 		DS.numClasses = DS.classAllIndices.length;
+		
+		// ***
+		// 87
+		doNormData ();
+		//
 		
 		UI.tmtableClassify.setRowCount(0);
 		UI.tmtableClassify.setColumnCount(0);
@@ -320,7 +323,7 @@ public class Classify {
             double[] sum = new double[Opts.numDims];
             for (int i=0;i<Opts.numDims;i++) {
                 for (int a=0;a<DS.numVars;a++){
-                    sum[i] += DS.normData[f][a] * mc[a][i];
+                	sum[i] += DS.normData[f][a] * mc[a][i];
                 }
                 mcPCA[i][f] = sum[i];
             }
@@ -356,43 +359,43 @@ public class Classify {
 	}
 	
 	
-//	private static void doNormData () {
-//
-//		if ( Opts.normType.equals("MaxMinNorm")) {
-//			
-//		    for(int a = 0;a<DS.numVars;a++){
-//		    	double dif = DS.normParas[1][a]-DS.normParas[0][a];
-//		    	for(int f = 0;f<DS.numSamples;f++){
-//		        	if(dif>0){
-//	                    DS.normData[f][a] = 1000*(DS.rawData[f][a]-DS.normParas[0][a])/dif-500;
-//	                }else{
-//	                	DS.normData[f][a] = 0;
-//	                }
-//	            }
-//	        }
-//		    return;
-//		}
-//		
-//		if ( Opts.normType.equals("Pareto")) {
-//			for(int a = 0;a<DS.numVars;a++){
-//				double sd = DS.normParas[1][a];
-//				double avg = DS.normParas[0][a];
-//				for(int f = 0;f<DS.numSamples;f++){
-//					 DS.normData[f][a] = 1000 * (DS.rawData[f][a]-avg) / sd;
-//				}
-//			}
-//			return;
-//        }
-//		if ( Opts.normType.equals("None")) {
-//			for(int a = 0;a<DS.numVars;a++){
-//	            for(int f = 0;f<DS.numSamples;f++){
-//	            	 DS.normData[f][a] = DS.rawData[f][a];
-//	            }
-//	        }
-//			return;
-//		}
-//		return;
-//	}
+	private static void doNormData () {
+
+		if ( Opts.normType.equals("MaxMinNorm")) {
+			
+		    for(int a = 0;a<DS.numVars;a++){
+		    	double dif = DS.normParas[1][a]-DS.normParas[0][a];
+		    	for(int f = 0;f<DS.numSamples;f++){
+		        	if(dif>0){
+	                    DS.normData[f][a] = 1000*(DS.rawData[f][a]-DS.normParas[0][a])/dif-500;
+	                }else{
+	                	DS.normData[f][a] = 0;
+	                }
+	            }
+	        }
+		    return;
+		}
+		
+		if ( Opts.normType.equals("Pareto")) {
+			for(int a = 0;a<DS.numVars;a++){
+				double sd = DS.normParas[1][a];
+				double avg = DS.normParas[0][a];
+				for(int f = 0;f<DS.numSamples;f++){
+					 DS.normData[f][a] = 1000 * (DS.rawData[f][a]-avg) / sd;
+				}
+			}
+			return;
+        }
+		if ( Opts.normType.equals("None")) {
+			for(int a = 0;a<DS.numVars;a++){
+	            for(int f = 0;f<DS.numSamples;f++){
+	            	 DS.normData[f][a] = DS.rawData[f][a];
+	            }
+	        }
+			return;
+		}
+		return;
+	}
 	public static JSONObject readEnsemble(String fileName) {
 		File file = new File(fileName);
         StringBuilder contents = new StringBuilder();

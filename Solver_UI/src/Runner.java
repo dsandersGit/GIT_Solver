@@ -594,8 +594,8 @@ public class Runner {
         for (int f=0;f<DS.numSamples;f++){
             double[] sum = new double[Opts.numDims];
             for (int i=0;i<Opts.numDims;i++) {
-                for (int a=0;a<DS.numVars;a++){
-                    sum[i] += DS.normData[f][a] * mcEigenVec[a][i];
+                for (int a=0;a<DS.numVars;a++){ 
+                	sum[i] += DS.normData[f][a] * mcEigenVec[a][i];
                 }
                 mcPCA[i][f] = sum[i];
             }
