@@ -157,6 +157,7 @@ public class Tools {
 	}
 	static double[][] doNormData () {
 		// 85 System.out.println(Opts.normType);
+
 		DS.normData = new double[DS.numSamples][DS.numVars];
 		double[][] erg = null;
 		if ( Opts.normType.equals("MaxMinNorm")) {

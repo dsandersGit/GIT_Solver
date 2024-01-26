@@ -300,32 +300,79 @@ public class UI {
 	}
 	static boolean refreshOptions() {
 
+		String TxtBuffer = txtOpts.getText();
+		
 		JSONObject jo_Opts = null; 
 		 try {
-			 jo_Opts = new JSONObject(txtOpts.getText());
+			 jo_Opts = new JSONObject(TxtBuffer);
 		    } catch (JSONException e) {
 		    	txtOpts.setText(Opts.getOptsAsJson().toString(3));
 		        return false;
 		    }
-		 try {
-			if (jo_Opts.has("normType")) 	Opts.normType 		= jo_Opts.getString("normType");
-			if (jo_Opts.has("numDims")) 	Opts.numDims 		= jo_Opts.getInt("numDims");
-			if (jo_Opts.has("trainRatio"))	Opts.trainRatio 	= jo_Opts.getDouble("trainRatio");
-			if (jo_Opts.has("numCycles")) 	Opts.numCycles 		= jo_Opts.getInt("numCycles");
-			if (jo_Opts.has("noBetterStop"))Opts.noBetterStop 	= jo_Opts.getInt("noBetterStop");
-			if (jo_Opts.has("minBetter")) 	Opts.minBetter 		= jo_Opts.getDouble("minBetter");
-			if (jo_Opts.has("plotTimer")) 	Opts.plotTimer 		= jo_Opts.getInt("plotTimer");
-			if (jo_Opts.has("fixTrainSet")) Opts.fixTrainSet 	= jo_Opts.getBoolean("fixTrainSet");
-			if (jo_Opts.has("activation")) 	Opts.activation		= jo_Opts.getString("activation");
-
-		  } catch (JSONException e) {
-			  txtOpts.setText(Opts.getOptsAsJson().toString(3));
-		        return false;
-		  }
 		 
+		 // 89 
+		 if ( checkOptions(jo_Opts)== null ) {
+			 try {
+				if (jo_Opts.has("normType")) 	Opts.normType 		= jo_Opts.getString("normType");
+				if (jo_Opts.has("numDims")) 	Opts.numDims 		= jo_Opts.getInt("numDims");
+				if (jo_Opts.has("trainRatio"))	Opts.trainRatio 	= jo_Opts.getDouble("trainRatio");
+				if (jo_Opts.has("numCycles")) 	Opts.numCycles 		= jo_Opts.getInt("numCycles");
+				if (jo_Opts.has("noBetterStop"))Opts.noBetterStop 	= jo_Opts.getInt("noBetterStop");
+				if (jo_Opts.has("minBetter")) 	Opts.minBetter 		= jo_Opts.getDouble("minBetter");
+				if (jo_Opts.has("plotTimer")) 	Opts.plotTimer 		= jo_Opts.getInt("plotTimer");
+				if (jo_Opts.has("fixTrainSet")) Opts.fixTrainSet 	= jo_Opts.getBoolean("fixTrainSet");
+				if (jo_Opts.has("activation")) 	Opts.activation		= jo_Opts.getString("activation");
+	
+			  } catch (JSONException e) {
+				  txtOpts.setText(Opts.getOptsAsJson().toString(3));
+			        return false;
+			  }
+		}else {
+			txtOpts.setText(Opts.getOptsAsJson().toString(3));
+			JOptionPane.showMessageDialog(null, "Options malformed: "+checkOptions(jo_Opts), "Options", JOptionPane.WARNING_MESSAGE);
+			return false;
+		}
 		return true;
 	}
-	
+	static String checkOptions(JSONObject jo_Opts) {
+		 try {
+			if (!jo_Opts.has("dstType")) return "dstType";
+				if ( !jo_Opts.getString("dstType").equals("GROUP") )
+					if ( !jo_Opts.getString("dstType").equals("EGO") ) return "dstType";
+			if (!jo_Opts.has("normType")) return "normType";
+			if ( !jo_Opts.getString("normType").equals("Pareto") )
+				if ( !jo_Opts.getString("normType").equals("MaxMinNorm") )
+					if ( !jo_Opts.getString("normType").equals("None") )return "normType";
+			if (!jo_Opts.has("numDims"))  return "numDims";
+				if ( jo_Opts.getInt("numDims")<1 || jo_Opts.getInt("numDims")> 10) return "numDims";
+			if (!jo_Opts.has("trainRatio")) return "trainRatio";
+				if ( jo_Opts.getDouble("trainRatio")<0 || jo_Opts.getDouble("trainRatio")>1) return "trainRatio";
+			if (!jo_Opts.has("numCycles"))  return "numCycles";
+				if ( jo_Opts.getInt("numCycles")<1 || jo_Opts.getInt("numCycles")> 99) return "numCycles";
+			if (!jo_Opts.has("noBetterStop")) return "noBetterStop";
+//				if ( jo_Opts.getInt("noBetterStop")<1 ) return false;
+			if (!jo_Opts.has("minBetter")) 	 return "minBetter";
+				if ( jo_Opts.getDouble("minBetter")<0 || jo_Opts.getDouble("minBetter")>1) return "minBetter";
+			//if (!jo_Opts.has("plotTimer")) 	 return "plotTimer";
+			if (!jo_Opts.has("fixTrainSet"))  return "fixTrainSet";
+				boolean tst = false;
+				try {
+					tst = jo_Opts.getBoolean("fixTrainSet");
+				} catch (JSONException e) {
+			        return "fixTrainSet";
+				  }
+				//if ( jo_Opts.getBoolean("fixTrainSet") || !jo_Opts.getBoolean("fixTrainSet") ) return "fixTrainSet";
+			if (!jo_Opts.has("activation")) 	 return "activation";
+				if ( !jo_Opts.getString("activation").equals("DxA") )
+					if ( !jo_Opts.getString("activation").equals("D+A") )
+						if ( !jo_Opts.getString("activation").equals("D") )
+							if ( !jo_Opts.getString("activation").equals("A") )return "activation";
+
+		  } catch (JSONException e) {
+		        return "parsingError";
+		  }
+		 return null;
+	}
 	public static void refreshStatus() {
 		
 		menuActionClassify.setEnabled(true);
@@ -648,6 +695,8 @@ public class UI {
 		menuExport.add(menuExportTP_FP_TN_FN);
 		JMenuItem menuExportDistances = new JMenuItem(" 1D Scores"); 
 		menuExport.add(menuExportDistances);
+		JMenuItem menuExportNormData = new JMenuItem(" Normalized Data "); 
+		menuExport.add(menuExportNormData);
 		menuExport.addSeparator();
 		JMenuItem menuExportPlot = new JMenuItem(" Copy current plot "); 
 		menuExport.add(menuExportPlot);
@@ -976,6 +1025,27 @@ public class UI {
 		    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		    clipboard.setContents( stringSelection, stringSelection );
 		}});
+		// 90
+		menuExportNormData.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
+			StringBuffer out = new StringBuffer();
+			out.append("Normalized Data\n");
+			out.append("Sample");
+			for (int a=0;a<DS.AreaNames.length;a++) {
+				out.append("\t"+DS.AreaNames[a]);	
+			}
+			out.append("\n");
+			for (int f=0;f<DS.SampleNames.length;f++) {
+				out.append(DS.SampleNames[f]);
+				for (int a=0;a<DS.AreaNames.length;a++) {
+					out.append("\t"+DS.normData[f][a]);	
+				}
+				out.append("\n");
+			}
+
+			StringSelection stringSelection = new StringSelection( out.toString() );
+		    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		    clipboard.setContents( stringSelection, stringSelection );
+		}});
 		menuExportPlot.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
 			BufferedImage img=null;
 			if(maintabbed.getSelectedIndex()==tab_Distance ){
@@ -1047,7 +1117,7 @@ public class UI {
 		Runner.cleanRunner ();
 		tmtableClassify.setColumnCount(0);
 		tmtableClassify.setRowCount(0);
-		maintabbed.setSelectedIndex(tab_Distance);
+		//maintabbed.setSelectedIndex(tab_Distance);
 		jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
 		refreshStatus();
 		
