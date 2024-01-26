@@ -170,14 +170,14 @@ public class Runner {
 
 	       }
 	        if ( notBetterCount > Opts.noBetterStop) {
-	        	if ( dstLatestMax  > distanceOld* Opts.minBetter && dstLatestMax > 0 ) {
+	        	if ( (dstLatestMax  >= distanceOld* Opts.minBetter && dstLatestMax > 0)  ) {
 	        		finish();
 	                return false;
 	            }
 	            dstLatestMax = distanceOld;
 	            notBetterCount=0;
 	        }
-        
+	        //System.out.println("out " + ndst+"\t"+distanceOld+"\t"+notBetterCount);
         return true;
 	}
 	

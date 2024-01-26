@@ -170,7 +170,7 @@ public class Tools {
 	                if(maxRawData[a]<DS.rawData[f][a] || f==0)maxRawData[a] = DS.rawData[f][a];
 	            }
 	            //85
-	            if ( maxRawData[a] == minRawData[a] ) maxRawData[a] =+ 1; 
+	           //if ( maxRawData[a] == minRawData[a] ) maxRawData[a] =+ 1; 
 	        }
 		    for(int a = 0;a<DS.numVars;a++){
 		    	erg[0][a] = minRawData[a];
@@ -183,8 +183,6 @@ public class Tools {
 	                	DS.normData[f][a] = 0;
 	                }
 	            }
-		    	 //85
-	            if ( maxRawData[a] == minRawData[a] ) maxRawData[a] =+ 1; 
 	        }
 		    return erg; 
 		}
@@ -208,8 +206,15 @@ public class Tools {
 				ParetoScaleSd[a] = sd;
 				erg[0][a] = ParetoScaleAvg[a];
 		    	erg[1][a] = ParetoScaleSd[a];
+		    	// 88
 				for(int f = 0;f<DS.numSamples;f++){
-					 DS.normData[f][a] = 1000 * (DS.rawData[f][a]-avg) / sd;
+					if ( sd == 0) {
+						DS.normData[f][a] = 0;
+					}else {
+						DS.normData[f][a] = 1000 * (DS.rawData[f][a]-avg) / sd;	
+					}
+					 
+					 
 				}
 			}
 			return erg;

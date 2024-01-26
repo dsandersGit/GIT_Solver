@@ -110,11 +110,13 @@ public class SolverStart {
 	 * 85: doNormData() position BUGFIX
 	 * 86: isNumeric: BUG scientific numbers fixed
 	 * 87: redo: normData inClassify
+	 * 
+	 * 88: sd == 0 Bug
 	 * 	 */
  
 	public static String 	app 			= "solver [ISI]";
-	public static String 	appAdd 			= " 0.1.87";
-	public static String 	revision 		= " 87";
+	public static String 	appAdd 			= " 0.1.88";
+	public static String 	revision 		= " 88";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;

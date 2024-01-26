@@ -339,11 +339,23 @@ public class Classify {
 	      //  if ( distances[f]>maxDist ) maxDist = distances[f];					// CRUCIAL 
 	        
 	    }
-		if ( maxDst == 0)return ;
+		
+		// 88
+//		if ( maxDst == 0)return ;
+//		for (int f=0;f<DS.numSamples;f++){
+//			distances[f] /= maxDst;
+//		}
+		if ( maxDst != 0) {
 		for (int f=0;f<DS.numSamples;f++){
 			distances[f] /= maxDst;
 		}
-	  
+		}else {
+			System.out.println("WARNING: maxDst = 0");
+			for (int f=0;f<DS.numSamples;f++){
+				distances[f] = 0;
+			}
+		}
+		
 	    // doCLassify
 	    int[] classification = new int [DS.numSamples];
         for (int f=0;f<DS.numSamples;f++){
