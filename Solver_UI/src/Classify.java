@@ -121,19 +121,19 @@ public class Classify {
 			for (int p=0;p<Opts.numDims; p++) {
 				avgs[p] = Double.parseDouble(itmp[p].trim()); 
 			}
-			int trainCount = 0;int targetCount = 0;
+			int trainCount = 0;int testCount = 0;
 			itmp  		= in.getString(		"TrainSet").split(",");
 			for (int f=0;f<itmp.length; f++) {
 				if ( itmp[f].trim().equals("1")) {
 						trainCount++;
 				
 				}
-				targetCount++;
+				testCount++;
 			}
 			
 			
-			double bonus = accuracyTest * accuracyTest; 													
-			if ( trainCount == targetCount)
+			double bonus = accuracyTest * accuracyTest; 														
+			if ( trainCount == testCount)
 				bonus = accuracyTrain * accuracyTrain; 														/// Training ohne TestDaten
 			fullBonusClassification[getTargetColorIndexPos (targetColorIndex)] += 1;						//; + bonus ?
 			doClassify (mc, split, avgs, targetColorIndex, sumUpClassification, bonus, maxDst );
@@ -262,7 +262,7 @@ public class Classify {
 			out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
 			out.append(Tools.txtLen (""+matchCountTarget[i])+"\t");
 			out.append(Tools.txtLen (""+(allCountTarget[i]-matchCountTarget[i]))+"\t");
-			out.append(Tools.txtLen (""+((100*matchCountTarget[i])/allCountTarget[i]))+"%\t");
+			out.append(Tools.txtLen (""+((100*matchCountTarget[i])/allCountTarget[i]))+"%\t");				// Possible Bug allCountTarget[i] == 0
 			out.append("\n");
 		}
 		out.append("________________\t________________\t________________\t________________"+"\n");

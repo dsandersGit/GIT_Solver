@@ -113,11 +113,12 @@ public class SolverStart {
 	 * 88: sd == 0 Bug
 	 * 89: Check Options Malform
 	 * 90: Export NormData
+	 * 91: Debug variable ID > Remove
 	 * 	 */
  
 	public static String 	app 			= "solver [ISI]";
 	public static String 	appAdd 			= " 0.2";
-	public static String 	revision 		= " 90";
+	public static String 	revision 		= " 91";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static long 		plotTimer 		= -1;
@@ -218,6 +219,8 @@ public class SolverStart {
 		
 		if(args.length>1)
 			DS.variableID = args[1]; 
+		
+		System.out.println("DS.variableID " + DS.variableID);
 	}
 	public static void trainPattern() throws IOException {
 
@@ -416,9 +419,7 @@ public class SolverStart {
 		main.remove("FingerPrints");
 		for (int i=0;i<DS.freezs.size();i++) {
 			JSONObject modl = DS.freezs.get(i).getModelAsJson();
-		
 			main.append("model", modl);
-
 			main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
 		}
 		

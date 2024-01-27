@@ -64,8 +64,9 @@ public class DS {
 	};	// 20 Colors = Max Count for Classes
 	
 	public static BufferedImage[] legendImage = null;
-
-	public static String variableID = "-no_ID-";
+	// 91: 
+	//public static String variableID = "-no_ID-";
+	public static String variableID = "";
 	
 	public DS () {
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));

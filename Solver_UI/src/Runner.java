@@ -477,12 +477,20 @@ public class Runner {
         	for (int i=0;i<Opts.numDims;i++) {
                 mcEigenVec [a][i] = 0;
             }
+        	// 92
+        	for (int i=0;i<Opts.numDims;i++) {
+                mcEigenVec [a][i] = small- Math.random()*2*small;
+            }
         	break;
         case 8: 
         	for (int i=0;i<DS.numVars;i++) {
         		for (int j=0;j<Opts.numDims;j++) {
         			if (a!=i)mcEigenVec [i][j] = 0;
         		}
+            }
+        	// 92
+        	for (int i=0;i<Opts.numDims;i++) {
+                mcEigenVec [a][i] = small- Math.random()*2*small;
             }
         	break;      
         case 9: 

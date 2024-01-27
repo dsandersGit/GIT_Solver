@@ -411,7 +411,8 @@ public class UI {
 					if ( !DS.AreaNames[i].equals(ensVarNames[i]) && !DS.AreaNames[i].equals('\"'+ensVarNames[i]+'\"'))ensMatchData = false;	
 				}
 			}
-			JSONObject ds 		= DS.js_Ensemble.getJSONObject("DS");
+			// 91
+			JSONObject ds 		= DS.js_Ensemble.getJSONObject("DS");			// WhatFor, to block shared ensembles?
 			if (ds.has("variableID")) {
 			String modelVarID = ds.getString("variableID");
 			if ( DS.variableID.length() > 0)
