@@ -117,11 +117,12 @@ public class SolverStart {
 	 * 92: Copy data when saving ensemble
 	 * 93: Feature 'Skip' > go on to next target
 	 * 94: Feature 'Shuffle' > new random eigenvectors 
+	 * 95: Skip change to Next, more inuitive
 	 * 	 */
  
 	public static String 	app 			= "solver [ISI]";
-	public static String 	appAdd 			= " 0.2.94";
-	public static String 	revision 		= " 94";
+	public static String 	appAdd 			= " 0.2.95";
+	public static String 	revision 		= " 95";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static boolean 	immediateSkip 	= false;					// 93

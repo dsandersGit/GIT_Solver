@@ -124,7 +124,7 @@ public class UI {
 	static JButton jbClassify = new JButton();
 	static JButton jb_Stop = new JButton("Stop Training");
 	static JButton 	jB_Shuffle = new JButton(" Shuffle Now");
-	static JButton 	jB_Skip = new JButton(" Skip");
+	static JButton 	jB_Skip = new JButton(" Next");
 	static JButton jb_DefaultOptions = new JButton("Default Options");
 	
 	static JPanel panLive = new JPanel();
@@ -887,63 +887,7 @@ public class UI {
 						  }
 			}
 		}});
-		
-		
-//		menuActionOptions.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
-//		
-//			JLabel lab_noBetter = new JLabel ("Number of tolerated non-improvement " + Opts.noBetterStop );
-//			JSlider sld_noBetter = new JSlider (100,10000,1000);
-//			sld_noBetter.setMajorTickSpacing(500);
-//			sld_noBetter.setMinorTickSpacing(100);
-//			sld_noBetter.setPaintTicks(true);
-//			sld_noBetter.addChangeListener(new ChangeListener() {
-//		        @Override
-//		        public void stateChanged(ChangeEvent event) {
-//		            int val = ((JSlider)event.getSource()).getValue();
-//		            lab_noBetter.setText("Number of tolerated non-improvement " + val);
-//		        }
-//		    });
-//			JLabel lab_actMode = new JLabel ("Set activation function");
-//			String[] actModes = {"DxA", "D+A", "A"};
-//			JComboBox<String> cbo_act = new JComboBox<String>(actModes);
-//			
-//			JLabel lab_dstMode = new JLabel ("Set distance function");
-//			String[] dstModes = {"GROUP", "EGO"};
-//			JComboBox<String> cbo_dst = new JComboBox<String>(dstModes);
-//			
-//			JLabel lab_train = new JLabel ("Set train/test ratio");
-//			JSlider sld_train = new JSlider (10,100,70);
-//			sld_train.setMajorTickSpacing(10);
-//			sld_train.setPaintTicks(true);
-//			sld_train.addChangeListener(new ChangeListener() {
-//		        @Override
-//		        public void stateChanged(ChangeEvent event) {
-//		            int val = ((JSlider)event.getSource()).getValue();
-//		            lab_train.setText("Set train/test ratio " + ((float)val/100.));
-//		        }
-//		    });
-//			JCheckBox chk_fixTrain = new JCheckBox("Fix trainset", Opts.fixTrainSet);
-//			
-//			JPanel jp = new JPanel();
-//		 	jp.setLayout(new BoxLayout(jp,BoxLayout.Y_AXIS));
-//			Object[] array = new Object[1];
-//			jp.add(lab_noBetter);
-//			jp.add(sld_noBetter);
-//			jp.add(lab_actMode);
-//			jp.add(cbo_act);
-//			jp.add(lab_dstMode);
-//			jp.add(cbo_dst);
-//			jp.add(lab_train);
-//			jp.add(sld_train);
-//			jp.add(chk_fixTrain);
-//			array[0] = jp;
-//		    int eingabe = JOptionPane.showConfirmDialog(null,array,"Options", JOptionPane.OK_CANCEL_OPTION);
-//		    if(eingabe != 0){
-//		    	return;
-//		    }
-//			
-//		}});
-		// *******************************
+	
 		menuExportVectors.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 			JSONObject ensemble = DS.js_Ensemble;
 			if (ensemble== null )return;
