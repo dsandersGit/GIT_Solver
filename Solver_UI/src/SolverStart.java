@@ -115,15 +115,17 @@ public class SolverStart {
 	 * 90: Export NormData
 	 * 91: Debug variable ID > Remove
 	 * 92: Copy data when saving ensemble
-	 * 93: Feature 'Shuffle Now' > go on to next target
+	 * 93: Feature 'Skip' > go on to next target
+	 * 94: Feature 'Shuffle' > new random eigenvectors 
 	 * 	 */
  
 	public static String 	app 			= "solver [ISI]";
-	public static String 	appAdd 			= " 0.2";
-	public static String 	revision 		= " 93";
+	public static String 	appAdd 			= " 0.2.94";
+	public static String 	revision 		= " 94";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
-	public static boolean 	immediateShuffle = false;					// 93
+	public static boolean 	immediateSkip 	= false;					// 93
+	public static boolean 	doShuffle		= false;					// 94
 	public static long 		plotTimer 		= -1;
 	public static boolean 	darkMode 		= false;
 	public static Color 	backColor 		= Color.DARK_GRAY;
@@ -157,20 +159,20 @@ public class SolverStart {
 //		}
 //		
 //		
-////		  UIManager.put( "control", new Color( 128, 128, 128) );
-////		  UIManager.put( "info", new Color(128,128,128) );
-////		  UIManager.put( "nimbusBase", new Color( 18, 30, 49) );
-////		  UIManager.put( "nimbusAlertYellow", new Color( 248, 187, 0) );
-////		  UIManager.put( "nimbusDisabledText", new Color( 128, 128, 128) );
-////		  UIManager.put( "nimbusFocus", new Color(115,164,209) );
-////		  UIManager.put( "nimbusGreen", new Color(176,179,50) );
-////		  UIManager.put( "nimbusInfoBlue", new Color( 66, 139, 221) );
-////		  UIManager.put( "nimbusLightBackground", new Color( 18, 30, 49) );
-////		  UIManager.put( "nimbusOrange", new Color(191,98,4) );
-////		  UIManager.put( "nimbusRed", new Color(169,46,34) );
-////		  UIManager.put( "nimbusSelectedText", new Color( 255, 255, 255) );
-////		  UIManager.put( "nimbusSelectionBackground", new Color( 104, 93, 156) );
-////		  UIManager.put( "text", new Color( 230, 230, 230) );
+//		  UIManager.put( "control", new Color( 128, 128, 128) );
+//		  UIManager.put( "info", new Color(128,128,128) );
+//		  UIManager.put( "nimbusBase", new Color( 18, 30, 49) );
+//		  UIManager.put( "nimbusAlertYellow", new Color( 248, 187, 0) );
+//		  UIManager.put( "nimbusDisabledText", new Color( 128, 128, 128) );
+//		  UIManager.put( "nimbusFocus", new Color(115,164,209) );
+//		  UIManager.put( "nimbusGreen", new Color(176,179,50) );
+//		  UIManager.put( "nimbusInfoBlue", new Color( 66, 139, 221) );
+//		  UIManager.put( "nimbusLightBackground", new Color( 18, 30, 49) );
+//		  UIManager.put( "nimbusOrange", new Color(191,98,4) );
+//		  UIManager.put( "nimbusRed", new Color(169,46,34) );
+//		  UIManager.put( "nimbusSelectedText", new Color( 255, 255, 255) );
+//		  UIManager.put( "nimbusSelectionBackground", new Color( 104, 93, 156) );
+//		  UIManager.put( "text", new Color( 230, 230, 230) );
 //		  try {
 //		    for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
 //		      if ("Nimbus".equals(info.getName())) {

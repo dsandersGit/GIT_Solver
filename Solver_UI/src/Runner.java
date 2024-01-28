@@ -56,7 +56,8 @@ public class Runner {
     
 	
 	public Runner(int target, String tName, boolean activationIsDst) {
-		SolverStart.immediateShuffle = false;
+		SolverStart.immediateSkip 	= false;
+		SolverStart.doShuffle		= false;
 		absCount =0 ;
 		mappedSigmoid = new double[200];
 		for (double i=-10;i<10;i+=0.1) {
@@ -105,7 +106,7 @@ public class Runner {
         trainSet = DS.fixedTrainSet[i];
 
         int step = 100;
-        while ( reDo( -1 ) && !SolverStart.immediateStop && !SolverStart.immediateShuffle) {
+        while ( reDo( -1 ) && !SolverStart.immediateStop && !SolverStart.immediateSkip) {
         	absCount++;
         	if ( absCount%step == 0 )UI.labRun.setText("Run: " + absCount);
         	if ( absCount > 3000 ) step = 1000;
@@ -125,6 +126,7 @@ public class Runner {
 		if ( src < 0 ){
 			zuFiAgain = zufi(zuFiAgain);
 	    }else{
+	    	
 	    	for (int a=0;a<DS.numVars;a++){
 	    		for (int i=0;i<Opts.numDims;i++) {
 	    			mcEigenVec[a][i]     = DS.freezs.get(src).eigenVec[a][i];
@@ -133,6 +135,15 @@ public class Runner {
 	        }
 	    	curr_Dist = 0;
 	    }
+		
+		if ( SolverStart.doShuffle ) {
+			SolverStart.doShuffle = false;
+			curr_Dist = 0;
+			distanceOld=0;
+			zufi(-1);
+			logZufi();
+		}
+			
 		
 		 calcPlot();
 	        double ndst = 0;

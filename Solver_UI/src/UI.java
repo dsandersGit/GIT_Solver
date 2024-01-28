@@ -124,6 +124,7 @@ public class UI {
 	static JButton jbClassify = new JButton();
 	static JButton jb_Stop = new JButton("Stop Training");
 	static JButton 	jB_Shuffle = new JButton(" Shuffle Now");
+	static JButton 	jB_Skip = new JButton(" Skip");
 	static JButton jb_DefaultOptions = new JButton("Default Options");
 	
 	static JPanel panLive = new JPanel();
@@ -284,8 +285,11 @@ public class UI {
 		jb_Stop.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			SolverStart.immediateStop = true;
 		}});
+		jB_Skip.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
+			SolverStart.immediateSkip = true;
+		}});
 		jB_Shuffle.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
-			SolverStart.immediateShuffle = true;
+			SolverStart.doShuffle = true;
 		}});
 		labStatusIcon = new JLabel(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
 		
@@ -298,6 +302,7 @@ public class UI {
 		panR.add(labTimePerRun);		
 		panR.add(proStatus);
 		panR.add(jb_Stop);
+		panR.add(jB_Skip);
 		panR.add(jB_Shuffle);
 		panR.add(labStatusIcon);
 		
