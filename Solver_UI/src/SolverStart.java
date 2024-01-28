@@ -114,19 +114,22 @@ public class SolverStart {
 	 * 89: Check Options Malform
 	 * 90: Export NormData
 	 * 91: Debug variable ID > Remove
+	 * 92: Copy data when saving ensemble
+	 * 93: Feature 'Shuffle Now' > go on to next target
 	 * 	 */
  
 	public static String 	app 			= "solver [ISI]";
 	public static String 	appAdd 			= " 0.2";
-	public static String 	revision 		= " 91";
+	public static String 	revision 		= " 93";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
+	public static boolean 	immediateShuffle = false;					// 93
 	public static long 		plotTimer 		= -1;
 	public static boolean 	darkMode 		= false;
 	public static Color 	backColor 		= Color.DARK_GRAY;
 	public static Color 	frontColor 		= Color.LIGHT_GRAY;
 	public static JSONObject defOptions     = null;
-	public static String dataFileName = "";
+	//public static String dataFileName = "";
 	
 	public static float[] rollingAccuracy			= null;    // gain / class
 	public static float[] rollingAccuracyX			= null;
@@ -204,11 +207,13 @@ public class SolverStart {
 					File f = new File(args[0]);
 					DS.txtSummary = null;
 					DS.fileName =  f.getName();
+					DS.filePath = f;
 					UI.tmtableClassify.setColumnCount(0);
 					UI.tmtableClassify.setRowCount(0);
 					new DS();										
 					DS.normParas = Tools.doNormData ();				
-					SolverStart.dataFileName = f.getName();
+					//SolverStart.dataFileName = f.getName();
+					//DS.fileName = f.getName();
 					
 					SolverStart.analyzeRawData(f.getName());
 					UI.maintabbed.setSelectedIndex(UI.tab_Summary);

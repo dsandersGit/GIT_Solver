@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
@@ -23,7 +24,8 @@ public class DS {
 	//public static boolean[]		noTrainingSet	= null;					//
 	
 	public static double[][] 	normParas		= null;
-	public static String 	    fileName		= null;
+	public static String 	    fileName		= "";
+	public static File	 	    filePath		= null;
 	
 	public static int			numVars			= 0;
 	public static int			numSamples		= 0;

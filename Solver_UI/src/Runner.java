@@ -56,6 +56,7 @@ public class Runner {
     
 	
 	public Runner(int target, String tName, boolean activationIsDst) {
+		SolverStart.immediateShuffle = false;
 		absCount =0 ;
 		mappedSigmoid = new double[200];
 		for (double i=-10;i<10;i+=0.1) {
@@ -104,13 +105,14 @@ public class Runner {
         trainSet = DS.fixedTrainSet[i];
 
         int step = 100;
-        while ( reDo( -1 ) && !SolverStart.immediateStop ) {
+        while ( reDo( -1 ) && !SolverStart.immediateStop && !SolverStart.immediateShuffle) {
         	absCount++;
         	if ( absCount%step == 0 )UI.labRun.setText("Run: " + absCount);
         	if ( absCount > 3000 ) step = 1000;
         }
         finish();
         if ( !SolverStart.immediateStop ) doFreeze();
+        
 	}
 	public static void cleanRunner () {
 		accuracyTrain.clear();
@@ -169,13 +171,15 @@ public class Runner {
 	            notBetterCount ++;
 
 	       }
-	        if ( notBetterCount > Opts.noBetterStop) {
+	        if ( notBetterCount > Opts.noBetterStop ) {
+	        	
 	        	if ( (dstLatestMax  >= distanceOld* Opts.minBetter && dstLatestMax > 0)  ) {
 	        		finish();
 	                return false;
 	            }
 	            dstLatestMax = distanceOld;
 	            notBetterCount=0;
+	           
 	        }
 	        //System.out.println("out " + ndst+"\t"+distanceOld+"\t"+notBetterCount);
         return true;
@@ -319,8 +323,9 @@ public class Runner {
 		            numElseTrain = oCTr;
 		            numElseTest = oCTe;
 		            UI.spDst.dats.clear();
-		            int pSize = 8;
-		            if ( DS.numSamples>1000)pSize = 4;
+		            int pSize = 10;
+		            if ( DS.numSamples>1000)pSize = 6;
+		            
 		            
 		            UI.spDst.setXY(xTest,yTest, pSize, Color.LIGHT_GRAY, null, true, false, false);
 		            UI.spDst.setXY(xOTest,yOTest, pSize, Color.LIGHT_GRAY, null, true, false, false);

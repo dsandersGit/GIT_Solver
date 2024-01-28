@@ -20,6 +20,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
@@ -81,6 +82,7 @@ public class UI {
 	static JMenu 		menuAction = new JMenu( " Action"); 
 	static JMenuItem 	menuActionClassify = new JMenuItem(" Classify"); 
 	static JMenuItem 	menuActionTrainImmediateStop = new JMenuItem(" Stop Training Now");
+	
 	static JMenuItem 	menuActionTrain = new JMenuItem(" Train"); 
 	static JMenuItem 	menuFileSaveEnsemble = new JMenuItem(" Save Ensemble"); 
 	static JMenuItem 	menuFileLoadEnsemble = new JMenuItem(" Load Ensemble"); 
@@ -121,6 +123,7 @@ public class UI {
 	static JButton jbSaveEns = new JButton();
 	static JButton jbClassify = new JButton();
 	static JButton jb_Stop = new JButton("Stop Training");
+	static JButton 	jB_Shuffle = new JButton(" Shuffle Now");
 	static JButton jb_DefaultOptions = new JButton("Default Options");
 	
 	static JPanel panLive = new JPanel();
@@ -281,6 +284,9 @@ public class UI {
 		jb_Stop.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			SolverStart.immediateStop = true;
 		}});
+		jB_Shuffle.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
+			SolverStart.immediateShuffle = true;
+		}});
 		labStatusIcon = new JLabel(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
 		
 		panL.add(labRun);
@@ -292,6 +298,7 @@ public class UI {
 		panR.add(labTimePerRun);		
 		panR.add(proStatus);
 		panR.add(jb_Stop);
+		panR.add(jB_Shuffle);
 		panR.add(labStatusIcon);
 		
 		pan.add(panL);
@@ -388,7 +395,9 @@ public class UI {
 		jb_Stop.setEnabled(false);
 		jbLoadEns.setEnabled(true);
 		
-		jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
+		//jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
+		jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+DS.fileName+"]");
+		
 		
 		boolean noData 			= false;
 		boolean noEns 			= false;
@@ -681,6 +690,7 @@ public class UI {
 		menuActionTrain.setAccelerator(KeyStroke.getKeyStroke('T',InputEvent.CTRL_DOWN_MASK));
 		menuAction.add(menuActionTrainImmediateStop);
 		menuActionTrainImmediateStop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CANCEL, InputEvent.CTRL_DOWN_MASK));
+		
 		menuAction.add(new JSeparator());
 		menuAction.add(menuActionClassify);
 		menuAction.add(new JSeparator());
@@ -726,6 +736,7 @@ public class UI {
 			
 			DS.txtSummary = null;
 			DS.fileName =  "Clipboard";
+			DS.filePath = null;
 			tmtableClassify.setColumnCount(0);
 			tmtableClassify.setRowCount(0);
 			
@@ -840,6 +851,8 @@ public class UI {
 		menuActionTrainImmediateStop.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
 			SolverStart.immediateStop = true;
 		}});
+		
+		
 		menuActionTrain.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			train();
 		}});
@@ -1119,7 +1132,9 @@ public class UI {
 		tmtableClassify.setColumnCount(0);
 		tmtableClassify.setRowCount(0);
 		//maintabbed.setSelectedIndex(tab_Distance);
-		jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
+		//jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
+		jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+DS.fileName+"]");
+		
 		refreshStatus();
 		
 			Thread thread = new Thread(new Runnable()
@@ -1175,6 +1190,18 @@ public class UI {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+	    
+	    // Copy Data. Clipboard data will not be saved
+	    if ( DS.filePath != null ) {
+		    File dest = new File(f.getAbsolutePath()+"_"+DS.fileName);
+		    try {
+				Files.copy(DS.filePath.toPath(), dest.toPath());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    }
+	    
 	}
 	static void loadEnsemble(boolean auto) {
 
@@ -1251,8 +1278,8 @@ public class UI {
 //		SolverStart.bootstrap() ;
 		
 		DS.normParas = Tools.doNormData ();				// Daten Normalisieren
-		SolverStart.dataFileName = f.getName();
-		
+		//SolverStart.dataFileName = f.getName();
+		DS.fileName= f.getName();
 		SolverStart.analyzeRawData(f.getName());
 		UI.maintabbed.setSelectedIndex(UI.tab_Summary);
 		refreshStatus();
