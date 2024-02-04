@@ -28,7 +28,7 @@ public class SolverStart {
 	 *  + data import and check 
 	 *  + data classification training commander
 	 *  
-	 *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
+	 *  Copyright(c) 2009-2024, Daniel Sanders, All rights reserved.
 	 *  https://github.com/dsandersGit/GIT_Solver
 	 */
 	
@@ -118,11 +118,14 @@ public class SolverStart {
 	 * 93: Feature 'Skip' > go on to next target
 	 * 94: Feature 'Shuffle' > new random eigenvectors 
 	 * 95: Skip change to Next, more inuitive
+	 * 96: Remove Boost
+	 * 97: System.out of ensemble to external LogStreamReader
+	 * 98: Save raw data
 	 * 	 */
  
 	public static String 	app 			= "solver [ISI]";
-	public static String 	appAdd 			= " 0.2.95";
-	public static String 	revision 		= " 95";
+	public static String 	appAdd 			= " 0.2.97";
+	public static String 	revision 		= " 97";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static boolean 	immediateSkip 	= false;					// 93
@@ -228,7 +231,7 @@ public class SolverStart {
 		if(args.length>1)
 			DS.variableID = args[1]; 
 		
-		System.out.println("DS.variableID " + DS.variableID);
+		//System.out.println("DS.variableID " + DS.variableID);
 	}
 	public static void trainPattern() throws IOException {
 
@@ -717,7 +720,6 @@ public class SolverStart {
 	        if ( !hasHeader ) {
 	        	for (int i=0;i<noAreas; i++) {
 	        		 DS.AreaNames [i] = '\"'+"VAR:"+i+'\"';
-	        		 
 	        	}
 	        }else {
 	        	noFiles--;

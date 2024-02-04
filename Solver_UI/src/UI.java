@@ -74,6 +74,7 @@ public class UI {
 	static 		JLabel			labStatusIcon		= null;
 	static 		JLabel			labAccuracy			= new JLabel("---");
 	static 		JProgressBar	proStatus			= new JProgressBar();
+	static 		JProgressBar	proNoBetterStop		= new JProgressBar();
 	static 		JLabel			labTimePerRun		= new JLabel("Process: ---");
 	static 		JLabel			labRun				= new JLabel("RUN: ---");
 	
@@ -87,7 +88,8 @@ public class UI {
 	static JMenuItem 	menuFileSaveEnsemble = new JMenuItem(" Save Ensemble"); 
 	static JMenuItem 	menuFileLoadEnsemble = new JMenuItem(" Load Ensemble"); 
 	static JMenu 		menuExport = new JMenu( " Export");
-	static JMenuItem 	menuFileSplitData = new JMenuItem(" Split Data"); 
+	static JMenuItem 	menuFileSplitData = new JMenuItem(" Split Data");
+	static JMenuItem 	menuFileSaveData = new JMenuItem(" Save Data");  
 	
 	static int tab_Classify = 0;
 	static int tab_Train = 1;
@@ -117,15 +119,15 @@ public class UI {
 	static 				JLabel iconAlgo = new Icon_Solver();
 	static 				JLabel iconClassify = null;
 	
-	static JButton jbLoad = new JButton();
-	static JButton jbTrain = new JButton();
-	static JButton jbLoadEns = new JButton();
-	static JButton jbSaveEns = new JButton();
-	static JButton jbClassify = new JButton();
-	static JButton jb_Stop = new JButton("Stop Training");
-	static JButton 	jB_Shuffle = new JButton(" Shuffle Now");
-	static JButton 	jB_Skip = new JButton(" Next");
-	static JButton jb_DefaultOptions = new JButton("Default Options");
+	static 				JButton jbLoad 	= new JButton();
+	static 				JButton jbTrain = new JButton();
+	static 				JButton jbLoadEns = new JButton();
+	static 				JButton jbSaveEns = new JButton();
+	static 				JButton jbClassify = new JButton();
+	static 				JButton jb_Stop = new JButton("Stop Training");
+	static 				JButton jB_Shuffle = new JButton(" Shuffle Now");
+	static 				JButton jB_Skip = new JButton(" Next");
+	static 				JButton jb_DefaultOptions = new JButton("Default Options");
 	
 	static JPanel panLive = new JPanel();
 	static JPanel panLiveAcc = new JPanel();
@@ -293,6 +295,7 @@ public class UI {
 		}});
 		labStatusIcon = new JLabel(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
 		
+		panL.add(proNoBetterStop);
 		panL.add(labRun);
 		panL.add(labAccuracy);
 		panL.add(labSamples);
@@ -681,6 +684,7 @@ public class UI {
 		menuFileLoadClip.setAccelerator(KeyStroke.getKeyStroke('V',InputEvent.CTRL_DOWN_MASK));
 		menuFile.add(menuFileLoadClip);
 		menuFile.add(new JSeparator());
+		menuFile.add(menuFileSaveData);
 		menuFile.add(menuFileSplitData);
 		menuFile.add(new JSeparator());
 		menuFile.add(menuFileLoadEnsemble);
@@ -838,6 +842,59 @@ public class UI {
 		    try {
 		    	bwTrain.close();
 		    	bwTest.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}});
+		menuFileSaveData.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
+			// 98
+			refreshOptions();
+			StringBuffer out = new StringBuffer();
+
+			out.append("Class");
+        	for (int j=0;j< DS.numVars; j++) {
+        		out.append("," + DS.AreaNames[j].replaceAll("\"", ""));	
+        	}
+        	out.append("\n");
+        
+	        for (int f=0;f<DS.numSamples;f++){
+	        	String cls = DS.ClassNames[f];
+	        	
+	        	if ( cls.length()<1 || Tools.isNumeric(cls) ) {
+	        		cls = "class"+DS.classAllIndices[Tools.getIndexOfTarget(DS.classIndex[f])];
+	        	}
+	        	out.append(cls);
+	        	for (int j=0;j< DS.numVars; j++) {
+            		out.append("," + DS.rawData[f][j]);	
+            	}
+	        	out.append("\n");
+	        }
+			
+			Preferences prefs;
+		    prefs = Preferences.userRoot().node("Solver");
+		    String path = prefs.get("path", ".");
+		    String[] type = {"CSV"};
+		    String[] sht = {"CSV"};
+			File f = Tools.getFile("Select file to save", path,type,sht, true);
+			if ( f == null) return;
+			if ( !f.getName().endsWith(".csv"))
+				f = new File(f.getAbsolutePath()+".csv");
+			
+			FileWriter fw = null;
+			try {
+				fw = new FileWriter(f, false);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		    BufferedWriter bw = new BufferedWriter(fw);
+		    try {
+		    	fw.write(out.toString());
+			} catch (JSONException | IOException e1) {
+				e1.printStackTrace();
+			}
+		  
+		    try {
+		    	bw.close();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -1107,8 +1164,6 @@ public class UI {
 	    String[] type = {"DS_Ensemble"};
 	    String[] sht = {"ENS"};
 		File f = Tools.getFile("Select file to save", path,type,sht, true);
-		
-		//File f = getFile("Save ensemble file", SolverStart.app,"DS_Ensemble", "ENS", true);
 		if ( f == null) return;
 		
 		if ( !f.getName().toLowerCase().endsWith(".ens")) {
@@ -1126,6 +1181,7 @@ public class UI {
 	    BufferedWriter bw = new BufferedWriter(fw);
 	    try {
 			bw.write(DS.js_Ensemble.toString(3));
+			System.out.println(DS.js_Ensemble.toString(3));					// 97 System.out of ensemble to external LogStreamReader
 		} catch (JSONException | IOException e1) {
 			e1.printStackTrace();
 		}

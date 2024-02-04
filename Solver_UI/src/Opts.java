@@ -30,7 +30,7 @@ public class Opts {
 	public static int  		minVariableCount		= 2;					// No User Option! minimal number of variables
 	public static int  		retainModelNum 			= 5;					// Model per class in reduced ensemble
 	
-	public static boolean 	doBoost					= false;
+//	public static boolean 	doBoost					= false;
 	public static boolean 	showDevelopment			= true;
 	
 

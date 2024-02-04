@@ -18,7 +18,7 @@ public class Runner {
 	public double[][] mcEigenVec 	= null;
 	public double[][] mcEigenVecOld = null;
 	public double[][] mcPCA 		= null;
-	public static int[][] booster	= null;
+	//public static int[][] booster	= null;
 	int zuFiAgain 					= -1;
 	double curr_Dist 				= 0;
 	double[] distances 				= null;
@@ -82,9 +82,9 @@ public class Runner {
 	        mcEigenVecOld         	= new double [DS.numVars][Opts.numDims];
 	        mcPCA                 	= new double [Opts.numDims][DS.numSamples];
 		}
-		if ( booster == null) {
-			booster = new int[DS.numSamples][DS.numClasses];
-		}
+//		if ( booster == null) {
+//			booster = new int[DS.numSamples][DS.numClasses];
+//		}
         if ( activationIsDst) {
         	doDistxAccur = true;
         	doAccur = false;
@@ -108,7 +108,10 @@ public class Runner {
         int step = 100;
         while ( reDo( -1 ) && !SolverStart.immediateStop && !SolverStart.immediateSkip) {
         	absCount++;
-        	if ( absCount%step == 0 )UI.labRun.setText("Run: " + absCount);
+        	if ( absCount%step == 0 ) {
+        		UI.labRun.setText("Run: " + absCount);
+        		UI.proNoBetterStop.setValue(notBetterCount*100 / Opts.noBetterStop );
+        	}
         	if ( absCount > 3000 ) step = 1000;
         }
         finish();
@@ -119,7 +122,7 @@ public class Runner {
 		accuracyTrain.clear();
 		accuracyTest.clear();
 		dstTrain.clear();
-		booster = null;
+//		booster = null;
 	}
 
 	private boolean reDo(int src){														// src > Daten aus Freeze extrahieren
@@ -528,39 +531,39 @@ public class Runner {
         
         return a;
     }
-	private int toTheLeft(){
-		// TODO 
-		double maxWin = 0;int maxPos = 0;				// die Variable, deren 1% Änderung am meisten bringt
-		for (int a=0;a<DS.numVars;a++){
-			undoZufi();
-			double baseDst = doFullCalc();
-            mcEigenVec [a][0] =  0.1;
-            double postDst = doFullCalc();
-            if (Math.abs(postDst-baseDst)>maxWin) {
-            	maxWin = Math.abs(postDst-baseDst);
-            	maxPos = a;
-            }
-		}
-		undoZufi();
-		 mcEigenVec [maxPos][0] =  0.1;
-		return maxPos;
-	}
-	private double toTheTop(int a){
-		// TODO 
-		double maxWin = 0;int maxPos = 0;				// die Variable, deren 1% Änderung am meisten bringt
-		for (double i=-1;i<1;i+=0.05){
-			undoZufi();
-			double baseDst = doFullCalc();
-            mcEigenVec [a][0] = i;
-            double postDst = doFullCalc();
-            if (Math.abs(postDst-baseDst)>maxWin) {
-            	maxWin = Math.abs(postDst-baseDst);
-            	maxPos = a;
-            }
-		}
-		undoZufi();
-		return maxPos;
-	}
+//	private int toTheLeft(){							// 96
+//		// TODO 
+//		double maxWin = 0;int maxPos = 0;				// die Variable, deren 1% Änderung am meisten bringt
+//		for (int a=0;a<DS.numVars;a++){
+//			undoZufi();
+//			double baseDst = doFullCalc();
+//            mcEigenVec [a][0] =  0.1;
+//            double postDst = doFullCalc();
+//            if (Math.abs(postDst-baseDst)>maxWin) {
+//            	maxWin = Math.abs(postDst-baseDst);
+//            	maxPos = a;
+//            }
+//		}
+//		undoZufi();
+//		 mcEigenVec [maxPos][0] =  0.1;
+//		return maxPos;
+//	}
+//	private double toTheTop(int a){				// 96
+//		// TODO 
+//		double maxWin = 0;int maxPos = 0;				// die Variable, deren 1% Änderung am meisten bringt
+//		for (double i=-1;i<1;i+=0.05){
+//			undoZufi();
+//			double baseDst = doFullCalc();
+//            mcEigenVec [a][0] = i;
+//            double postDst = doFullCalc();
+//            if (Math.abs(postDst-baseDst)>maxWin) {
+//            	maxWin = Math.abs(postDst-baseDst);
+//            	maxPos = a;
+//            }
+//		}
+//		undoZufi();
+//		return maxPos;
+//	}
 	private double doFullCalc() {
 		double ndst = 0 ;
 		 calcPlot();
@@ -683,15 +686,17 @@ public class Runner {
        }
        if ( maxDist == 0)return 0 ;
        double fak = 1./maxDist;
-       int indexOfTarget = Tools.getIndexOfTarget(targetColorIndex); 
+//       int indexOfTarget = Tools.getIndexOfTarget(targetColorIndex); 
        for (int f=0;f<DS.numSamples;f++){
-    	   if (booster[f][indexOfTarget] == 0) booster[f][indexOfTarget] = 1;
+   // 	   if (booster[f][indexOfTarget] == 0) booster[f][indexOfTarget] = 1;	// 96
            distances[f] *= fak;
            if ( trainSet[f]) {
-           	if ( DS.classIndex[f] == targetColorIndex ) {
-           		dstTarget += (booster[f][indexOfTarget] * distances[f]);
-           		targetCount+=booster[f][indexOfTarget];
-           	}
+	           	if ( DS.classIndex[f] == targetColorIndex ) {
+	          		dstTarget += distances[f];
+	          		targetCount+=1;
+	//           	dstTarget += (booster[f][indexOfTarget] * distances[f]);		// 96
+	//         		targetCount+=booster[f][indexOfTarget];
+	           	}
 	            if ( DS.classIndex[f] != targetColorIndex ) {
 	            	dstOther += distances[f];
 	            	OtherCount++;
@@ -701,6 +706,9 @@ public class Runner {
        }
        dstTarget	/= targetCount;
        dstOther		/= OtherCount;
+       
+//       System.out.println(dstTarget+"\t"+dstOther);
+       
        dstTarget 	-= 0.5;
        dstOther 	-= 0.5;
        dstTarget 	*= 20;
@@ -708,85 +716,34 @@ public class Runner {
        return getMappedSigmoid(dstOther) - getMappedSigmoid(dstTarget);
        
     }
-    private double getDistancesDDBAK(double[] avg){
-    	maxDist = 0;
-        float[] dstPerClass = new float[DS.classAllIndices.length];
-        float[] classCount = new float[DS.classAllIndices.length];
-       if ( avg == null) avg = getAverageTarget();                        // Abstand vom Schwerpunkt Auswahl Target, Zahl zw 0 - 1
-       
-       distances = new double[DS.numSamples];
-       for (int f=0;f<DS.numSamples;f++){
-               double val = 0;
-               for (int i=0;i<Opts.numDims;i++) {
-                   val += (Math.pow(mcPCA[i][f]-avg[i], 2) );                
-               }
-           distances[f]=Math.pow(val, .5);
-           if ( distances[f]>maxDist ) maxDist = distances[f];
-       }
-       if ( maxDist == 0)return 0 ;
-       double fak = 1./maxDist;
-       int indexOfTarget = Tools.getIndexOfTarget(targetColorIndex); 
-       for (int f=0;f<DS.numSamples;f++){
-    	   if (booster[f][indexOfTarget] == 0) booster[f][indexOfTarget] = 1;		// init
-           distances[f] *= fak;
-           if ( trainSet[f]) {
-           	if ( DS.classIndex[f] == targetColorIndex ) {
-           		dstPerClass[indexOfTarget] += (booster[f][indexOfTarget] * distances[f]);
-           		classCount[indexOfTarget]+=booster[f][indexOfTarget];
-           	}
-	            if ( DS.classIndex[f] != targetColorIndex ) {
-	            	int indexOfOther = Tools.getIndexOfTarget(DS.classIndex[f]);
-	            	dstPerClass[indexOfOther] += distances[f];
-	            	classCount[indexOfOther]++;
-	            }
-           }
-           
-       }
-       double sum=0;
-       for (int i=0;i<DS.classAllIndices.length;i++) {
-    	   dstPerClass[i] 	/= classCount[i];
-    	   dstPerClass[i]	-= 0.5;
-    	   dstPerClass[i]	*= 20.;
-       }
-       for (int i=0;i<DS.classAllIndices.length;i++) {
-    	   if ( i != indexOfTarget )
-    		   sum +=  (getMappedSigmoid(dstPerClass[i]) - getMappedSigmoid(dstPerClass[indexOfTarget]));
-       }
-       sum /= (DS.classAllIndices.length-1);
-//       dstTarget	/= targetCount;
-//       dstOther		/= OtherCount;
-//       dstTarget 	-= 0.5;
-//       dstOther 	-= 0.5;
-//       dstTarget 	*= 20;
-//       dstOther 	*= 20;
-       return sum;
-       
-    }
+    
     private float doClassify(boolean training, boolean boost) {
         classification = new int [DS.numSamples];
-        float tp=0, fp=0, tn=0, fn=0;
+//        float tp=0, fp=0, tn=0, fn=0;
         float correct = 0;float all =0;
-        int indexOfTarget = Tools.getIndexOfTarget(targetColorIndex); 
+//        int indexOfTarget = Tools.getIndexOfTarget(targetColorIndex); 
         for (int i=0;i<DS.numSamples;i++){
             //if (trainSet[i]) {
                 if ( distances[i] < split/100) {
                     classification[i] = targetColorIndex;
                     if (trainSet[i] == training)                    
                         if (DS.classIndex[i] == targetColorIndex) {
-                            tp++;correct++;
+//                            tp++;
+                            correct++;
                         }else {
-                            fn++;
+//                            fn++;
                         }
                 }else {
                     classification[i] = -1;
-                    if ( boost &&  Opts.doBoost && DS.classIndex[i] == targetColorIndex ) booster[i][indexOfTarget] ++;
-                    if (trainSet[i] == training) {
-                        if (DS.classIndex[i] == targetColorIndex) {
-                            fp++;
-                        }else {
-                            tn++;//correct++;
-                        }
-                    }
+                    // 96
+//                    if ( boost &&  Opts.doBoost && DS.classIndex[i] == targetColorIndex ) booster[i][indexOfTarget] ++;
+//                    if (trainSet[i] == training) {
+//                        if (DS.classIndex[i] == targetColorIndex) {
+//                            fp++;
+//                        }else {
+//                            tn++;//correct++;
+//                        }
+//                    }
                 }
                 if (trainSet[i] == training && DS.classIndex[i] == targetColorIndex) all++;
         }
@@ -899,8 +856,14 @@ public class Runner {
             if ( has0Split ) split = (split+startSplit)/2; 
    }
     private double getMappedSigmoid( double val ) {
+    	
+    	
+    	
     	// TODO: Mapping
     	int v = (int)((val + 10)*10);
+    	
+    	//System.out.println(val + "\t" +v+ "\t" +mappedSigmoid[v]);
+    	
     	if ( v < 0)	return 0.;
     	if ( v > 199) {
     		return 1.;
