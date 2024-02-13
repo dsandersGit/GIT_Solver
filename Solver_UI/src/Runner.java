@@ -163,7 +163,8 @@ public class Runner {
 
 	        
 	        // distanceOld!=0
-	        if ( (ndst  > distanceOld )  ){
+	        //102
+	        if ( (ndst* Opts.minBetter  > distanceOld )  ){
 	        	//System.out.println(ndst+"\t"+distanceOld);
 	            accuracyTrain.add((float) accuracy);
 	            accuracyTest.add((float) doClassify(false, false));
@@ -658,10 +659,10 @@ public class Runner {
            		dstTarget += getMappedSigmoid(20*(distances[f]-0.5));
            		targetCount++;
            	}
-	            if ( DS.classIndex[f] != targetColorIndex ) {
-	            	dstOther += getMappedSigmoid(20*(distances[f]-0.5));
-	            	OtherCount++;
-	            }
+            if ( DS.classIndex[f] != targetColorIndex ) {
+            	dstOther += getMappedSigmoid(20*(distances[f]-0.5));
+            	OtherCount++;
+            }
            }
        }
        return dstOther/OtherCount - dstTarget/targetCount;

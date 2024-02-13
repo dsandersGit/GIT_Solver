@@ -52,7 +52,7 @@ import javax.swing.table.DefaultTableModel;
  * user-interface
  *  + graphical user interface, forms and actions 
  *  
- *  Copyright(c) 2009-2023, Daniel Sanders, All rights reserved.
+ *  Copyright(c) 2009-2024, Daniel Sanders, All rights reserved.
  *  https://github.com/dsandersGit/GIT_Solver
  */
 
@@ -337,6 +337,7 @@ public class UI {
 				if (jo_Opts.has("plotTimer")) 	Opts.plotTimer 		= jo_Opts.getInt("plotTimer");
 				if (jo_Opts.has("fixTrainSet")) Opts.fixTrainSet 	= jo_Opts.getBoolean("fixTrainSet");
 				if (jo_Opts.has("activation")) 	Opts.activation		= jo_Opts.getString("activation");
+				if (jo_Opts.has("dstType"))		Opts.dstType		= jo_Opts.getString("dstType");			//99
 	
 			  } catch (JSONException e) {
 				  txtOpts.setText(Opts.getOptsAsJson().toString(3));

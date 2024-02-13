@@ -121,11 +121,15 @@ public class SolverStart {
 	 * 96: Remove Boost
 	 * 97: System.out of ensemble to external LogStreamReader
 	 * 98: Save raw data
+	 * 99: BugFix
+	 * 100: dstType EGO now will change fullClassification algorithm > more individual, distance to class style
+	 * 101: Ratio Train / Test
+	 * 102: Opts.minBetter reinstalled
 	 * 	 */
  
 	public static String 	app 			= "solver [ISI]";
-	public static String 	appAdd 			= " 0.2.97";
-	public static String 	revision 		= " 97";
+	public static String 	appAdd 			= " 0.2.102";
+	public static String 	revision 		= " 102";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static boolean 	immediateSkip 	= false;					// 93
@@ -900,5 +904,22 @@ public class SolverStart {
 	        UI.proStatus.setValue(0);
 	        if (fail) JOptionPane.showConfirmDialog(null, "<HTML><H3>Import of data failed</H3>", SolverStart.app, JOptionPane.OK_OPTION, JOptionPane.WARNING_MESSAGE);
 	}
-	
+	public void makeDataUp(int numClasses, int numData) {
+		
+        DS.rawData 		= new double[numClasses*numData][numData];
+        DS.AreaNames 		= new String[numData];
+        DS.SampleNames 	= new String[numClasses*numData];
+        DS.classIndex 		= new int[numClasses*numData];
+        DS.ClassNames 		= new String[numClasses*numData];
+		
+		for (int c=0;c<numClasses; c++) {
+			for (int d=0;d<numData; d++) {
+				DS.ClassNames[c*numData+d] = "Class_"+c;
+				DS.classIndex[c*numData+d] = c;
+				DS.AreaNames[d] = "Var_"+d;
+				DS.SampleNames[c*numData+d] = "Sample_"+ (c*numData+d);
+				
+			}
+		}
+	}
 }

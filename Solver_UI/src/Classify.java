@@ -147,6 +147,7 @@ public class Classify {
 		int[][] confusionMatrixTrain = new int[DS.numClasses][DS.numClasses];
 		int[][] confusionMatrixTest = new int[DS.numClasses][DS.numClasses];
 		
+		
 		// Test Train/
 		int add = 7; // sonst 6
 		
@@ -251,6 +252,30 @@ public class Classify {
              
 		 }
 
+		int[] trainRatio = new int[DS.numClasses];
+		int[] testRatio = new int[DS.numClasses];
+		
+		// 101
+		for (int i=0;i<DS.numClasses;i++) {
+			float isInTrain = 0;
+			float isOutTrain = 0;
+			float isInTest = 0;
+			float isOutTest = 0;
+			for (int j=0;j<DS.numClasses;j++) {
+				if ( i==j) {
+					isInTrain += confusionMatrixTrain [i][j];
+					isInTest += confusionMatrixTest [i][j];
+				}else {
+					isOutTrain += confusionMatrixTrain [i][j];
+					isOutTest += confusionMatrixTest [i][j];
+				}
+			}
+			
+			trainRatio[i] = Math.round(100*isInTrain/(isInTrain+isOutTrain));
+			testRatio[i] = Math.round(100*isInTest/(isInTest+isOutTest));
+		}
+		
+		
 		StringBuffer out = new StringBuffer();
 		out.append("SUMMARY:"+"\n");
 		out.append(Tools.txtLen ("CLASS") + "\t");
@@ -273,26 +298,30 @@ public class Classify {
 			for (int i=0;i<DS.numClasses;i++) {
 				out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
 			}
-			out.append("\n");
+			out.append(Tools.txtLen ("RATIO") + "\n");
+			//out.append("\n");
 			for (int i=0;i<DS.numClasses;i++) {
 				out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
 				for (int j=0;j<DS.numClasses;j++) {
 					out.append(Tools.txtLen ("" + confusionMatrixTrain [i][j])+"\t");	
 				}
-				out.append("\n");
+				out.append(Tools.txtLen ("" + trainRatio [i])+"\n");
+				//out.append("\n");
 			}
 			out.append(""+"\n");
 			out.append(Tools.txtLen ("Validation")+"\t");
 			for (int i=0;i<DS.numClasses;i++) {
 				out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
 			}
-			out.append("\n");
+			out.append(Tools.txtLen ("RATIO") + "\n");
+			//out.append("\n");
 			for (int i=0;i<DS.numClasses;i++) {
 				out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
 				for (int j=0;j<DS.numClasses;j++) {
 					out.append(Tools.txtLen ("" + confusionMatrixTest [i][j])+"\t");	
 				}
-				out.append("\n");
+				out.append(Tools.txtLen ("" + testRatio [i])+"\n");
+				//out.append("\n");
 			}
 			out.append(""+"\n");
 		}
@@ -356,18 +385,34 @@ public class Classify {
 			}
 		}
 		
+		
+		// 100: Massive Change
+		boolean tryTest =  Opts.dstType.contentEquals("EGO") ;
+		int[] classification = new int [DS.numSamples];
+		
+		
+		if ( tryTest) {											// Development
+			for (int f=0;f<DS.numSamples;f++){
+	            if ( distances[f] < split/100) {
+	                classification[f] = target;
+	                sumUpClass[f][indexPos] += bonus * (1.-distances[f]) ;
+	            }else {
+	                classification[f] = -1;
+	                sumUpClass[f][indexPos] -= bonus* (distances[f]) ;
+	            }
+	        }
+		}else {
+			for (int f=0;f<DS.numSamples;f++){
+	            if ( distances[f] < split/100) {
+	                classification[f] = target;
+	                sumUpClass[f][indexPos] += bonus ;
+	            }else {
+	                classification[f] = -1;
+	                sumUpClass[f][indexPos] -= bonus;
+	            }
+	        }	
+		}
 	    // doCLassify
-	    int[] classification = new int [DS.numSamples];
-        for (int f=0;f<DS.numSamples;f++){
-            if ( distances[f] < split/100) {
-                classification[f] = target;
-                sumUpClass[f][indexPos] += bonus;
-            }else {
-                classification[f] = -1;
-                sumUpClass[f][indexPos] -= bonus;
-            }
-        }
-       
 	}
 	
 	

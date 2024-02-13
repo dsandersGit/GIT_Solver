@@ -12,7 +12,7 @@
 public class Opts {
 	// INIT
 	public static String	dstType			 		= "GROUP"; 				// "EGO"; "GROUP"
-	public static String	normType		 		= "Pareto"; 		// "MaxMinNorm"; "Pareto"; "None"
+	public static String	normType		 		= "MaxMinNorm"; 		// "MaxMinNorm"; "Pareto"; "None"
 	public static String	activation	 			= "DxA";				// Activation Function "DxA" or "A" or "D", "D+A"
 	//
 	public static int 		numDims			 		= 3; 					// Number of Neurons / Dimensions
