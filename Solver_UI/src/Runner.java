@@ -174,7 +174,8 @@ public class Runner {
 	            notBetterCount = 0;
 	            distanceOld = ndst;
 	            
-	            if ( (System.currentTimeMillis() - SolverStart.plotTimer) > Opts.plotTimer || SolverStart.plotTimer < 0) {
+	            if ( (System.currentTimeMillis() - SolverStart.plotTimer) > Opts.plotTimer || SolverStart.plotTimer < 0 || SolverStart.doRedrawOnClick) {
+	            	SolverStart.doRedrawOnClick = false;
 	            	SolverStart.plotTimer = System.currentTimeMillis(); 
 	            	doStreamPlot(false);
 	            }

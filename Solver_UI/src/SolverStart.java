@@ -129,15 +129,16 @@ public class SolverStart {
 	 * 104: Better EGO distance
 	 * 	 */
  
-	public static String 	app 			= "solver [ISI]";
+	public static String 	app 			= "solver_DEV [ISI]";
 	public static String 	appAdd 			= " 0.2.104";
 	public static String 	revision 		= " 104";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static boolean 	immediateSkip 	= false;					// 93
 	public static boolean 	doShuffle		= false;					// 94
+	public static boolean 	doRedrawOnClick	= true;					// 94
 	public static long 		plotTimer 		= -1;
-//	public static boolean 	darkMode 		= false;
+	public static boolean 	darkMode 		= true;
 	public static Color 	backColor 		= Color.DARK_GRAY;
 	public static Color 	frontColor 		= Color.LIGHT_GRAY;
 	public static JSONObject defOptions     = null;
@@ -156,57 +157,57 @@ public class SolverStart {
 	
 	public static void main(String[] args) {
 		
-//		// taken from https://stackoverflow.com/questions/36128291/how-to-make-a-swing-application-have-dark-nimbus-theme-netbeans
-//		for (int i=0;i<uiColorKeys.length;i++) {
-//			uiBaseColors[i] = UIManager.getColor(uiColorKeys[i]);
-//		}
-//		if (darkMode) {
-//			frontColor 	= new Color(255,255,253);
-//			backColor 	= Color.DARK_GRAY;
-//			for (int i=0;i<uiColorKeys.length;i++) {
-//				UIManager.put(uiColorKeys[i],uiDarkColors[i]);
-//			}
-//		}
-//		
-//		
-//		  UIManager.put( "control", new Color( 128, 128, 128) );
-//		  UIManager.put( "info", new Color(128,128,128) );
-//		  UIManager.put( "nimbusBase", new Color( 18, 30, 49) );
-//		  UIManager.put( "nimbusAlertYellow", new Color( 248, 187, 0) );
-//		  UIManager.put( "nimbusDisabledText", new Color( 128, 128, 128) );
-//		  UIManager.put( "nimbusFocus", new Color(115,164,209) );
-//		  UIManager.put( "nimbusGreen", new Color(176,179,50) );
-//		  UIManager.put( "nimbusInfoBlue", new Color( 66, 139, 221) );
-//		  UIManager.put( "nimbusLightBackground", new Color( 18, 30, 49) );
-//		  UIManager.put( "nimbusOrange", new Color(191,98,4) );
-//		  UIManager.put( "nimbusRed", new Color(169,46,34) );
-//		  UIManager.put( "nimbusSelectedText", new Color( 255, 255, 255) );
-//		  UIManager.put( "nimbusSelectionBackground", new Color( 104, 93, 156) );
-//		  UIManager.put( "text", new Color( 230, 230, 230) );
-//		  try {
-//		    for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-//		      if ("Nimbus".equals(info.getName())) {
-//		          javax.swing.UIManager.setLookAndFeel(info.getClassName());
-//		          break;
-//		      }
-//		    }
-//		  } catch (ClassNotFoundException e) {
-//		    e.printStackTrace();
-//		  } catch (InstantiationException e) {
-//		    e.printStackTrace();
-//		  } catch (IllegalAccessException e) {
-//		    e.printStackTrace();
-//		  } catch (javax.swing.UnsupportedLookAndFeelException e) {
-//		    e.printStackTrace();
-//		  } catch (Exception e) {
-//		    e.printStackTrace();
-//		  }
+		// taken from https://stackoverflow.com/questions/36128291/how-to-make-a-swing-application-have-dark-nimbus-theme-netbeans
+		for (int i=0;i<uiColorKeys.length;i++) {
+			uiBaseColors[i] = UIManager.getColor(uiColorKeys[i]);
+		}
+		if (darkMode) {
+			frontColor 	= new Color(255,255,253);
+			backColor 	= Color.DARK_GRAY;
+			for (int i=0;i<uiColorKeys.length;i++) {
+				UIManager.put(uiColorKeys[i],uiDarkColors[i]);
+			}
+		}
 		
-		try {
-			backColor 	= new Color(255,255,253);
-			frontColor 	= Color.DARK_GRAY;
-	          UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-			}catch( Exception be ) { be.printStackTrace(); }
+		
+		  UIManager.put( "control", new Color( 128, 128, 128) );
+		  UIManager.put( "info", new Color(128,128,128) );
+		  UIManager.put( "nimbusBase", new Color( 18, 30, 49) );
+		  UIManager.put( "nimbusAlertYellow", new Color( 248, 187, 0) );
+		  UIManager.put( "nimbusDisabledText", new Color( 128, 128, 128) );
+		  UIManager.put( "nimbusFocus", new Color(115,164,209) );
+		  UIManager.put( "nimbusGreen", new Color(176,179,50) );
+		  UIManager.put( "nimbusInfoBlue", new Color( 66, 139, 221) );
+		  UIManager.put( "nimbusLightBackground", new Color( 18, 30, 49) );
+		  UIManager.put( "nimbusOrange", new Color(191,98,4) );
+		  UIManager.put( "nimbusRed", new Color(169,46,34) );
+		  UIManager.put( "nimbusSelectedText", new Color( 255, 255, 255) );
+		  UIManager.put( "nimbusSelectionBackground", new Color( 104, 93, 156) );
+		  UIManager.put( "text", new Color( 230, 230, 230) );
+		  try {
+		    for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+		      if ("Nimbus".equals(info.getName())) {
+		          javax.swing.UIManager.setLookAndFeel(info.getClassName());
+		          break;
+		      }
+		    }
+		  } catch (ClassNotFoundException e) {
+		    e.printStackTrace();
+		  } catch (InstantiationException e) {
+		    e.printStackTrace();
+		  } catch (IllegalAccessException e) {
+		    e.printStackTrace();
+		  } catch (javax.swing.UnsupportedLookAndFeelException e) {
+		    e.printStackTrace();
+		  } catch (Exception e) {
+		    e.printStackTrace();
+		  }
+		
+//		try {
+//			backColor 	= new Color(255,255,253);
+//			frontColor 	= Color.DARK_GRAY;
+//	          UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+//			}catch( Exception be ) { be.printStackTrace(); }
 		
 		defOptions = Opts.getOptsAsJson();
 		new UI();

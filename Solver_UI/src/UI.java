@@ -45,6 +45,8 @@ import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -232,6 +234,17 @@ public class UI {
 		maintabbed.add("Ensemble",scEnsemble);
 		maintabbed.add("Algorithm", iconAlgo);
 //		maintabbed.add("spSpread", spSpread);
+		
+		ChangeListener changeListener = new ChangeListener() {
+		 public void stateChanged(ChangeEvent changeEvent) {
+		        JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent.getSource();
+		        int index = sourceTabbedPane.getSelectedIndex();
+		        SolverStart.doRedrawOnClick = true;
+		      }
+		    };
+		maintabbed.addChangeListener(changeListener);
+		
+		     
 		
 //		maintabbed.add("[Exp.] HeatMap", heatMap);
 		
@@ -1138,7 +1151,7 @@ public class UI {
 		Runner.cleanRunner ();
 		tmtableClassify.setColumnCount(0);
 		tmtableClassify.setRowCount(0);
-		//maintabbed.setSelectedIndex(tab_Distance);
+		maintabbed.setSelectedIndex(tab_Distance);
 		//jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
 		jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+DS.fileName+"]");
 		
