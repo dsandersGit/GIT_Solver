@@ -123,19 +123,21 @@ public class SolverStart {
 	 * 98: Save raw data
 	 * 99: BugFix
 	 * 100: dstType EGO now will change fullClassification algorithm > more individual, distance to class style
-	 * 101: Ratio Train / Test
+	 * 101: Ratio Train / Test in ConfusionMatrix
 	 * 102: Opts.minBetter reinstalled
+	 * 103: Deleted Summary
+	 * 104: Better EGO distance
 	 * 	 */
  
 	public static String 	app 			= "solver [ISI]";
-	public static String 	appAdd 			= " 0.2.102";
-	public static String 	revision 		= " 102";
+	public static String 	appAdd 			= " 0.2.104";
+	public static String 	revision 		= " 104";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static boolean 	immediateSkip 	= false;					// 93
 	public static boolean 	doShuffle		= false;					// 94
 	public static long 		plotTimer 		= -1;
-	public static boolean 	darkMode 		= false;
+//	public static boolean 	darkMode 		= false;
 	public static Color 	backColor 		= Color.DARK_GRAY;
 	public static Color 	frontColor 		= Color.LIGHT_GRAY;
 	public static JSONObject defOptions     = null;

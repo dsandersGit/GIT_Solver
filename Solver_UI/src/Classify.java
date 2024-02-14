@@ -17,8 +17,8 @@ public class Classify {
 	
 	public static double accuracyTest = 0;
 	public static double accuracyTrain = 0;
-	public static int[] matchCountTarget 	= null; //new float[DS.numClasses];
-	public static int[] allCountTarget 		= null; //new float[DS.numClasses];
+//	public static int[] matchCountTarget 	= null; //new float[DS.numClasses];
+//	public static int[] allCountTarget 		= null; //new float[DS.numClasses];
 	
 	public  Classify() {
 
@@ -158,8 +158,8 @@ public class Classify {
 		float allCountTest			= 0;
 		float allCountTrain			= 0;
 		
-		matchCountTarget 	= new int[DS.numClasses];
-		allCountTarget 		= new int[DS.numClasses];
+//		matchCountTarget 	= new int[DS.numClasses];
+//		allCountTarget 		= new int[DS.numClasses];
 		
 		for (int f=0;f<DS.numSamples;f++){
 			Object[] row = new Object[DS.numClasses+add];
@@ -222,7 +222,7 @@ public class Classify {
 				 }else {
 					 matchCountTrain++;
 				 }
-				 matchCountTarget[Tools.getIndexOfTarget(DS.classIndex[f])]++;
+//				 matchCountTarget[Tools.getIndexOfTarget(DS.classIndex[f])]++;
 				 row[5] = "++++++";
 			 }else {
 				 row[5] = "------";
@@ -245,9 +245,9 @@ public class Classify {
 			 }else {
 				 allCountTrain++;
 			 }
-			 int val = Tools.getIndexOfTarget(DS.classIndex[f]);
-             if ( val > - 1)
-                 allCountTarget[val]++;
+//			 int val = Tools.getIndexOfTarget(DS.classIndex[f]);
+//             if ( val > - 1)
+//                 allCountTarget[val]++;
              UI.tmtableClassify.addRow(row);
              
 		 }
@@ -277,21 +277,22 @@ public class Classify {
 		
 		
 		StringBuffer out = new StringBuffer();
-		out.append("SUMMARY:"+"\n");
-		out.append(Tools.txtLen ("CLASS") + "\t");
-		out.append(Tools.txtLen ("MATCHES") + "\t");
-		out.append(Tools.txtLen ("MISSES") + "\t");
-		out.append(Tools.txtLen ("RATIO") + "\n");
-		out.append("________________\t________________\t________________\t________________"+"\n");
-		for (int i=0;i<matchCountTarget.length;i++) {
-			out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
-			out.append(Tools.txtLen (""+matchCountTarget[i])+"\t");
-			out.append(Tools.txtLen (""+(allCountTarget[i]-matchCountTarget[i]))+"\t");
-			out.append(Tools.txtLen (""+((100*matchCountTarget[i])/allCountTarget[i]))+"%\t");				// Possible Bug allCountTarget[i] == 0
-			out.append("\n");
-		}
-		out.append("________________\t________________\t________________\t________________"+"\n");
-		out.append("\n");
+		// 103
+//		out.append("SUMMARY:"+"\n");
+//		out.append(Tools.txtLen ("CLASS") + "\t");
+//		out.append(Tools.txtLen ("MATCHES") + "\t");
+//		out.append(Tools.txtLen ("MISSES") + "\t");
+//		out.append(Tools.txtLen ("RATIO") + "\n");
+//		out.append("________________\t________________\t________________\t________________"+"\n");
+//		for (int i=0;i<matchCountTarget.length;i++) {
+//			out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
+//			out.append(Tools.txtLen (""+matchCountTarget[i])+"\t");
+//			out.append(Tools.txtLen (""+(allCountTarget[i]-matchCountTarget[i]))+"\t");
+//			out.append(Tools.txtLen (""+((100*matchCountTarget[i])/allCountTarget[i]))+"%\t");				// Possible Bug allCountTarget[i] == 0
+//			out.append("\n");
+//		}
+//		out.append("________________\t________________\t________________\t________________"+"\n");
+//		out.append("\n");
 		if ( DS.fixedTrainSet != null) {
 			out.append("ConfusionMatrix:\n");
 			out.append(Tools.txtLen ("Training")+"\t");
@@ -392,13 +393,15 @@ public class Classify {
 		
 		
 		if ( tryTest) {											// Development
+			double mid = split/100.;
 			for (int f=0;f<DS.numSamples;f++){
-	            if ( distances[f] < split/100) {
+	            if ( distances[f] < mid) {
 	                classification[f] = target;
-	                sumUpClass[f][indexPos] += bonus * (1.-distances[f]) ;
+	                // 104
+	                sumUpClass[f][indexPos] += bonus * (mid-distances[f])/mid ;
 	            }else {
 	                classification[f] = -1;
-	                sumUpClass[f][indexPos] -= bonus* (distances[f]) ;
+	                sumUpClass[f][indexPos] -= bonus* ((distances[f]-mid)/(1.-mid)) ;
 	            }
 	        }
 		}else {

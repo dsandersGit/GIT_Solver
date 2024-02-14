@@ -703,9 +703,9 @@ public class UI {
 		
 		menuAction.add(new JSeparator());
 		menuAction.add(menuActionClassify);
-		menuAction.add(new JSeparator());
-		JMenuItem menuActionTheme = new JMenuItem(" Theme"); 
-		menuAction.add(menuActionTheme);
+		//menuAction.add(new JSeparator());
+		//JMenuItem menuActionTheme = new JMenuItem(" Theme"); 
+		//menuAction.add(menuActionTheme);
 		// ---------------------------------------------------------------------
 		
 		JMenuItem menuExportVectors = new JMenuItem(" Vectors"); 
@@ -923,28 +923,28 @@ public class UI {
 			maintabbed.setSelectedIndex(tab_Classify);
 			SolverStart.classify();
 		}});
-		menuActionTheme.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent be){	
-			if ( SolverStart.darkMode) {
-				 try {
-					    for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-					      if ("Nimbus".equals(info.getName())) {
-					          javax.swing.UIManager.setLookAndFeel(info.getClassName());
-					          break;
-					      }
-					    } 
-					    } catch (ClassNotFoundException e) {
-						    e.printStackTrace();
-						  } catch (InstantiationException e) {
-						    e.printStackTrace();
-						  } catch (IllegalAccessException e) {
-						    e.printStackTrace();
-						  } catch (javax.swing.UnsupportedLookAndFeelException e) {
-						    e.printStackTrace();
-						  } catch (Exception e) {
-						    e.printStackTrace();
-						  }
-			}
-		}});
+//		menuActionTheme.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent be){	
+//			if ( SolverStart.darkMode) {
+//				 try {
+//					    for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//					      if ("Nimbus".equals(info.getName())) {
+//					          javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//					          break;
+//					      }
+//					    } 
+//					    } catch (ClassNotFoundException e) {
+//						    e.printStackTrace();
+//						  } catch (InstantiationException e) {
+//						    e.printStackTrace();
+//						  } catch (IllegalAccessException e) {
+//						    e.printStackTrace();
+//						  } catch (javax.swing.UnsupportedLookAndFeelException e) {
+//						    e.printStackTrace();
+//						  } catch (Exception e) {
+//						    e.printStackTrace();
+//						  }
+//			}
+//		}});
 	
 		menuExportVectors.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 			JSONObject ensemble = DS.js_Ensemble;
