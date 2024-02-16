@@ -128,6 +128,7 @@ public class SolverStart {
 	 * 103: Deleted Summary
 	 * 104: Better EGO distance
 	 * 105: Split in Live View
+	 * 106: Nicer Split in Live View
 	 * 	 */
  
 	public static String 	app 			= "solver_DEV [ISI]";

@@ -343,25 +343,25 @@ public class Runner {
 		            if ( DS.numSamples>1000)pSize = 6;
 		            
 		            // split
-		            float[] xSplit = new float[5];
-		            float[] ySplit = new float[5];
+		            float[] xSplit = new float[7];
+		            float[] ySplit = new float[7];
 		            xSplit[0] = 0;
-		            xSplit[1] = (split/100);
+		            xSplit[1] = (float) ((split/100)-0.03);
 		            xSplit[2] = (split/100);
 		            xSplit[3] = (split/100);
-		            xSplit[4] = 1;
-		            ySplit[0] = 0;
-		            ySplit[1] = 0;
-		            ySplit[2] = DS.numSamples;
+		            xSplit[4] = (split/100);
+		            xSplit[5] = (float) ((split/100)+0.03);
+		            xSplit[6] = 1;
+		            ySplit[0] = -(DS.numSamples/10);
+		            ySplit[1] = -(DS.numSamples/10);
+		            ySplit[2] = 0;
 		            ySplit[3] = DS.numSamples;
 		            ySplit[4] = DS.numSamples;
+		            ySplit[5] = DS.numSamples+(DS.numSamples/10);
+		            ySplit[6] = DS.numSamples+(DS.numSamples/10);
 		            UI.spDst.setXY(xTest,yTest, pSize, Color.LIGHT_GRAY, null, true, false, false);
-		            UI.spDst.setXY(xOTest,yOTest, pSize, Color.LIGHT_GRAY, null, true, false, false);
-		            //71: ClassColor in LIVE
-		            //UI.spDst.setXY(xTrain,yTrain, pSize, new Color(0, 130, 0), "Train: " + DS.classAllIndNme[Classify.getTargetColorIndexPos (targetColorIndex)], true, false, false);
-		            //71: ClassColor in LIVE
+		            UI.spDst.setXY(xOTest,yOTest, pSize, Tools.getClassColor(19), null, true, false, false);
 		            UI.spDst.setXY(xTrain,yTrain, pSize, Tools.getClassColor(index), "Train: " + DS.classAllIndNme[index], true, false, false);
-		           // UI.spDst.setXY(xOTrain,yOTrain, pSize, new Color(220,54,39), "OtherTrain", true, false, false);
 		            UI.spDst.setXY(xOTrain,yOTrain, pSize, yTrainCol, "Testing", true, false, false);
 		            
 //		            UI.spDst.setXY(xSigmoid,ySigmoid, pSize, Color.black, null, false, true, false);
