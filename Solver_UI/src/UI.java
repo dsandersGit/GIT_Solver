@@ -300,9 +300,11 @@ public class UI {
 		jb_Stop.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			SolverStart.immediateStop = true;
 		}});
+		jB_Skip.setEnabled(false);
 		jB_Skip.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
 			SolverStart.immediateSkip = true;
 		}});
+		jB_Shuffle.setEnabled(false);
 		jB_Shuffle.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
 			SolverStart.doShuffle = true;
 		}});
@@ -415,6 +417,9 @@ public class UI {
 		menuActionTrain.setEnabled(true);
 		menuActionClassify.setEnabled(true);
 		jb_Stop.setEnabled(false);
+		jB_Skip.setEnabled(false);
+		jB_Shuffle.setEnabled(false);
+		proNoBetterStop.setValue(0);
 		jbLoadEns.setEnabled(true);
 		
 		//jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
@@ -478,6 +483,8 @@ public class UI {
 			jbTrain.setEnabled(false);
 			menuActionTrain.setEnabled(false);
 			jb_Stop.setEnabled(true);
+			jB_Skip.setEnabled(true);
+			jB_Shuffle.setEnabled(true);
 			jbLoad.setEnabled(false);
 			jbLoadEns.setEnabled(false);
 		}
@@ -716,9 +723,7 @@ public class UI {
 		
 		menuAction.add(new JSeparator());
 		menuAction.add(menuActionClassify);
-		//menuAction.add(new JSeparator());
-		//JMenuItem menuActionTheme = new JMenuItem(" Theme"); 
-		//menuAction.add(menuActionTheme);
+		
 		// ---------------------------------------------------------------------
 		
 		JMenuItem menuExportVectors = new JMenuItem(" Vectors"); 
@@ -936,28 +941,7 @@ public class UI {
 			maintabbed.setSelectedIndex(tab_Classify);
 			SolverStart.classify();
 		}});
-//		menuActionTheme.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent be){	
-//			if ( SolverStart.darkMode) {
-//				 try {
-//					    for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-//					      if ("Nimbus".equals(info.getName())) {
-//					          javax.swing.UIManager.setLookAndFeel(info.getClassName());
-//					          break;
-//					      }
-//					    } 
-//					    } catch (ClassNotFoundException e) {
-//						    e.printStackTrace();
-//						  } catch (InstantiationException e) {
-//						    e.printStackTrace();
-//						  } catch (IllegalAccessException e) {
-//						    e.printStackTrace();
-//						  } catch (javax.swing.UnsupportedLookAndFeelException e) {
-//						    e.printStackTrace();
-//						  } catch (Exception e) {
-//						    e.printStackTrace();
-//						  }
-//			}
-//		}});
+		
 	
 		menuExportVectors.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 			JSONObject ensemble = DS.js_Ensemble;

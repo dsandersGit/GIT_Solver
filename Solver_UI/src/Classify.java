@@ -299,7 +299,7 @@ public class Classify {
 			for (int i=0;i<DS.numClasses;i++) {
 				out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
 			}
-			out.append(Tools.txtLen ("RATIO") + "\n");
+			out.append(Tools.txtLen ("RATIO [%]") + "\n");
 			//out.append("\n");
 			for (int i=0;i<DS.numClasses;i++) {
 				out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
@@ -314,7 +314,7 @@ public class Classify {
 			for (int i=0;i<DS.numClasses;i++) {
 				out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
 			}
-			out.append(Tools.txtLen ("RATIO") + "\n");
+			out.append(Tools.txtLen ("RATIO [%]") + "\n");
 			//out.append("\n");
 			for (int i=0;i<DS.numClasses;i++) {
 				out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");

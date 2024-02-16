@@ -11,7 +11,7 @@
 
 public class Opts {
 	// INIT
-	public static String	dstType			 		= "EGO"; 				// "EGO"; "GROUP"
+	public static String	dstType			 		= "GROUP"; 				// "EGO"; "GROUP"
 	public static String	normType		 		= "MaxMinNorm"; 		// "MaxMinNorm"; "Pareto"; "None"
 	public static String	activation	 			= "DxA";				// Activation Function "DxA" or "A" or "D", "D+A"
 	//

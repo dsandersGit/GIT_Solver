@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 /*
  * tools
@@ -50,6 +51,7 @@ public class Tools {
             return false;  
           }  
     }
+	
 	public static String txtLen (String txt) {
 		if (Tools.isNumeric(txt)) {
 			while (txt.length()<16) {

@@ -127,18 +127,19 @@ public class SolverStart {
 	 * 102: Opts.minBetter reinstalled
 	 * 103: Deleted Summary
 	 * 104: Better EGO distance
+	 * 105: Split in Live View
 	 * 	 */
  
 	public static String 	app 			= "solver_DEV [ISI]";
-	public static String 	appAdd 			= " 0.2.104";
-	public static String 	revision 		= " 104";
+	public static String 	appAdd 			= " 0.2.105";
+	public static String 	revision 		= " 105";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static boolean 	immediateSkip 	= false;					// 93
 	public static boolean 	doShuffle		= false;					// 94
 	public static boolean 	doRedrawOnClick	= true;					// 94
 	public static long 		plotTimer 		= -1;
-	public static boolean 	darkMode 		= true;
+	public static boolean 	darkMode 		= false;
 	public static Color 	backColor 		= Color.DARK_GRAY;
 	public static Color 	frontColor 		= Color.LIGHT_GRAY;
 	public static JSONObject defOptions     = null;
@@ -158,17 +159,16 @@ public class SolverStart {
 	public static void main(String[] args) {
 		
 		// taken from https://stackoverflow.com/questions/36128291/how-to-make-a-swing-application-have-dark-nimbus-theme-netbeans
-		for (int i=0;i<uiColorKeys.length;i++) {
-			uiBaseColors[i] = UIManager.getColor(uiColorKeys[i]);
-		}
 		if (darkMode) {
+			for (int i=0;i<uiColorKeys.length;i++) {
+				uiBaseColors[i] = UIManager.getColor(uiColorKeys[i]);
+			}
+		
 			frontColor 	= new Color(255,255,253);
 			backColor 	= Color.DARK_GRAY;
 			for (int i=0;i<uiColorKeys.length;i++) {
 				UIManager.put(uiColorKeys[i],uiDarkColors[i]);
 			}
-		}
-		
 		
 		  UIManager.put( "control", new Color( 128, 128, 128) );
 		  UIManager.put( "info", new Color(128,128,128) );
@@ -202,13 +202,13 @@ public class SolverStart {
 		  } catch (Exception e) {
 		    e.printStackTrace();
 		  }
-		
-//		try {
-//			backColor 	= new Color(255,255,253);
-//			frontColor 	= Color.DARK_GRAY;
-//	          UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-//			}catch( Exception be ) { be.printStackTrace(); }
-		
+		}else {
+		try {
+			backColor 	= new Color(255,255,253);
+			frontColor 	= Color.DARK_GRAY;
+	          UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+			}catch( Exception be ) { be.printStackTrace(); }
+		}
 		defOptions = Opts.getOptsAsJson();
 		new UI();
 		UI.loadEnsemble(true);

@@ -177,7 +177,7 @@ public class Runner {
 	            if ( (System.currentTimeMillis() - SolverStart.plotTimer) > Opts.plotTimer || SolverStart.plotTimer < 0 || SolverStart.doRedrawOnClick) {
 	            	SolverStart.doRedrawOnClick = false;
 	            	SolverStart.plotTimer = System.currentTimeMillis(); 
-	            	doStreamPlot(false);
+	            	doStreamPlot(true);
 	            }
 	            
 	        }else{
@@ -342,7 +342,19 @@ public class Runner {
 		            int pSize = 10;
 		            if ( DS.numSamples>1000)pSize = 6;
 		            
-		            
+		            // split
+		            float[] xSplit = new float[5];
+		            float[] ySplit = new float[5];
+		            xSplit[0] = 0;
+		            xSplit[1] = (split/100);
+		            xSplit[2] = (split/100);
+		            xSplit[3] = (split/100);
+		            xSplit[4] = 1;
+		            ySplit[0] = 0;
+		            ySplit[1] = 0;
+		            ySplit[2] = DS.numSamples;
+		            ySplit[3] = DS.numSamples;
+		            ySplit[4] = DS.numSamples;
 		            UI.spDst.setXY(xTest,yTest, pSize, Color.LIGHT_GRAY, null, true, false, false);
 		            UI.spDst.setXY(xOTest,yOTest, pSize, Color.LIGHT_GRAY, null, true, false, false);
 		            //71: ClassColor in LIVE
@@ -352,7 +364,8 @@ public class Runner {
 		           // UI.spDst.setXY(xOTrain,yOTrain, pSize, new Color(220,54,39), "OtherTrain", true, false, false);
 		            UI.spDst.setXY(xOTrain,yOTrain, pSize, yTrainCol, "Testing", true, false, false);
 		            
-		            UI.spDst.setXY(xSigmoid,ySigmoid, pSize, Color.black, null, false, true, false);
+//		            UI.spDst.setXY(xSigmoid,ySigmoid, pSize, Color.black, null, false, true, false);
+		            UI.spDst.setXY(xSplit,ySplit, 3, Color.black, null, false, true, false);
 		            UI.spDst.refreshPlot();
 
 	            }
