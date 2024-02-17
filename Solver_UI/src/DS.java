@@ -46,7 +46,7 @@ public class DS {
 			new Color(60,180,75),	// grün
 			new Color(0,130,200),	// marineblau
 			new Color(0,0,128),		// dunkelblau
-			new Color(170,110,40), //hellbraun
+			new Color(170,110,40),  //hellbraun
 			new Color(0,0,0),		// schwarz
 			new Color(70,240,240),	// cyan
 			new Color(170,255,195),	// damped green

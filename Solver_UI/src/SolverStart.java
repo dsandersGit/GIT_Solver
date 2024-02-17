@@ -115,11 +115,12 @@ public class SolverStart {
 	 * 106: Nicer Split in Live View
 	 * 107: Resize Algo Image
 	 * 108: Load respects "<areaSelection>" in *.dat files WARNING> must be respected for ENSEMBLE out!!!!
+	 * 109: Bug during import o *.dat
 	 * 	 */
  
-	public static String 	app 			= "solver_DEV [ISI]";
-	public static String 	appAdd 			= " 0.2.108";
-	public static String 	revision 		= " 108";
+	public static String 	app 			= "solver [ISI]";
+	public static String 	appAdd 			= " 0.2.109";
+	public static String 	revision 		= " 109";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static boolean 	immediateSkip 	= false;					// 93
@@ -849,6 +850,9 @@ public class SolverStart {
         	test = lines[fstLine].split("\t");
         	if( useArea==null ) {
         		useArea = new boolean[test.length-4];
+        		for (int i=0;i<useArea.length;i++) {
+        			useArea[i] = true;
+        		}
         	}
 	        
 	        // [Label rausschmeissen]
