@@ -68,7 +68,6 @@ public class Runner {
         for (int i=0;i<xSigmoid.length;i++) {
         	xSigmoid[i] = (float) ((float)i/200.);
         	ySigmoid[i] = DS.numSamples * (float) getMappedSigmoid(((float)i/200. - 0.5f)*10);
-        	
         }
 		
 		targetColorIndex 		= target;
@@ -872,13 +871,8 @@ public class Runner {
    }
     private double getMappedSigmoid( double val ) {
     	
-    	
-    	
     	// TODO: Mapping
     	int v = (int)((val + 10)*10);
-    	
-    	//System.out.println(val + "\t" +v+ "\t" +mappedSigmoid[v]);
-    	
     	if ( v < 0)	return 0.;
     	if ( v > 199) {
     		return 1.;

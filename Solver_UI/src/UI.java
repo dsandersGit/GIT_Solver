@@ -6,11 +6,14 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -240,6 +243,14 @@ public class UI {
 		        JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent.getSource();
 		        int index = sourceTabbedPane.getSelectedIndex();
 		        SolverStart.doRedrawOnClick = true;
+		        if ( index == tab_Algo) {
+		        	ImageIcon imageIcon = new ImageIcon(ClassLoader.getSystemResource("solver_algo.png"));
+		        	Image image = imageIcon.getImage(); // transform it 
+		        	Image newimg = image.getScaledInstance(iconAlgo.getWidth(), iconAlgo.getHeight(),  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+		        	imageIcon = new ImageIcon(newimg);  // transform it back
+
+		        	iconAlgo.setIcon(imageIcon);
+		        }
 		      }
 		    };
 		maintabbed.addChangeListener(changeListener);
@@ -260,7 +271,7 @@ public class UI {
 		tab_Train 		= 2;
 		tab_Distance 	= 2;
 		tab_Accuracy 	= 4;
-		tab_Algo		= 7;
+		tab_Algo		= 8;
 		tab_3D 			= 6;
 		tab_Opts 		= 1;
 		tab_Summary 	= 0;
@@ -282,6 +293,20 @@ public class UI {
 		jF.setLocationRelativeTo(null);
 		jF.setVisible(true);
 		jF.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		
+		jF.addComponentListener(new ComponentAdapter() 
+		{  
+		        public void componentResized(ComponentEvent evt) {
+		            Component c = (Component)evt.getSource();
+		            ImageIcon imageIcon = new ImageIcon(ClassLoader.getSystemResource("solver_algo.png"));
+		        	Image image = imageIcon.getImage(); // transform it 
+		        	Image newimg = image.getScaledInstance(iconAlgo.getWidth(), iconAlgo.getHeight(),  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+		        	imageIcon = new ImageIcon(newimg);  // transform it back
+
+		        	iconAlgo.setIcon(imageIcon);
+		        }
+		});
 		
 		refreshStatus();
 	

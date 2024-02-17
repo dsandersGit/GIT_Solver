@@ -38,22 +38,6 @@ public class SolverStart {
 	 * Might be beneficial to do bootstrapping for small sample sizes (resampling with duplicates )
 	 */
 	
-	/*
-	 * MINDMAP Algo Name: 
-	 * Center Same, Disperse Others   CS-DO
-	 * Disperse Non Target
-	 * Unique Center Distance Disperse UC-DD
-	 * Unique Separate by Distance US_D  
-	 * Iterate Disperse from Some ID-S
-	 * Iterating Geometrical Dispersion IGD
-	 * Iterative Spatial Dispersion ISD
-	 * Iterating Spatial expulsion ISE
-	 * Iterating Spatial adjustment ISA
-	 * Iterating Spatial Class Discrimination ISCD
-	 * Iterating Spatial Segregation ISS
-	 * Iterating Spatial Partitioning ISP * 
-	 * Iterative Spatial Isolation ISI *****
-	 */
 	
 	/*
 	 * 34: Fingerprint Model und Opts
@@ -129,11 +113,13 @@ public class SolverStart {
 	 * 104: Better EGO distance
 	 * 105: Split in Live View
 	 * 106: Nicer Split in Live View
+	 * 107: Resize Algo Image
+	 * 108: Load respects "<areaSelection>" in *.dat files WARNING> must be respected for ENSEMBLE out!!!!
 	 * 	 */
  
 	public static String 	app 			= "solver_DEV [ISI]";
-	public static String 	appAdd 			= " 0.2.105";
-	public static String 	revision 		= " 105";
+	public static String 	appAdd 			= " 0.2.108";
+	public static String 	revision 		= " 108";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static boolean 	immediateSkip 	= false;					// 93
@@ -830,11 +816,29 @@ public class SolverStart {
 	        String[] lines = contents.toString().split(System.getProperty("line.separator"));
 	        String[] test = lines[0].split("\t");
 	        int fstLine = 0;
+	        boolean[] useArea = null;
+	        boolean[] selFiles = null;
 	        for(int i=0;i<lines.length;i++){
 	        	if(!lines[i].startsWith("\\\\")){
 	        		test = lines[i].split("\t");
 	        		fstLine = i;
 	        		break;
+	        	}else {
+	        		test = lines[i].split("\t");
+	        		if(test[1].equals("<areaSelection>")){
+	        			useArea = new boolean[test.length-2];
+	        			 for(int a=2;a<test.length;a++){
+	        				 if(test[a].equals("0"))useArea[a-2]=false;
+	        				 if(test[a].equals("1"))useArea[a-2]=true;
+	        			 }
+	        		}
+	        		if(test[1].equals("<fileSelection>")){
+	        			selFiles = new boolean[test.length-2];
+	        			 for(int a=2;a<test.length;a++){
+	        				 if(test[a].equals("0"))selFiles[a-2]=false;
+	        				 if(test[a].equals("1"))selFiles[a-2]=true;
+	        			 }
+	        		}
 	        	}
 	        }
 	        
@@ -843,14 +847,17 @@ public class SolverStart {
         	noFiles = lines.length-1-fstLine;
         	
         	test = lines[fstLine].split("\t");
-        	
-	        boolean[] areaIsLabel = new boolean[test.length-4];
+        	if( useArea==null ) {
+        		useArea = new boolean[test.length-4];
+        	}
+	        
 	        // [Label rausschmeissen]
 	        for(int i=4;i<test.length;i++){
 	        	if ( test[i].toLowerCase().contains("[label]")) {
-	        		areaIsLabel[i-4] = true;
+	        		useArea[i-4] = false;
 	        	}else {
-	        		noAreas++;
+	        		if ( useArea[i-4])
+	        			noAreas++;
 	        	}
 	        }
 
@@ -870,7 +877,7 @@ public class SolverStart {
 	      
 	        int ac = 0;
 	        for(int i=4;i<test.length;i++){
-	        	if ( !areaIsLabel[i-4]) {
+	        	if ( useArea[i-4]) {
 	        		DS.AreaNames[ac] = '\"'+test[i]+'\"';
 	        		ac++;
 	        	}
@@ -891,7 +898,7 @@ public class SolverStart {
 		        	DS.SampleNames[i-fstLine-1] = tmp[3];
 		        	ac=0;
 			        for(int j=4;j<tmp.length;j++){
-			        	if ( !areaIsLabel[j-4]) {
+			        	if ( useArea[j-4]) {
 			        		try {
 			        			DS.rawData[i-fstLine-1][ac] = Double.parseDouble(tmp[j]);
 			        		}catch (NumberFormatException e) {
