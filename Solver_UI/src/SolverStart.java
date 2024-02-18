@@ -116,11 +116,12 @@ public class SolverStart {
 	 * 107: Resize Algo Image
 	 * 108: Load respects "<areaSelection>" in *.dat files WARNING> must be respected for ENSEMBLE out!!!!
 	 * 109: Bug during import o *.dat
+	 * 110: Option Dialog, Classify Table Background Color
 	 * 	 */
  
 	public static String 	app 			= "solver [ISI]";
-	public static String 	appAdd 			= " 0.2.109";
-	public static String 	revision 		= " 109";
+	public static String 	appAdd 			= " 0.2.110";
+	public static String 	revision 		= " 110";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static boolean 	immediateSkip 	= false;					// 93
@@ -145,6 +146,7 @@ public class SolverStart {
 			 new Color( 255, 255, 255), new Color( 104, 93, 156),new Color( 230, 230, 230)};
 	
 	public static void main(String[] args) {
+	
 		
 		// taken from https://stackoverflow.com/questions/36128291/how-to-make-a-swing-application-have-dark-nimbus-theme-netbeans
 		if (darkMode) {
@@ -248,7 +250,7 @@ public class SolverStart {
 		UI.sp2D.refreshPlot();
 		UI.menuFile.setEnabled(false);
 		UI.txtEnsemble.setText("");
-		UI.tmtableStat.setRowCount(0);
+		UI.tmtableValidation.setRowCount(0);
 		UI.txtClassify.setText("");
 		//72: Train/Test change only cycle wise
 		//DS.fixedTrainSet = null;
@@ -429,7 +431,7 @@ public class SolverStart {
 			main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
 		}
 		
-		DS.setEnsemble(main);
+		//DS.setEnsemble(main);
 		new Classify();
 		
 		UI.proStatus.setValue(0);
@@ -474,7 +476,7 @@ public class SolverStart {
 		row[14] 		= Tools.myRound(spes,4);
 		row[15] 		= Tools.myRound(((float)(mc.tp_fp_tn_fn[0][1]+ mc.tp_fp_tn_fn[2][1]))/ ((float)(mc.tp_fp_tn_fn[0][1]+mc.tp_fp_tn_fn[1][1]+mc.tp_fp_tn_fn[2][1]+mc.tp_fp_tn_fn[3][1])),4);
 		
-		UI.tmtableStat.addRow(row);
+		UI.tmtableValidation.addRow(row);
 		
 
 //		UI.heatMap.repaint();
@@ -864,11 +866,13 @@ public class SolverStart {
 	        			noAreas++;
 	        	}
 	        }
-
-	       //  noAreas = test.length-4;
+	
+		       //  noAreas = test.length-4;
     	
 	         if ( noFiles < 1 || noAreas < 1) fail = true;
 	         
+	         
+	         DS.usedAreas = useArea;
 	         DS.rawData 		= new double[noFiles][noAreas];
 	         DS.AreaNames 		= new String[noAreas];
 	         DS.SampleNames 	= new String[noFiles];

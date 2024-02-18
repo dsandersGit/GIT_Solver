@@ -12,6 +12,7 @@ public class DS {
 	public static double 		rawData [][] 	= null; 				// RawData : Sample / Variable
 	public static String[]		SampleNames 	= null;
 	public static String[]		AreaNames 		= null;
+	public static boolean[] 	usedAreas 		= null;					// Ignored Areas during import
 	public static String[]		ClassNames 		= null;
 	public static int[]			classIndex 		= null;					// Color per sample
 	public static int[]			listClassIndex 		= null;					// Color per sample
@@ -69,6 +70,8 @@ public class DS {
 	// 91: 
 	//public static String variableID = "-no_ID-";
 	public static String variableID = "";
+
+	
 	
 	public DS () {
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
@@ -368,6 +371,19 @@ public class DS {
 			tmp.append(classIndex[i]);	
 		}
 		out.put("ClassIndices", 		tmp.toString());
+		
+		tmp = new StringBuffer();
+		if ( usedAreas != null) {
+			for (int i=0;i<DS.usedAreas.length;i++) {
+				if ( i>0)tmp.append(",");
+				if ( usedAreas[i]) {
+					tmp.append("1");
+				}else {
+					tmp.append("0");
+				}
+			}
+			out.put("UsedAreas", 		tmp.toString());
+		}
 		
 		return out;
 	}

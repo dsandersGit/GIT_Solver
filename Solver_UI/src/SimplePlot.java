@@ -878,19 +878,7 @@ class SP_PlotCanvas extends JPanel{
 // Daten plotten
 		
 	
-		// LINES
-		  for(int i = 0;i<dats.size();i++){
-			  SP_PlotData pd = dats.get(i);
-			  if(pd.showLines){
-				  g.setColor(pd.col);
-				  if(activeData != i && activeData>-1) g.setColor(Color.LIGHT_GRAY);
-				  for(int x = 1; x < pd.xdat.length;x++){
-					  if(pd.ok[x] && pd.ok[x-1])
-					  g.drawLine(getX(pd.xdat[x]),getY(pd.ydat[x]),getX(pd.xdat[x-1]),getY(pd.ydat[x-1]));
-				  }
-			  }
-		  }
-		
+	
 		  // Points
 		for(int i = 0;i<dats.size();i++){
 			SP_PlotData pd = dats.get(i);
@@ -913,17 +901,7 @@ class SP_PlotCanvas extends JPanel{
 			 	}
 			  }
 		
-		// LINES Active
-		  for(int i = 0;i<dats.size();i++){
-			  SP_PlotData pd = dats.get(i);
-			  if(pd.showLines && i == activeData){
-				  g.setColor(pd.col);
-				  for(int x = 1; x < pd.xdat.length;x++){
-					  if(pd.ok[x] && pd.ok[x-1])
-					  g.drawLine(getX(pd.xdat[x]),getY(pd.ydat[x]),getX(pd.xdat[x-1]),getY(pd.ydat[x-1]));
-				  }
-			  }
-		  }
+
 		
 		  // Points Active
 		for(int i = 0;i<dats.size();i++){
@@ -940,7 +918,30 @@ class SP_PlotCanvas extends JPanel{
 			 	}
 			  }
 		
-
+		// LINES
+		  for(int i = 0;i<dats.size();i++){
+			  SP_PlotData pd = dats.get(i);
+			  if(pd.showLines){
+				  g.setColor(pd.col);
+				  if(activeData != i && activeData>-1) g.setColor(Color.LIGHT_GRAY);
+				  for(int x = 1; x < pd.xdat.length;x++){
+					  if(pd.ok[x] && pd.ok[x-1])
+					  g.drawLine(getX(pd.xdat[x]),getY(pd.ydat[x]),getX(pd.xdat[x-1]),getY(pd.ydat[x-1]));
+				  }
+			  }
+		  }
+		
+			// LINES Active
+		  for(int i = 0;i<dats.size();i++){
+			  SP_PlotData pd = dats.get(i);
+			  if(pd.showLines && i == activeData){
+				  g.setColor(pd.col);
+				  for(int x = 1; x < pd.xdat.length;x++){
+					  if(pd.ok[x] && pd.ok[x-1])
+					  g.drawLine(getX(pd.xdat[x]),getY(pd.ydat[x]),getX(pd.xdat[x-1]),getY(pd.ydat[x-1]));
+				  }
+			  }
+		  }
 		if(show0){
 			float sdash[] = { 2.0f };
 			  g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT,

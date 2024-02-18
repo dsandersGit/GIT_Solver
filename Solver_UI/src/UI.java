@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
@@ -31,6 +32,8 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -42,6 +45,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -67,9 +71,9 @@ public class UI {
 	static 				JScrollPane scClassify= new JScrollPane(tableClassify);
 	public static 		DefaultTableModel tmtableClassify;
 	
-	public static 		JTable tableStat = new JTable();
-	static 				JScrollPane scStat= new JScrollPane(tableStat);
-	public static 		DefaultTableModel tmtableStat;
+	public static 		JTable tableValidation = new JTable();
+	static 				JScrollPane scValidation= new JScrollPane(tableValidation);
+	public static 		DefaultTableModel tmtableValidation;
 	
 	static 		JMenuBar 		mBar 				= null;
 	static 		JLabel			labVars				= new JLabel("Vars: 0");
@@ -92,6 +96,7 @@ public class UI {
 	static JMenuItem 	menuActionTrain = new JMenuItem(" Train"); 
 	static JMenuItem 	menuFileSaveEnsemble = new JMenuItem(" Save Ensemble"); 
 	static JMenuItem 	menuFileLoadEnsemble = new JMenuItem(" Load Ensemble"); 
+	static JMenuItem 	menuActionOptions = new JMenuItem(" Algorithm Options"); 
 	static JMenu 		menuExport = new JMenu( " Export");
 	static JMenuItem 	menuFileSplitData = new JMenuItem(" Split Data");
 	static JMenuItem 	menuFileSaveData = new JMenuItem(" Save Data");  
@@ -102,7 +107,7 @@ public class UI {
 	static int tab_Algo = 1;
 	static int tab_Accuracy = 4;
 	static int tab_3D = -1;
-	static int tab_Opts = 1;
+//	static int tab_Opts = 1;
 	static int tab_Summary = 0;
 	static int tab_Statistics = 0;
 	
@@ -153,10 +158,10 @@ public class UI {
 		pan_classify.add(scClassify);
 		pan_classify.add(scTxtClassify);
 		
-		scStat = new JScrollPane(tableStat);
-		scStat.setOpaque(false);
-		scStat.setBackground(SolverStart.backColor);
-		scStat.setPreferredSize(new Dimension (800,600));
+		scValidation = new JScrollPane(tableValidation);
+		scValidation.setOpaque(false);
+		scValidation.setBackground(SolverStart.backColor);
+		scValidation.setPreferredSize(new Dimension (800,600));
 		
 		jF.setJMenuBar(setMyMenu());
 		sp.setTitle("Accuracy and Gain");
@@ -228,9 +233,9 @@ public class UI {
 		}});
 		
 		maintabbed.add("Data",scSummary);
-		maintabbed.add("Options",panOptions);
+//		maintabbed.add("Options",panOptions);
 		maintabbed.add("Live", panLive);
-		maintabbed.add("Validation",scStat);
+		maintabbed.add("Validation",scValidation);
 		maintabbed.add("Trends", panLiveAcc);
 		maintabbed.add("Classification", pan_classify);
 		maintabbed.addTab("3D",tab3D);
@@ -267,15 +272,15 @@ public class UI {
 		sp2D.setYAxis("loadings ");
 		
 		
-		tab_Classify 	= 5;
-		tab_Train 		= 2;
-		tab_Distance 	= 2;
-		tab_Accuracy 	= 4;
-		tab_Algo		= 8;
-		tab_3D 			= 6;
-		tab_Opts 		= 1;
+		tab_Classify 	= 4;
+		tab_Train 		= 1;
+		tab_Distance 	= 1;
+		tab_Accuracy 	= 3;
+		tab_Algo		= 7;
+		tab_3D 			= 5;
+//		tab_Opts 		= 1;
 		tab_Summary 	= 0;
-		tab_Statistics 	= 3;
+		tab_Statistics 	= 2;
 		
 		txtOpts.setWrapStyleWord(true);
 		txtOpts.setLineWrap(true);
@@ -353,15 +358,14 @@ public class UI {
 		pan.add(panR);
 		return pan;
 	}
-	static boolean refreshOptions() {
+	static boolean refreshOptions(String txt) {
 
-		String TxtBuffer = txtOpts.getText();
+		String TxtBuffer = txt;
 		
 		JSONObject jo_Opts = null; 
 		 try {
 			 jo_Opts = new JSONObject(TxtBuffer);
 		    } catch (JSONException e) {
-		    	txtOpts.setText(Opts.getOptsAsJson().toString(3));
 		        return false;
 		    }
 		 
@@ -380,12 +384,10 @@ public class UI {
 				if (jo_Opts.has("dstType"))		Opts.dstType		= jo_Opts.getString("dstType");			//99
 	
 			  } catch (JSONException e) {
-				  txtOpts.setText(Opts.getOptsAsJson().toString(3));
 			        return false;
 			  }
 		}else {
-			txtOpts.setText(Opts.getOptsAsJson().toString(3));
-			JOptionPane.showMessageDialog(null, "Options malformed: "+checkOptions(jo_Opts), "Options", JOptionPane.WARNING_MESSAGE);
+			
 			return false;
 		}
 		return true;
@@ -441,6 +443,7 @@ public class UI {
 		jbClassify.setEnabled(true);
 		menuActionTrain.setEnabled(true);
 		menuActionClassify.setEnabled(true);
+		menuActionOptions.setEnabled(true);
 		jb_Stop.setEnabled(false);
 		jB_Skip.setEnabled(false);
 		jB_Shuffle.setEnabled(false);
@@ -512,6 +515,7 @@ public class UI {
 			jB_Shuffle.setEnabled(true);
 			jbLoad.setEnabled(false);
 			jbLoadEns.setEnabled(false);
+			menuActionOptions.setEnabled(false);
 		}
 		
 		if ( !noEns)
@@ -547,46 +551,42 @@ public class UI {
 		tableClassify.setAutoCreateRowSorter(true);
 		
 		
-		tableStat= new JTable() {
+		tableValidation= new JTable() {
 	        private static final long serialVersionUID = 1L;
 	        public boolean isCellEditable(int row, int column) {                
 	                return false;               
 	        };
 	    };
-		tmtableStat =(DefaultTableModel) tableStat.getModel();
-		tableStat.getTableHeader().setOpaque(false);
-		tableStat.getTableHeader().setBackground(SolverStart.backColor);
-		fnt = tableStat.getTableHeader().getFont(); 
-		tableStat.getTableHeader().setFont(fnt.deriveFont(Font.BOLD));
+		tmtableValidation =(DefaultTableModel) tableValidation.getModel();
+		tableValidation.getTableHeader().setOpaque(false);
+		tableValidation.getTableHeader().setBackground(SolverStart.backColor);
+		fnt = tableValidation.getTableHeader().getFont(); 
+		tableValidation.getTableHeader().setFont(fnt.deriveFont(Font.BOLD));
 		
-		tableStat.getTableHeader().setReorderingAllowed(false);
-		tableStat.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		//tableStat.setAutoCreateRowSorter(true);
-		tmtableStat.addColumn("run");
-		tmtableStat.addColumn("type");
-		tmtableStat.addColumn("Target");
-		tmtableStat.addColumn("TP_Train");
-		tmtableStat.addColumn("FP_Train");
-		tmtableStat.addColumn("TN_Train");
-		tmtableStat.addColumn("FN_Train");
-		tmtableStat.addColumn("Sensitivity_Train");
-		tmtableStat.addColumn("Specificity_Train");
+		tableValidation.getTableHeader().setReorderingAllowed(false);
+		tableValidation.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		//tableValidation.setAutoCreateRowSorter(true);
+		tmtableValidation.addColumn("run");
+		tmtableValidation.addColumn("type");
+		tmtableValidation.addColumn("Target");
+		tmtableValidation.addColumn("TP_Train");
+		tmtableValidation.addColumn("FP_Train");
+		tmtableValidation.addColumn("TN_Train");
+		tmtableValidation.addColumn("FN_Train");
+		tmtableValidation.addColumn("Sensitivity_Train");
+		tmtableValidation.addColumn("Specificity_Train");
 		
-		tmtableStat.addColumn("TP_Validation");
-		tmtableStat.addColumn("FP_Validation");
-		tmtableStat.addColumn("TN_Validation");
-		tmtableStat.addColumn("FN_Validation");
-		tmtableStat.addColumn("Sensitivity_Validation");
-		tmtableStat.addColumn("Specificity_Validation");
-		tmtableStat.addColumn("Accuracy_Validation");
+		tmtableValidation.addColumn("TP_Validation");
+		tmtableValidation.addColumn("FP_Validation");
+		tmtableValidation.addColumn("TN_Validation");
+		tmtableValidation.addColumn("FN_Validation");
+		tmtableValidation.addColumn("Sensitivity_Validation");
+		tmtableValidation.addColumn("Specificity_Validation");
+		tmtableValidation.addColumn("Accuracy_Validation");
 
+		// 110
 		tableClassify.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-	        /**
-			 * 
-			 */
 			private static final long serialVersionUID = 1L;
-
-		
 			@Override
 	        public Component getTableCellRendererComponent(JTable table,
 	                Object value, boolean isSelected, boolean hasFocus,
@@ -601,39 +601,74 @@ public class UI {
 		            double val =  0;
 		            try {
 		            	val = Double.parseDouble((String)(""+value));
-		            	
 		            }catch(NumberFormatException ee){
 		        	}
-		            int red = 0;
-		            int green = (int) (val * 255);
-		            
-		            if ( green > 255) green = 255;
-		            if ( green < 0 ) {
-		            	red = -green/2;green = 0;
-		            	if ( red>255)red = 255;
-		            }
-		            if ( val < 0.5) {
-		            	setForeground(Color.WHITE);
-		            }else {
+//		            int red = 116;
+//		            int green = 215;
+//		            int blue = 191;
+//		            if ( val > 0) {
+//		            	red 	+= (int) (-val * 86);
+//		            	green 	+= (int) (-val * 101);
+//		            	blue	+= (int) (-val * 73);
+//		            }else {
+//		            	red 	+= (int) (val * 139);
+//		            	green 	+= (int) (-val * 29);
+//		            	blue	+= (int) (-val * 65);
+//		            }
+		            setForeground(Color.BLACK);
+		            int red = 170;
+		            int green = 170;
+		            int blue = 170;
+		            if ( val > 0) {
+		            	red 	+= (int) (val * 80);
+		            	green 	+= (int) (val * 80);
+		            	blue	+= (int) (val * 80);
 		            	setForeground(Color.BLACK);
+		            }else {
+		            	red 	+= (int) (val * 170);
+		            	green 	+= (int) (val * 170);
+		            	blue	+= (int) (val * 170);
+		            	setForeground(Color.WHITE);
 		            }
-		            setBackground(new Color(red,green, 100));
+		            if ( red < 0) red = 0;
+		            if ( green < 0) green = 0;
+		            if ( blue < 0) blue = 0;
+		            if ( red > 255) red = 200;
+		            if ( green > 255) green = 200;
+		            if ( blue > 255) blue = 200;
+		            
+		            
+		            
+		            setBackground(new Color(red,green, blue));
 	            }
 	            return this;
 	        }
 	    });
-		
-		tableStat.addMouseListener(new MouseAdapter() {
-//	          public void mouseClicked(MouseEvent e) {
-//	              for (int i=0;i<tableStat.getSelectedRows().length;i++) {
-//	              	boolean[] kill = new boolean[tableStat.getSelectedRows().length]
-//	              	int val = tableStat.getSelectedRows()[i];
-//	              	System.out.println(tmtableStat.getValueAt(val, 0));
-//	              }
-//	          }
+		tableValidation.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+			private static final long serialVersionUID = 1L;
+			@Override
+	        public Component getTableCellRendererComponent(JTable table,
+	                Object value, boolean isSelected, boolean hasFocus,
+	                int row, int column) {
+
+	            JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+	            Font font = label.getFont();
+	            label.setFont(font.deriveFont(Font.PLAIN));
+	            setBackground(SolverStart.backColor);setForeground(SolverStart.frontColor);
+	            if ( column>2 && column<9) {
+	            	setBackground(Color.decode("#F8D568")); // 248 213 104
+	            }
+	            if ( column>8 && column<16) {
+	            	setBackground(new Color(0,255, 147));
+	            }
+	            return this;
+	        }
+	    });
+		tableValidation.addMouseListener(new MouseAdapter() {
+
 	          public void mouseReleased(MouseEvent e){
 	        	  if(e.getModifiers()!=InputEvent.BUTTON3_MASK) return;
-	        	  int selCount = tableStat.getSelectedRows().length;
+	        	  int selCount = tableValidation.getSelectedRows().length;
 	        	  JPopupMenu inPOP = new JPopupMenu();
 	        	  JMenuItem item=null;
 	        	  item = new JMenuItem("Delete selected models");
@@ -643,7 +678,7 @@ public class UI {
 					  public void actionPerformed(ActionEvent e) {
 						  boolean[] killList = new boolean [DS.freezs.size()];
 						  for (int j= DS.freezs.size()-1;j>=0;j--) {
-								if(tableStat.isRowSelected(j)) {
+								if(tableValidation.isRowSelected(j)) {
 									killList[j] = true;
 								}else {
 									killList[j] = false;
@@ -652,11 +687,11 @@ public class UI {
 						  for (int j= DS.freezs.size()-1;j>=0;j--) {
 							  if ( killList[j] ) {
 								  DS.freezs.remove(j);
-								  tmtableStat.removeRow(j);
+								  tmtableValidation.removeRow(j);
 							  }
 						  }
 						  Tools.compileModels();
-						  tableStat.repaint();
+						  tableValidation.repaint();
 					  }});
 				  inPOP.show(e.getComponent(), e.getX(), e.getY());
 	          	}
@@ -745,7 +780,8 @@ public class UI {
 		menuActionTrain.setAccelerator(KeyStroke.getKeyStroke('T',InputEvent.CTRL_DOWN_MASK));
 		menuAction.add(menuActionTrainImmediateStop);
 		menuActionTrainImmediateStop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CANCEL, InputEvent.CTRL_DOWN_MASK));
-		
+		menuAction.add(new JSeparator());
+		menuAction.add(menuActionOptions);
 		menuAction.add(new JSeparator());
 		menuAction.add(menuActionClassify);
 		
@@ -803,7 +839,7 @@ public class UI {
 			UI.maintabbed.setSelectedIndex(UI.tab_Summary);
 		}});
 		menuFileSplitData.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
-			refreshOptions();
+			//refreshOptions();
 			StringBuffer outTrain = new StringBuffer();
 			StringBuffer outTest = new StringBuffer();
 			outTrain.append("Class");
@@ -892,7 +928,7 @@ public class UI {
 		}});
 		menuFileSaveData.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
 			// 98
-			refreshOptions();
+			//refreshOptions();
 			StringBuffer out = new StringBuffer();
 
 			out.append("Class");
@@ -961,6 +997,43 @@ public class UI {
 		
 		menuActionTrain.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			train();
+		}});
+		menuActionOptions.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
+			JPanel pan = new JPanel();
+			pan.setLayout(new BoxLayout(pan, BoxLayout.PAGE_AXIS));
+			boolean success = true;
+			JTextArea man = new JTextArea(Opts.getOptsAsJson().toString(3));
+		    JScrollPane scrMan = new JScrollPane(man);
+		    scrMan.setPreferredSize(new Dimension(400,400));
+			Object[] buttons = {"OK", "Default", "Cancel"}; 
+			
+			pan.add(new JLabel("<HTML>"
+					+ "Text is a JSON String to refine the machine learning algorithm.<BR>"
+					+ "To start with, set to DEFAULT, should work for most use cases.<BR>"
+					+ "You may want to refine for acceleration, training ratio adjustment<BR>"
+					+ "or depth of discrimiation seeking.<BR>"
+					+ "</HTML>"					));
+			pan.add(scrMan);
+			 
+	         int selected = JOptionPane.showOptionDialog(null,
+	        		 pan, 
+	                                                     "Algorithm Options", 
+	                                                     JOptionPane.DEFAULT_OPTION, 
+	                                                     JOptionPane.QUESTION_MESSAGE, 
+	                                                     null, buttons, buttons[0]);
+	        if (selected == 0)
+	        	success = refreshOptions(man.getText());
+	        if (selected == 1)
+	        	success = refreshOptions(SolverStart.defOptions.toString(3));
+	        if (selected == 2);
+				
+			if ( !success )
+				JOptionPane.showMessageDialog(null, "Options malformed. Operation canceled", "Algorithm Options", JOptionPane.WARNING_MESSAGE);
+		}});
+		
+		menuActionClassify.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
+			///maintabbed.setSelectedIndex(tab_Classify);
+			SolverStart.classify();
 		}});
 		menuActionClassify.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 			maintabbed.setSelectedIndex(tab_Classify);
@@ -1151,10 +1224,10 @@ public class UI {
 		
 		DS.freezs.clear();
 		
-		if ( !refreshOptions() ) {
-			JOptionPane.showMessageDialog(jF, "<HTML><H3>Options malformed > set to last well-formed</H3>");
-			return;
-		}
+//		if ( !refreshOptions() ) {
+//			JOptionPane.showMessageDialog(jF, "<HTML><H3>Options malformed > set to last well-formed</H3>");
+//			return;
+//		}
 		
 		SolverStart.immediateStop = false;
 		Runner.cleanRunner ();
@@ -1223,9 +1296,8 @@ public class UI {
 	    if ( DS.filePath != null ) {
 		    File dest = new File(f.getAbsolutePath()+"_"+DS.fileName);
 		    try {
-				Files.copy(DS.filePath.toPath(), dest.toPath());
+				Files.copy(DS.filePath.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 	    }
@@ -1269,10 +1341,10 @@ public class UI {
 		
 	}
 	private static void loadData() {
-		if ( !refreshOptions() ) {
-			JOptionPane.showMessageDialog(jF, "<HTML><H3>Options malformed > set to default</H3>");
-			return;
-		}
+//		if ( !refreshOptions() ) {
+//			JOptionPane.showMessageDialog(jF, "<HTML><H3>Options malformed > set to default</H3>");
+//			return;
+//		}
 		
 		Preferences prefs;
 	    prefs = Preferences.userRoot().node("Solver");
