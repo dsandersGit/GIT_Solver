@@ -17,8 +17,7 @@ public class Classify {
 	
 	public static double accuracyTest = 0;
 	public static double accuracyTrain = 0;
-//	public static int[] matchCountTarget 	= null; //new float[DS.numClasses];
-//	public static int[] allCountTarget 		= null; //new float[DS.numClasses];
+	public static StringBuffer confMatrixout = new StringBuffer();
 	
 	public  Classify() {
 
@@ -276,7 +275,7 @@ public class Classify {
 		}
 		
 		
-		StringBuffer out = new StringBuffer();
+		
 		// 103
 //		out.append("SUMMARY:"+"\n");
 //		out.append(Tools.txtLen ("CLASS") + "\t");
@@ -293,41 +292,55 @@ public class Classify {
 //		}
 //		out.append("________________\t________________\t________________\t________________"+"\n");
 //		out.append("\n");
+		confMatrixout = new StringBuffer();
+		StringBuffer txtOut = new StringBuffer();
 		if ( DS.fixedTrainSet != null) {
-			out.append("ConfusionMatrix:\n");
-			out.append(Tools.txtLen ("Training")+"\t");
+			txtOut.append("ConfusionMatrix:\n");
+			txtOut.append(Tools.txtLen ("Training:")+"\t");
+			confMatrixout.append("Trn."+"\n");
 			for (int i=0;i<DS.numClasses;i++) {
-				out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
+				txtOut.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
 			}
-			out.append(Tools.txtLen ("RATIO [%]") + "\n");
+			txtOut.append(Tools.txtLen ("RATIO [%]") + "\n");
 			//out.append("\n");
 			for (int i=0;i<DS.numClasses;i++) {
-				out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
+				txtOut.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
+				confMatrixout.append(DS.classAllIndNme[i]+"|");
 				for (int j=0;j<DS.numClasses;j++) {
-					out.append(Tools.txtLen ("" + confusionMatrixTrain [i][j])+"\t");	
+					txtOut.append(Tools.txtLen ("" + confusionMatrixTrain [i][j])+"\t");
+					confMatrixout.append("" + confusionMatrixTrain [i][j]+"|");
 				}
-				out.append(Tools.txtLen ("" + trainRatio [i])+"\n");
+				txtOut.append(Tools.txtLen ("" + trainRatio [i])+"\n");
+				confMatrixout.append("\n");
 				//out.append("\n");
 			}
-			out.append(""+"\n");
-			out.append(Tools.txtLen ("Validation")+"\t");
+			txtOut.append(""+"\n");
+			confMatrixout.append(""+"\n");
+			
+			txtOut.append(Tools.txtLen ("Validation:")+"\t");
+			confMatrixout.append("Vald."+"\n");
 			for (int i=0;i<DS.numClasses;i++) {
-				out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
+				txtOut.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
+//				confMatrixout.append(DS.classAllIndNme[i]+"|");
 			}
-			out.append(Tools.txtLen ("RATIO [%]") + "\n");
+			txtOut.append(Tools.txtLen ("RATIO [%]") + "\n");
 			//out.append("\n");
 			for (int i=0;i<DS.numClasses;i++) {
-				out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
+				txtOut.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
+				confMatrixout.append(DS.classAllIndNme[i]+"|");
 				for (int j=0;j<DS.numClasses;j++) {
-					out.append(Tools.txtLen ("" + confusionMatrixTest [i][j])+"\t");	
+					txtOut.append(Tools.txtLen ("" + confusionMatrixTest [i][j])+"\t");
+					confMatrixout.append("" + confusionMatrixTest [i][j]+"|");
 				}
-				out.append(Tools.txtLen ("" + testRatio [i])+"\n");
+				txtOut.append(Tools.txtLen ("" + testRatio [i])+"\n");
+				confMatrixout.append("\n");
 				//out.append("\n");
 			}
-			out.append(""+"\n");
+			txtOut.append(""+"\n");
+			confMatrixout.append(""+"\n");
 		}
 		
-		UI.txtClassify.setText(out.toString());
+		UI.txtClassify.setText(txtOut.toString());
 		accuracyTrain = Tools.myRound(100* (matchCountTrain/allCountTrain),1);
 		accuracyTest = Tools.myRound(100* (matchCountTest/allCountTest),1);
 		if (  allCountTest == 0) {

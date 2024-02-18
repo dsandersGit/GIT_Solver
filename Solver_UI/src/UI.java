@@ -1211,8 +1211,11 @@ public class UI {
 		menuAboutCredits.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			JOptionPane.showMessageDialog(null, "<HTML> used libraries and dependencies: <ul>"
 					+ "<li>JSON java libraries from JSON.org</li>"
+					+ "<li>QR Code:<BR>Copyright © 2024 Project Nayuki. (MIT License)<BR>" + 
+					"https://www.nayuki.io/page/qr-code-generator-library</li>"
 					//+ "<li>FlatLaf - Flat Look and Feel Theme</li>"
-					+ "</ul><BR>", "CREDITS", JOptionPane.INFORMATION_MESSAGE);
+					+ "</ul><BR>"
+					+ "", "CREDITS", JOptionPane.INFORMATION_MESSAGE);
 		}});
 		//-------------------------------------------------------------------------------------------------------------------
 		return mBar;

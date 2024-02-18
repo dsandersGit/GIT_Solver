@@ -9,10 +9,16 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Objects;
+
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -116,7 +122,8 @@ public class SolverStart {
 	 * 107: Resize Algo Image
 	 * 108: Load respects "<areaSelection>" in *.dat files WARNING> must be respected for ENSEMBLE out!!!!
 	 * 109: Bug during import o *.dat
-	 * 110: Option Dialog, Classify Table Background Color
+	 * 110: Option Dialog, Classify_Table Background Color Gradient
+	 * 111: QR Code receipt https://github.com/nayuki/QR-Code-generator/tree/master
 	 * 	 */
  
 	public static String 	app 			= "solver [ISI]";
@@ -132,7 +139,6 @@ public class SolverStart {
 	public static Color 	backColor 		= Color.DARK_GRAY;
 	public static Color 	frontColor 		= Color.LIGHT_GRAY;
 	public static JSONObject defOptions     = null;
-	//public static String dataFileName = "";
 	
 	public static float[] rollingAccuracy			= null;    // gain / class
 	public static float[] rollingAccuracyX			= null;
@@ -269,6 +275,7 @@ public class SolverStart {
 		Runner.cleanRunner();												// reset Runner > training session module
 		
 		// Preparing Ensemble JSON
+		JSONObject QRmain = new JSONObject();
 		JSONObject main = new JSONObject();
 		main.put("creator", SolverStart.app + SolverStart.appAdd + " r" + SolverStart.revision);
 		StringBuffer out = new StringBuffer();
@@ -283,7 +290,10 @@ public class SolverStart {
 	    main.put("ObjectVersion"				, "01.00"); 
 	    main.put("Support"						,"N/A");
 	    
-	   
+
+		QRmain.put("creator", SolverStart.app + SolverStart.appAdd );
+		QRmain.put("Date"				, ""+dtf.format(now));
+	    
 	    
 		// Time / run estimation
 	    long tme = System.currentTimeMillis();
@@ -442,8 +452,43 @@ public class SolverStart {
 	    isRunning = false;
 	    UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colGreen.png")));
 	    UI.refreshStatus();
+	    
+	    
+	    //111
+	    String txtReceipt = QRmain.toString()+"\n"+Classify.confMatrixout.toString();
+	    txtReceipt += "\nFP: " + Tools.getFingerPrint(txtReceipt);
+	    BufferedImage image = generateBarCode(txtReceipt);
+	    JLabel picLabel = new JLabel(new ImageIcon(image));
+	    JOptionPane.showMessageDialog(null, picLabel, "Receipt", JOptionPane.PLAIN_MESSAGE, null);
 	}
+	private static BufferedImage generateBarCode(String text) throws IOException {
+		// https://github.com/nayuki/QR-Code-generator/tree/master
+		QrCode.Ecc errCorLvl = QrCode.Ecc.LOW;  // Error correction level
+		QrCode qr = QrCode.encodeText(text, errCorLvl);  // Make the QR Code symbol
+		
+		BufferedImage img = toImage(qr, 6, 3);          // Convert to bitmap image
+		return img;
 
+	}
+	private static BufferedImage toImage(QrCode qr, int scale, int border) {
+		return toImage(qr, scale, border, 0xFFFFFF, 0x000000);
+	}
+	private static BufferedImage toImage(QrCode qr, int scale, int border, int lightColor, int darkColor) {
+		Objects.requireNonNull(qr);
+		if (scale <= 0 || border < 0)
+			throw new IllegalArgumentException("Value out of range");
+		if (border > Integer.MAX_VALUE / 2 || qr.size + border * 2L > Integer.MAX_VALUE / scale)
+			throw new IllegalArgumentException("Scale or border too large");
+		
+		BufferedImage result = new BufferedImage((qr.size + border * 2) * scale, (qr.size + border * 2) * scale, BufferedImage.TYPE_INT_RGB);
+		for (int y = 0; y < result.getHeight(); y++) {
+			for (int x = 0; x < result.getWidth(); x++) {
+				boolean color = qr.getModule(x / scale - border, y / scale - border);
+				result.setRGB(x, y, color ? darkColor : lightColor);
+			}
+		}
+		return result;
+	}
 	private static void fillStatistics(String type) {
 	
 		
