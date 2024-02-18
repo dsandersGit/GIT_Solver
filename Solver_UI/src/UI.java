@@ -32,8 +32,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -45,7 +44,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -88,18 +86,19 @@ public class UI {
 	static 		JLabel			labRun				= new JLabel("RUN: ---");
 	
 	
-	static JMenu 		menuFile = new JMenu( " File"); 
-	static JMenu 		menuAction = new JMenu( " Action"); 
-	static JMenuItem 	menuActionClassify = new JMenuItem(" Classify"); 
-	static JMenuItem 	menuActionTrainImmediateStop = new JMenuItem(" Stop Training Now");
+	static JMenu 				menuFile = new JMenu( " File"); 
+	static JMenu 				menuAction = new JMenu( " Action"); 
+	static JMenuItem 			menuActionClassify = new JMenuItem(" Classify"); 
+	static JMenuItem 			menuActionTrainImmediateStop = new JMenuItem(" Stop Training Now");
 	
-	static JMenuItem 	menuActionTrain = new JMenuItem(" Train"); 
-	static JMenuItem 	menuFileSaveEnsemble = new JMenuItem(" Save Ensemble"); 
-	static JMenuItem 	menuFileLoadEnsemble = new JMenuItem(" Load Ensemble"); 
-	static JMenuItem 	menuActionOptions = new JMenuItem(" Algorithm Options"); 
-	static JMenu 		menuExport = new JMenu( " Export");
-	static JMenuItem 	menuFileSplitData = new JMenuItem(" Split Data");
-	static JMenuItem 	menuFileSaveData = new JMenuItem(" Save Data");  
+	static JMenuItem 			menuActionTrain = new JMenuItem(" Train"); 
+	static JMenuItem 			menuFileSaveEnsemble = new JMenuItem(" Save Ensemble"); 
+	static JMenuItem 			menuFileLoadEnsemble = new JMenuItem(" Load Ensemble"); 
+	static JMenuItem 			menuActionOptions = new JMenuItem(" Algorithm Options");
+	static JCheckBoxMenuItem 	menuActionChk_QR = new JCheckBoxMenuItem(" QR-Receipt",true);
+	static JMenu 				menuExport = new JMenu( " Export");
+	static JMenuItem 			menuFileSplitData = new JMenuItem(" Split Data");
+	static JMenuItem 			menuFileSaveData = new JMenuItem(" Save Data");  
 	
 	static int tab_Classify = 0;
 	static int tab_Train = 1;
@@ -224,16 +223,7 @@ public class UI {
 		panLiveAcc.add(sp1D);
 		panLiveAcc.add(sp2D);
 		
-		JPanel panOptions = new JPanel();
-		panOptions.setLayout(new BorderLayout());
-		panOptions.add(txtOpts, BorderLayout.CENTER);
-		panOptions.add(jb_DefaultOptions, BorderLayout.SOUTH);
-		jb_DefaultOptions.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
-			txtOpts.setText(SolverStart.defOptions.toString(3));
-		}});
-		
 		maintabbed.add("Data",scSummary);
-//		maintabbed.add("Options",panOptions);
 		maintabbed.add("Live", panLive);
 		maintabbed.add("Validation",scValidation);
 		maintabbed.add("Trends", panLiveAcc);
@@ -241,7 +231,6 @@ public class UI {
 		maintabbed.addTab("3D",tab3D);
 		maintabbed.add("Ensemble",scEnsemble);
 		maintabbed.add("Algorithm", iconAlgo);
-//		maintabbed.add("spSpread", spSpread);
 		
 		ChangeListener changeListener = new ChangeListener() {
 		 public void stateChanged(ChangeEvent changeEvent) {
@@ -259,10 +248,6 @@ public class UI {
 		      }
 		    };
 		maintabbed.addChangeListener(changeListener);
-		
-		     
-		
-//		maintabbed.add("[Exp.] HeatMap", heatMap);
 		
 		sp1D.setTitle("Accuracy Development");
 		sp1D.setXAxis("# cycle");
@@ -312,6 +297,10 @@ public class UI {
 		        	iconAlgo.setIcon(imageIcon);
 		        }
 		});
+		
+		Preferences prefs;
+	    prefs = Preferences.userRoot().node("Solver");
+		prefs.getBoolean("menuActionChk_QR", true);
 		
 		refreshStatus();
 	
@@ -641,6 +630,12 @@ public class UI {
 		            
 		            setBackground(new Color(red,green, blue));
 	            }
+	            if ( column == 5)
+	            	if ( value.equals("------")) {
+	            		setBackground(Color.decode("#ffeeda"));
+	            	}else {
+	            		setBackground(Color.decode("#abf7B1"));
+	            	}
 	            return this;
 	        }
 	    });
@@ -782,6 +777,7 @@ public class UI {
 		menuActionTrainImmediateStop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CANCEL, InputEvent.CTRL_DOWN_MASK));
 		menuAction.add(new JSeparator());
 		menuAction.add(menuActionOptions);
+		menuAction.add(menuActionChk_QR);
 		menuAction.add(new JSeparator());
 		menuAction.add(menuActionClassify);
 		
@@ -1030,7 +1026,11 @@ public class UI {
 			if ( !success )
 				JOptionPane.showMessageDialog(null, "Options malformed. Operation canceled", "Algorithm Options", JOptionPane.WARNING_MESSAGE);
 		}});
-		
+		menuActionChk_QR.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
+			Preferences prefs;
+		    prefs = Preferences.userRoot().node("Solver");
+			prefs.putBoolean("menuActionChk_QR", menuActionChk_QR.isSelected());
+		}});
 		menuActionClassify.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 			///maintabbed.setSelectedIndex(tab_Classify);
 			SolverStart.classify();

@@ -166,7 +166,7 @@ public class Classify {
 			 ArrayList<Integer> all = new ArrayList<Integer>();
 			 int index = Tools.getIndexOfTarget (DS.classIndex[f]);
 		 
-			 row[0] = (f+1);
+			 row[0] = Tools.txtLen(""+(f+1));
 			 row[1] = DS.SampleNames[f];
 			 row[2] = DS.classIndex[f];
 			 row[3] = DS.ClassNames[f];

@@ -124,11 +124,12 @@ public class SolverStart {
 	 * 109: Bug during import o *.dat
 	 * 110: Option Dialog, Classify_Table Background Color Gradient
 	 * 111: QR Code receipt https://github.com/nayuki/QR-Code-generator/tree/master
+	 * 112: Classify Table 'run' sortable
 	 * 	 */
  
 	public static String 	app 			= "solver [ISI]";
-	public static String 	appAdd 			= " 0.2.110";
-	public static String 	revision 		= " 110";
+	public static String 	appAdd 			= " 0.2.112";
+	public static String 	revision 		= " 112";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static boolean 	immediateSkip 	= false;					// 93
@@ -455,11 +456,13 @@ public class SolverStart {
 	    
 	    
 	    //111
-	    String txtReceipt = QRmain.toString()+"\n"+Classify.confMatrixout.toString();
-	    txtReceipt += "\nFP: " + Tools.getFingerPrint(txtReceipt);
-	    BufferedImage image = generateBarCode(txtReceipt);
-	    JLabel picLabel = new JLabel(new ImageIcon(image));
-	    JOptionPane.showMessageDialog(null, picLabel, "Receipt", JOptionPane.PLAIN_MESSAGE, null);
+	    if (UI.menuActionChk_QR.isSelected()) {
+		    String txtReceipt = QRmain.toString()+"\n"+Classify.confMatrixout.toString();
+		    txtReceipt += "\nFP: " + Tools.getFingerPrint(txtReceipt);
+		    BufferedImage image = generateBarCode(txtReceipt);
+		    JLabel picLabel = new JLabel(new ImageIcon(image));
+		    JOptionPane.showMessageDialog(null, picLabel, "Receipt", JOptionPane.PLAIN_MESSAGE, null);
+	    }
 	}
 	private static BufferedImage generateBarCode(String text) throws IOException {
 		// https://github.com/nayuki/QR-Code-generator/tree/master
