@@ -893,7 +893,7 @@ class SP_PlotCanvas extends JPanel{
 							if(activeData != i && activeData>-1) g.setColor(Color.LIGHT_GRAY);
 							g.fillOval(getX(pd.xdat[x])-pd.dotSize/2, getY(pd.ydat[x])-pd.dotSize/2, pd.dotSize, pd.dotSize);
 							g.setColor(Color.DARK_GRAY);
-							g.drawOval(getX(pd.xdat[x])-pd.dotSize/2, getY(pd.ydat[x])-pd.dotSize/2, pd.dotSize, pd.dotSize);
+							if ( pd.dotSize > 6 ) g.drawOval(getX(pd.xdat[x])-pd.dotSize/2, getY(pd.ydat[x])-pd.dotSize/2, pd.dotSize, pd.dotSize);
 							if(pd.dots3D)g.setColor(new Color(255,255,255));
 							if(pd.dots3D)g.fillOval(getX(pd.xdat[x])-pd.dotSize/4-2, getY(pd.ydat[x])-pd.dotSize/4-2, pd.dotSize/2, pd.dotSize/2);
 						}
