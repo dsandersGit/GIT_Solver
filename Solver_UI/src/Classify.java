@@ -83,18 +83,31 @@ public class Classify {
 		doNormData ();
 		//
 		
-		UI.tmtableClassify.setRowCount(0);
-		UI.tmtableClassify.setColumnCount(0);
-		UI.tmtableClassify.addColumn("run");
-		UI.tmtableClassify.addColumn("sample");
-		UI.tmtableClassify.addColumn("classindex");
-		UI.tmtableClassify.addColumn("classname");
-		UI.tmtableClassify.addColumn("classification");
-		UI.tmtableClassify.addColumn("match");
-		UI.tmtableClassify.addColumn("train/validation");
+//		UI.tmtableClassify.setRowCount(0);
+//		UI.tmtableClassify.setColumnCount(0);
+		
+		Object[] tHeader = new Object[DS.numClasses+7];
+		tHeader[0]	= "run";
+		tHeader[1]	= "sample";
+		tHeader[2]	= "classindex";
+		tHeader[3]	= "classname";
+		tHeader[4]	= "classification";
+		tHeader[5]	= "match";
+		tHeader[6]	= "train/validation";
 		for (int j=0;j<DS.numClasses;j++) {
-			UI.tmtableClassify.addColumn(DS.classAllIndNme[j]);
+			tHeader[7+j] = DS.classAllIndNme[j];
 		}
+		
+//		UI.tmtableClassify.addColumn("run");
+//		UI.tmtableClassify.addColumn("sample");
+//		UI.tmtableClassify.addColumn("classindex");
+//		UI.tmtableClassify.addColumn("classname");
+//		UI.tmtableClassify.addColumn("classification");
+//		UI.tmtableClassify.addColumn("match");
+//		UI.tmtableClassify.addColumn("train/validation");
+//		for (int j=0;j<DS.numClasses;j++) {
+//			UI.tmtableClassify.addColumn(DS.classAllIndNme[j]);
+//		}
 		
 		double[][] mc 						= new double[DS.numVars][Opts.numDims];
 		double[] avgs 						= new double[Opts.numDims];
@@ -162,21 +175,21 @@ public class Classify {
 //		matchCountTarget 	= new int[DS.numClasses];
 //		allCountTarget 		= new int[DS.numClasses];
 		
+		Object[][] nData = new Object [DS.numSamples] [DS.numClasses+add];
 		for (int f=0;f<DS.numSamples;f++){
-			Object[] row = new Object[DS.numClasses+add];
-			 double max=-5;
+			double max=-5;
 			 ArrayList<Integer> all = new ArrayList<Integer>();
 			 int index = Tools.getIndexOfTarget (DS.classIndex[f]);
 		 
-			 row[0] = Tools.txtLen(""+(f+1));
-			 row[1] = DS.SampleNames[f];
-			 row[2] = DS.classIndex[f];
-			 row[3] = DS.ClassNames[f];
+			 nData[f][0] = Tools.txtLen(""+(f+1));
+			 nData[f][1] = DS.SampleNames[f];
+			 nData[f][2] = DS.classIndex[f];
+			 nData[f][3] = DS.ClassNames[f];
 			 
 			 int maxClassNum = -1;
 			 for (int i=0;i<DS.classAllIndices.length;i++) {
 				 double val = sumUpClassification[f][i]/fullBonusClassification[i]; 
-				 row[i+add] = Tools.myRound(val,6);
+				 nData[f][i+add] = Tools.myRound(val,6);
 				 if ( max <  val || i==0) {
 					 max = val;
 					 maxClassNum = i;
@@ -212,7 +225,7 @@ public class Classify {
 						 confusionMatrixTrain [Tools.getIndexOfTarget(DS.classIndex[f])][maxClassNum] ++;
 					 }
 			 
-			 row[4] = finalClass[f];
+			 nData[f][4] = finalClass[f];
 			 if (finalClass[f].equals(DS.ClassNames[f])) {						// contains
 				 if ( (Opts.fixTrainSet && DS.fixedTrainSet != null)) {
 					 if (DS.fixedTrainSet[index][f]) {
@@ -224,18 +237,18 @@ public class Classify {
 					 matchCountTrain++;
 				 }
 //				 matchCountTarget[Tools.getIndexOfTarget(DS.classIndex[f])]++;
-				 row[5] = "++++++";
+				 nData[f][5] = "++++++";
 			 }else {
-				 row[5] = "------";
+				 nData[f][5] = "------";
 			 }
 			 if ( Opts.fixTrainSet && DS.fixedTrainSet != null) {
 				 if (DS.fixedTrainSet[index][f]) {
-					 row[6] = "training";
+					 nData[f][6] = "training";
 				 }else {
-					 row[6] = "validation";
+					 nData[f][6] = "validation";
 				 }
 			 }else {
-				 row[6] = " - - - ";
+				 nData[f][6] = " - - - ";
 			 }
 			 if ( (Opts.fixTrainSet && DS.fixedTrainSet != null)) {
 				 if (DS.fixedTrainSet[index][f]) {
@@ -246,18 +259,100 @@ public class Classify {
 			 }else {
 				 allCountTrain++;
 			 }
-//			 int val = Tools.getIndexOfTarget(DS.classIndex[f]);
-//             if ( val > - 1)
-//                 allCountTarget[val]++;
-			 SwingUtilities.invokeLater(new Runnable() {
-			      @Override
-			      public void run() {
-			    	  UI.tmtableClassify.addRow(row);
-			      }
-			    });
-             
-             
-		 }
+		}
+		UI.scClassify.setViewportView(UI.tableClassify);
+		UI.tmtableClassify.setDataVector(nData, tHeader);
+		
+//		for (int f=0;f<DS.numSamples;f++){
+//			Object[] row = new Object[DS.numClasses+add];
+//			 double max=-5;
+//			 ArrayList<Integer> all = new ArrayList<Integer>();
+//			 int index = Tools.getIndexOfTarget (DS.classIndex[f]);
+//		 
+//			 row[0] = Tools.txtLen(""+(f+1));
+//			 row[1] = DS.SampleNames[f];
+//			 row[2] = DS.classIndex[f];
+//			 row[3] = DS.ClassNames[f];
+//			 
+//			 int maxClassNum = -1;
+//			 for (int i=0;i<DS.classAllIndices.length;i++) {
+//				 double val = sumUpClassification[f][i]/fullBonusClassification[i]; 
+//				 row[i+add] = Tools.myRound(val,6);
+//				 if ( max <  val || i==0) {
+//					 max = val;
+//					 maxClassNum = i;
+//					 all.clear();
+//					 all.add(i);
+//				 }else {
+//					 if ( max == val) {
+//						 all.add(i);
+//					 }
+//				 }
+//			 }
+//			 
+//			 if ( max > -5 ) {
+//				 finalClass[f] = "";
+//				 finalClassIndex[f] = -1;
+//				 for (int i=0;i<all.size();i++) {
+//					 if ( i>0) finalClass[f] += "|";
+//					 finalClass[f] += 	 DS.classAllIndNme[all.get(i)];
+//					 finalClassIndex[f] = DS.classAllIndices[all.get(i)];
+//					 if ( finalClass[f].contains("|")) finalClassIndex[f] = -1;					// Doppeltes Match
+//				 }
+//			 }else {
+//				 finalClass[f] = "-none-";
+//				 finalClassBonus[f] = 0;
+//				 finalClassIndex[f] = -1;
+//			 }
+//			 
+//			 if ( maxClassNum > -1) 
+//				 if ( DS.fixedTrainSet != null)
+//					 if (!DS.fixedTrainSet[index][f]) {
+//						 confusionMatrixTest [Tools.getIndexOfTarget(DS.classIndex[f])][maxClassNum] ++;
+//					 }else {
+//						 confusionMatrixTrain [Tools.getIndexOfTarget(DS.classIndex[f])][maxClassNum] ++;
+//					 }
+//			 
+//			 row[4] = finalClass[f];
+//			 if (finalClass[f].equals(DS.ClassNames[f])) {						// contains
+//				 if ( (Opts.fixTrainSet && DS.fixedTrainSet != null)) {
+//					 if (DS.fixedTrainSet[index][f]) {
+//						 matchCountTrain++;
+//					 }else {
+//						 matchCountTest++;
+//					 }
+//				 }else {
+//					 matchCountTrain++;
+//				 }
+////				 matchCountTarget[Tools.getIndexOfTarget(DS.classIndex[f])]++;
+//				 row[5] = "++++++";
+//			 }else {
+//				 row[5] = "------";
+//			 }
+//			 if ( Opts.fixTrainSet && DS.fixedTrainSet != null) {
+//				 if (DS.fixedTrainSet[index][f]) {
+//					 row[6] = "training";
+//				 }else {
+//					 row[6] = "validation";
+//				 }
+//			 }else {
+//				 row[6] = " - - - ";
+//			 }
+//			 if ( (Opts.fixTrainSet && DS.fixedTrainSet != null)) {
+//				 if (DS.fixedTrainSet[index][f]) {
+//					 allCountTrain++;
+//				 }else {
+//					 allCountTest++;
+//				 }
+//			 }else {
+//				 allCountTrain++;
+//			 }
+////			 int val = Tools.getIndexOfTarget(DS.classIndex[f]);
+////             if ( val > - 1)
+////                 allCountTarget[val]++;
+//	    	  UI.tmtableClassify.addRow(row);
+//
+//		 }
 
 		int[] trainRatio = new int[DS.numClasses];
 		int[] testRatio = new int[DS.numClasses];

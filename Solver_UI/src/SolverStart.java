@@ -125,11 +125,13 @@ public class SolverStart {
 	 * 110: Option Dialog, Classify_Table Background Color Gradient
 	 * 111: QR Code receipt https://github.com/nayuki/QR-Code-generator/tree/master
 	 * 112: Classify Table 'run' sortable
+	 * 113: UI.tableClassify Viewpoint solved
+	 * 
 	 * 	 */
  
 	public static String 	app 			= "solver [ISI]";
-	public static String 	appAdd 			= " 0.2.112";
-	public static String 	revision 		= " 112";
+	public static String 	appAdd 			= " 0.2.113";
+	public static String 	revision 		= " 113";
 	public static boolean 	isRunning 		= false;
 	public static boolean 	immediateStop 	= false;
 	public static boolean 	immediateSkip 	= false;					// 93
