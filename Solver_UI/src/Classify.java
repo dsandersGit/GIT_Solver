@@ -4,6 +4,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.SwingUtilities;
+
 
 /*
  * data-model-application 
@@ -150,7 +152,7 @@ public class Classify {
 		// Test Train/
 		int add = 7; // sonst 6
 		
-		UI.tmtableClassify.setRowCount(0);
+//		UI.tmtableClassify.setRowCount(0);
 		
 		float matchCountTest		= 0;
 		float matchCountTrain		= 0;
@@ -247,7 +249,13 @@ public class Classify {
 //			 int val = Tools.getIndexOfTarget(DS.classIndex[f]);
 //             if ( val > - 1)
 //                 allCountTarget[val]++;
-             UI.tmtableClassify.addRow(row);
+			 SwingUtilities.invokeLater(new Runnable() {
+			      @Override
+			      public void run() {
+			    	  UI.tmtableClassify.addRow(row);
+			      }
+			    });
+             
              
 		 }
 
@@ -403,8 +411,6 @@ public class Classify {
 		// 100: Massive Change
 		boolean tryTest =  Opts.dstType.contentEquals("EGO") ;
 		int[] classification = new int [DS.numSamples];
-		
-		
 		if ( tryTest) {											// Development
 			double mid = split/100.;
 			for (int f=0;f<DS.numSamples;f++){

@@ -253,7 +253,7 @@ public class Runner {
 	}
 	
 	private void doStreamPlot(boolean doDraw){
-	   	if ( doDraw || (UI.maintabbed.getSelectedIndex()==UI.tab_Distance || UI.maintabbed.getSelectedIndex()==UI.tab_Train)) {
+	   	if ( doDraw || UI.maintabbed.getSelectedIndex()==UI.tab_Live) {
 	   		int index = Classify.getTargetColorIndexPos (targetColorIndex);
             float[] yDst = new float[dstTrain.size()];
             float[] yTrain = new float[accuracyTrain.size()];

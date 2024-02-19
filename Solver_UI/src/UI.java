@@ -74,7 +74,7 @@ public class UI {
 	public static 		DefaultTableModel tmtableValidation;
 	
 	static 		JMenuBar 		mBar 				= null;
-	static 		JLabel			labVars				= new JLabel("Vars: 0");
+	static 		JLabel			labVars				= new JLabel("Features: 0");
 	static 		JLabel			labSamples			= new JLabel("Samples: 0");
 	static 		JLabel			labClasses			= new JLabel("Classes: 0");
 	//static 		JLabel			labStatus			= new JLabel("Status: ---");
@@ -87,7 +87,8 @@ public class UI {
 	
 	
 	static JMenu 				menuFile = new JMenu( " File"); 
-	static JMenu 				menuAction = new JMenu( " Action"); 
+	static JMenu 				menuAction = new JMenu( " Action");
+	static JMenu 				menuSettings = new JMenu( " Settings"); 
 	static JMenuItem 			menuActionClassify = new JMenuItem(" Classify"); 
 	static JMenuItem 			menuActionTrainImmediateStop = new JMenuItem(" Stop Training Now");
 	
@@ -101,12 +102,10 @@ public class UI {
 	static JMenuItem 			menuFileSaveData = new JMenuItem(" Save Data");  
 	
 	static int tab_Classify = 0;
-	static int tab_Train = 1;
-	static int tab_Distance = 1;
+	static int tab_Live = 1;
 	static int tab_Algo = 1;
-	static int tab_Accuracy = 4;
+	static int tab_Trends = 4;
 	static int tab_3D = -1;
-//	static int tab_Opts = 1;
 	static int tab_Summary = 0;
 	static int tab_Statistics = 0;
 	
@@ -139,7 +138,7 @@ public class UI {
 	static 				JButton jb_DefaultOptions = new JButton("Default Options");
 	
 	static JPanel panLive = new JPanel();
-	static JPanel panLiveAcc = new JPanel();
+	static JPanel panTrends = new JPanel();
 	
 	public UI() {
 
@@ -219,14 +218,14 @@ public class UI {
 		panLive.add(sp);
 		panLive.add(spDst);
 		
-		panLiveAcc.setLayout(new GridLayout(2,1));
-		panLiveAcc.add(sp1D);
-		panLiveAcc.add(sp2D);
+		panTrends.setLayout(new GridLayout(2,1));
+		panTrends.add(sp1D);
+		panTrends.add(sp2D);
 		
 		maintabbed.add("Data",scSummary);
 		maintabbed.add("Live", panLive);
 		maintabbed.add("Validation",scValidation);
-		maintabbed.add("Trends", panLiveAcc);
+		maintabbed.add("Trends", panTrends);
 		maintabbed.add("Classification", pan_classify);
 		maintabbed.addTab("3D",tab3D);
 		maintabbed.add("Ensemble",scEnsemble);
@@ -253,14 +252,13 @@ public class UI {
 		sp1D.setXAxis("# cycle");
 		sp1D.setYAxis("accuracy [%]");
 		sp2D.setTitle("Sum of Loadings");
-		sp2D.setXAxis("# variable");
+		sp2D.setXAxis("# feature");
 		sp2D.setYAxis("loadings ");
 		
 		
 		tab_Classify 	= 4;
-		tab_Train 		= 1;
-		tab_Distance 	= 1;
-		tab_Accuracy 	= 3;
+		tab_Live 		= 1;
+		tab_Trends	 	= 3;
 		tab_Algo		= 7;
 		tab_3D 			= 5;
 //		tab_Opts 		= 1;
@@ -451,7 +449,7 @@ public class UI {
 		if ( DS.numClasses < 2) {
 			noData = true;
 		}
-		labVars.setText("Vars: " + DS.numVars);
+		labVars.setText("Features: " + DS.numVars);
 		labSamples.setText("Samples: " + DS.numSamples);
 		labClasses.setText("Classes: " + DS.numClasses);
 		if ( DS.js_Ensemble != null) {
@@ -586,50 +584,65 @@ public class UI {
 	            label.setFont(font.deriveFont(Font.PLAIN));
 	            setBackground(SolverStart.backColor);setForeground(SolverStart.frontColor);
 	           
-	            if ( column>6) {
-		            double val =  0;
-		            try {
-		            	val = Double.parseDouble((String)(""+value));
-		            }catch(NumberFormatException ee){
-		        	}
-//		            int red = 116;
-//		            int green = 215;
-//		            int blue = 191;
+//	            if ( column>6) {
+//		            double val =  0;
+//		            try {
+//		            	val = Double.parseDouble((String)(""+value));
+//		            }catch(NumberFormatException ee){
+//		        	}
+//
+//		            setForeground(Color.BLACK);
+//		            int red = 170;
+//		            int green = 170;
+//		            int blue = 170;
 //		            if ( val > 0) {
-//		            	red 	+= (int) (-val * 86);
-//		            	green 	+= (int) (-val * 101);
-//		            	blue	+= (int) (-val * 73);
+//		            	red 	+= (int) (val * 80);
+//		            	green 	+= (int) (val * 80);
+//		            	blue	+= (int) (val * 80);
+//		            	setForeground(Color.BLACK);
 //		            }else {
-//		            	red 	+= (int) (val * 139);
-//		            	green 	+= (int) (-val * 29);
-//		            	blue	+= (int) (-val * 65);
+//		            	red 	+= (int) (val * 170);
+//		            	green 	+= (int) (val * 170);
+//		            	blue	+= (int) (val * 170);
+//		            	setForeground(Color.WHITE);
 //		            }
-		            setForeground(Color.BLACK);
-		            int red = 170;
-		            int green = 170;
-		            int blue = 170;
-		            if ( val > 0) {
-		            	red 	+= (int) (val * 80);
-		            	green 	+= (int) (val * 80);
-		            	blue	+= (int) (val * 80);
-		            	setForeground(Color.BLACK);
-		            }else {
-		            	red 	+= (int) (val * 170);
-		            	green 	+= (int) (val * 170);
-		            	blue	+= (int) (val * 170);
-		            	setForeground(Color.WHITE);
-		            }
-		            if ( red < 0) red = 0;
-		            if ( green < 0) green = 0;
-		            if ( blue < 0) blue = 0;
-		            if ( red > 255) red = 200;
-		            if ( green > 255) green = 200;
-		            if ( blue > 255) blue = 200;
-		            
-		            
-		            
-		            setBackground(new Color(red,green, blue));
+//		            if ( red < 0) red = 0;
+//		            if ( green < 0) green = 0;
+//		            if ( blue < 0) blue = 0;
+//		            if ( red > 255) red = 200;
+//		            if ( green > 255) green = 200;
+//		            if ( blue > 255) blue = 200;
+//		            
+//		            setBackground(new Color(red,green, blue));
+//	            }
+	            
+	            if ( column>6) {
+	            double val =  0;
+	            try {
+	            	val = Double.parseDouble((String)(""+value));
+	            }catch(NumberFormatException ee){
+	        	}
+
+	            setForeground(Color.BLACK);
+	            int red = 255;
+	            int green = 255;
+	            int blue = 255;
+	             
+	            if ( val > 0) {
+	            	red 	-= (int) (val * 84);
+	            	green 	-= (int) (val * 8);
+	            	blue	-= (int) (val * 78);
+	            	setForeground(Color.BLACK);
 	            }
+	            if ( red < 0) red = 0;
+	            if ( green < 0) green = 0;
+	            if ( blue < 0) blue = 0;
+	            if ( red > 255) red = 200;
+	            if ( green > 255) green = 200;
+	            if ( blue > 255) blue = 200;
+	            
+	            setBackground(new Color(red,green, blue));
+            }
 	            if ( column == 5)
 	            	if ( value.equals("------")) {
 	            		setBackground(Color.decode("#ffeeda"));
@@ -776,11 +789,11 @@ public class UI {
 		menuAction.add(menuActionTrainImmediateStop);
 		menuActionTrainImmediateStop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CANCEL, InputEvent.CTRL_DOWN_MASK));
 		menuAction.add(new JSeparator());
-		menuAction.add(menuActionOptions);
-		menuAction.add(menuActionChk_QR);
-		menuAction.add(new JSeparator());
 		menuAction.add(menuActionClassify);
 		
+		// ---------------------------------------------------------------------
+		menuSettings.add(menuActionOptions);
+		menuSettings.add(menuActionChk_QR);
 		// ---------------------------------------------------------------------
 		
 		JMenuItem menuExportVectors = new JMenuItem(" Vectors"); 
@@ -807,6 +820,7 @@ public class UI {
 		// ---------------------------------------------------------------------
 		mBar.add(menuFile);
 		mBar.add(menuAction);
+		mBar.add(menuSettings);
 		mBar.add(menuExport);
 		mBar.add(menuAbout);
 		
@@ -1164,19 +1178,19 @@ public class UI {
 		}});
 		menuExportPlot.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
 			BufferedImage img=null;
-			if(maintabbed.getSelectedIndex()==tab_Distance ){
+			if(maintabbed.getSelectedIndex()==tab_Live ){
 				 img = new BufferedImage(panLive.getWidth(), panLive.getHeight(), BufferedImage.TYPE_INT_RGB);
 			    Graphics g = img.getGraphics();
 			    g.setColor(panLive.getForeground());
 			    g.setFont(panLive.getFont());
 			    panLive.paintAll(g);
 			 }
-			if(maintabbed.getSelectedIndex()==tab_Accuracy ){
-				 img = new BufferedImage(panLiveAcc.getWidth(), panLiveAcc.getHeight(), BufferedImage.TYPE_INT_RGB);
+			if(maintabbed.getSelectedIndex()==tab_Trends ){
+				 img = new BufferedImage(panTrends.getWidth(), panTrends.getHeight(), BufferedImage.TYPE_INT_RGB);
 			    Graphics g = img.getGraphics();
-			    g.setColor(panLiveAcc.getForeground());
-			    g.setFont(panLiveAcc.getFont());
-			    panLiveAcc.paintAll(g);
+			    g.setColor(panTrends.getForeground());
+			    g.setFont(panTrends.getFont());
+			    panTrends.paintAll(g);
 			 }
 			if(maintabbed.getSelectedIndex()==tab_Algo ){
 				 img = new BufferedImage(iconAlgo.getWidth(), iconAlgo.getHeight(), BufferedImage.TYPE_INT_RGB);
@@ -1236,7 +1250,7 @@ public class UI {
 		Runner.cleanRunner ();
 		tmtableClassify.setColumnCount(0);
 		tmtableClassify.setRowCount(0);
-		maintabbed.setSelectedIndex(tab_Distance);
+		maintabbed.setSelectedIndex(tab_Live);
 		//jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
 		jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+DS.fileName+"]");
 		

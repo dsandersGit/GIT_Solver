@@ -539,7 +539,7 @@ public class SolverStart {
 	
 	
 	public  static void analyzeRawData(String file) {
-		Tools.sumryAdd ("+ The file ["+file+"] is composed of a matrix of "+DS.numSamples+" samples and "+DS.numVars+" variables. ");
+		Tools.sumryAdd ("+ The file ["+file+"] is composed of a matrix of "+DS.numSamples+" samples and "+DS.numVars+" features. ");
 		Tools.sumryAdd ("Samples are classified in "+DS.numClasses+" classes: ");
 		Tools.sumryAdd ("\n");
 		Tools.sumryAdd (Tools.txtLen("Class")+"\t"+Tools.txtLen("Population") + "\n");
@@ -563,7 +563,7 @@ public class SolverStart {
 			Tools.sumryAdd ("You can apply a previously saved enemble for classification. ");
 		}else {
 				
-			Tools.sumryAdd ("*Variable listing: ");
+			Tools.sumryAdd ("*Feature listing: ");
 			Tools.sumryAdd ("\n");
 			
 			double[] ParetoScaleAvg	= new double[DS.numVars];										// AVG and SD
@@ -584,7 +584,7 @@ public class SolverStart {
 				ParetoScaleAvg[a] = avg;
 				ParetoScaleSd[a] = sd;
 			}
-			Tools.sumryAdd (Tools.txtLen("Variable") +"\t"+ Tools.txtLen("Average") + "\t" + Tools.txtLen("Standard Dev.")+ "\t" + Tools.txtLen("AUROC max") + "\n");
+			Tools.sumryAdd (Tools.txtLen("Feature") +"\t"+ Tools.txtLen("Average") + "\t" + Tools.txtLen("Standard Dev.")+ "\t" + Tools.txtLen("AUROC max") + "\n");
 			Tools.sumryAdd ("________________\t________________\t________________\t________________" + "\n");
 			Tools.sumryAdd ("\n");
 			 
@@ -617,15 +617,15 @@ public class SolverStart {
 		
 	
 			if ( DS.numVars < DS.numSamples  ) {																			// MindestAnzahl Population / Class
-				Tools.sumryAdd ("+ Number of variables is reasonable for training (#Variables < #Samples)."+"\n");
+				Tools.sumryAdd ("+ Number of features is reasonable for training (#Features < #Samples)."+"\n");
 			}else {
-				Tools.sumryAdd ("[!] The number of variables surpasses the number of samples. Training is disadvised.");
-				Tools.sumryAdd (" Excessive variables typically push models to overfit. Generalization to new data is likely poor.\"\r\n"  
+				Tools.sumryAdd ("[!] The number of features surpasses the number of samples. Training is disadvised.");
+				Tools.sumryAdd (" Excessive features typically push models to overfit. Generalization to new data is likely poor.\"\r\n"  
 						+ " Use such models only for evaluation, not for production/publishing."+"\n");
 			}
 			
 			if ( DS.numVars < 2  ) {																						// MindestAnzahl Population / Class
-				Tools.sumryAdd ("[!] The number of variables is too small.");
+				Tools.sumryAdd ("[!] The number of features is too small.");
 			}
 			Tools.sumryAdd ("\n");
 		}
