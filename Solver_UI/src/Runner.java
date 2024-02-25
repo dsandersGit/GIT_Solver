@@ -467,7 +467,7 @@ public class Runner {
         
         if  ( again > -1)a = again;
        
-        if ( absCount < Opts.noBetterStop &&  absCount < 1000 ) z0 = 99;			// Max Variation on StartUp, first noBetterStop just gambling
+        //if ( absCount < Opts.noBetterStop &&  absCount < 1000 ) z0 = 99;			// Max Variation on StartUp, first noBetterStop just gambling
         
         switch(z0) {
         case 0:                                                            // EIN Area, ALLE PCA's Zufallswert

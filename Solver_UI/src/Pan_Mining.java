@@ -226,59 +226,117 @@ public class Pan_Mining extends JComponent {
 			 scatterPlot.setXY(x, y, 12, cn, DS.classAllIndNme[c], true, false, false);
 		 }
 		 
-	 
 		 // Sort
-		 double distance = 0;
-		 ArrayList<Float> 	sortData 	= new ArrayList<Float>();
-    	 ArrayList<Integer> sortDataPos 	= new ArrayList<Integer>();
+		 ArrayList<Float> 	sortDataX 	= new ArrayList<Float>();									// SORTING
+    	 ArrayList<Integer> sortDataPosX 	= new ArrayList<Integer>();
     	 for (int i=0;i<DS.numSamples; i++) {
     		 float data  = (float)(i);
     		 if (DS.timeIndex != null && chkTimeIndex.isSelected()) data = (float)DS.timeIndex[i];
-         	boolean isIn = false;
-             for(int j=0;j<sortData.size();j++){									
-                 if ( sortData.get(j)>data) {
-                     sortData.add	(j, data);
-                     sortDataPos.add(j, i);
+         	 boolean isIn = false;
+             for(int j=0;j<sortDataX.size();j++){									
+                 if ( sortDataX.get(j)>=data) {
+                     sortDataX.add	(j, data);
+                     sortDataPosX.add(j, i);
                      isIn = true;
                      break;
                  }
              }
              if ( !isIn) {
-                 sortData.add(data);
-                 sortDataPos.add(i);
+                 sortDataX.add(data);
+                 sortDataPosX.add(i);
              }
     	 }
-    	
-    	 int step = DS.numSamples/15;
-    	 float c = 0;
-    	 double colX = 0;
-    	 double colY = 0;
-    	 ArrayList<Float> 	avgX 	= new ArrayList<Float>();
-    	 ArrayList<Float> 	avgY 	= new ArrayList<Float>();
+    	 ArrayList<Float> 	sortDataY 	= new ArrayList<Float>();									// SORTING
+    	 ArrayList<Integer> sortDataPosY 	= new ArrayList<Integer>();
     	 for (int i=0;i<DS.numSamples; i++) {
-    		 int sortPos = sortDataPos.get(i);
-    		 c++;
-    		 if (DS.timeIndex != null && chkTimeIndex.isSelected()) {
-    			 colX += DS.timeIndex[sortPos];
-    		 }else {
-    			 colX += sortPos;
-    		 }
-    		 colY += DS.rawData[sortPos][area];
-    		 if ( c>step) {
-    			 avgX.add((float)(colX/c));
-    			 avgY.add((float)(colY/c));
-    			 colX=0;colY=0;
-    			 c=0;
-    		 }
+    		 float data  = (float)DS.rawData[i][area];
+    		 boolean isIn = false;
+             for(int j=0;j<sortDataY.size();j++){									
+                 if ( sortDataY.get(j)>=data) {
+                     sortDataY.add	(j, data);
+                     sortDataPosY.add(j, i);
+                     isIn = true;
+                     break;
+                 }
+             }
+             if ( !isIn) {
+                 sortDataY.add(data);
+                 sortDataPosY.add(i);
+             }
     	 }
-    	 float[] avgXPlot = new float[avgX.size()];
-    	 float[] avgYPlot = new float[avgY.size()];
-    	 for (int i=0;i<avgX.size(); i++) {
-    		 avgXPlot[i] = avgX.get(i);
-    		 avgYPlot[i] = avgY.get(i);
-//    		 System.out.println( avgXPlot[i]+"\t" + avgYPlot[i]);
-    	 }
-    	 scatterPlot.setXY(avgXPlot, avgYPlot, 12, Color.red, "Line", false, true, false);
+    	 
+//    	 // Spearman's rank correlation coefficient
+//    	 double p = 0;double num = 0;
+//    	 for (int i=0;i<sortDataY.size();i++) {
+////    		 System.out.println(sortDataPosX.get(i)+"\t"+sortDataPosY.get(i));
+//    		 p += Math.pow(sortDataPosX.get(i)-sortDataPosY.get(i),2);
+//    		 num ++;
+//    	 }
+//    	 scatterPlot.setTitle("Spearman correlation: " + Tools.myRound(( 1.-6.*p/(num*(Math.pow(num,2)-1))),3));
+
+
+    	 float[] 	avgX 	= new float[DS.numSamples];								// Rolling Average
+    	 float[] 	avgY 	= new float[DS.numSamples];
+    	 for (int i=0;i<DS.numSamples; i++) {
+    		 int sortPos = sortDataPosX.get(i);
+    		 int c=0;
+    		 for (int t=i-3;t<i+4;t++) {
+    			 if ( t>-1 && t<DS.numSamples) {
+		    		 if (DS.timeIndex != null && chkTimeIndex.isSelected()) {
+		    			 avgX[i] += sortDataX.get(t);
+		    		 }else {
+		    			 avgX[i] += t;
+		    		 }
+		    		 c++;
+    			 }
+    		 }
+    		 if (c>0)avgX[i] /= c;
+    		 c=0;;
+    		 for (int t=i-3;t<i+4;t++) {
+    			 if ( t>-1 &&t<DS.numSamples) {
+	    			 avgY[i] += DS.rawData[sortDataPosX.get(t)][area];
+		    		 c++;
+    			 }
+    		 }
+    		 if (c>0)avgY[i] /= c;
+//    		 System.out.println(i+"\t"+avgX[i]+"\t"+avgY[i]);
+    	 }	 
+    	 scatterPlot.setXY(avgX, avgY, 12, Color.red, "Line", false, true, false);
+    	 
+    	 
+//    	 int step = DS.numSamples/15;																// AVG Line
+//    	 float c = 0;
+//    	 double colX = 0;
+//    	 double colY = 0;
+//    	 ArrayList<Float> 	avgX 	= new ArrayList<Float>();
+//    	 ArrayList<Float> 	avgY 	= new ArrayList<Float>();
+//    	 for (int i=0;i<DS.numSamples; i++) {
+//    		 int sortPos = sortDataPosX.get(i);
+//    		 c++;
+//    		 if (DS.timeIndex != null && chkTimeIndex.isSelected()) {
+//    			 colX += DS.timeIndex[sortPos];
+//    		 }else {
+//    			 colX += sortPos;
+//    		 }
+//    		 colY += DS.rawData[sortPos][area];
+//    		 if ( c>step) {
+//    			 avgX.add((float)(colX/c));
+//    			 avgY.add((float)(colY/c));
+//    			 colX=0;colY=0;
+//    			 c=0;
+//    		 }
+//    	 }
+//    	 float[] avgXPlot = new float[avgX.size()];
+//    	 float[] avgYPlot = new float[avgY.size()];
+//    	 for (int i=0;i<avgX.size(); i++) {
+//    		 avgXPlot[i] = avgX.get(i);
+//    		 avgYPlot[i] = avgY.get(i);
+////    		 System.out.println( avgXPlot[i]+"\t" + avgYPlot[i]);
+//    	 }
+//    	 scatterPlot.setXY(avgXPlot, avgYPlot, 12, Color.red, "Line", false, true, false);
+    	 
+    	
+		
 		 
 		 scatterPlot.setBaseColor(Color.black);
 		 scatterPlot.setOuterBackGroundColor(Color.WHITE);
