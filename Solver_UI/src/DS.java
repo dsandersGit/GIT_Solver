@@ -15,7 +15,7 @@ public class DS {
 	public static boolean[] 	usedAreas 		= null;					// Ignored Areas during import
 	public static String[]		ClassNames 		= null;
 	public static int[]			classIndex 		= null;					// Color per sample
-	public static int[]			listClassIndex 		= null;					// Color per sample
+	public static int[]			listClassIndex 	= null;					// Color per sample
 	public static double 		normData [][] 	= null;
 	
 	public static int[]			classAllIndices	= null;					// [] Index of present Classes
@@ -23,6 +23,9 @@ public class DS {
 	public static String[]		classAllIndNme	= null;					// [] Population of each Classes, index like classIndices
 	public static boolean[][]	fixedTrainSet	= null;					//
 	//public static boolean[]		noTrainingSet	= null;					//
+	
+	public static double[] timeIndex;									// timeIndex from sample if available
+	public static boolean[]		selectedArea	= null;					// set Vectors to 0 is false;
 	
 	public static double[][] 	normParas		= null;
 	public static String 	    fileName		= "";
@@ -71,9 +74,14 @@ public class DS {
 	//public static String variableID = "-no_ID-";
 	public static String variableID = "";
 
+
+
 	
 	
 	public DS () {
+		
+		
+		
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
 		
 		if ( AreaNames == null) System.out.println("AreaNames is null");
@@ -123,6 +131,11 @@ public class DS {
 			
 		sepaX = new float[DS.numSamples];
 		sepaY = new float[DS.numSamples];
+		
+		selectedArea = new boolean[DS.numVars];
+		for (int i=0;i<DS.numVars;i++) {
+			selectedArea[i] = true;	
+		}
 //		75: Fixed Trainset Init moved from DS to SolverStart
 //		if ( Opts.fixTrainSet ) {
 //			getFixedTrainSet();
@@ -133,6 +146,7 @@ public class DS {
 		
 		
 		// ***
+		Pan_Mining.init();
 	}
 	private static void bootsStrapp(int bsBoost, int bsSet) {
 		/*

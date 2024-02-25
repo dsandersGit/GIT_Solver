@@ -106,14 +106,17 @@ public class UI {
 	static int tab_Algo = 1;
 	static int tab_Trends = 4;
 	static int tab_3D = -1;
+	static int tab_ensemble = -1;
 	static int tab_Summary = 0;
 	static int tab_Statistics = 0;
+	static int tab_spMining = 8;
 	
 	public static 		JTabbedPane maintabbed 		= new JTabbedPane();
 	public static 		SP_PlotCanvas sp 			= new SP_PlotCanvas();
 	public static 		SP_PlotCanvas spDst 		= new SP_PlotCanvas();
 	public static 		SP_PlotCanvas sp1D 			= new SP_PlotCanvas();
 	public static 		SP_PlotCanvas sp2D 			= new SP_PlotCanvas();
+	public static 		Pan_Mining	 panMining		= new Pan_Mining();
 	//public static 		SP_PlotCanvas spSpread 		= new SP_PlotCanvas();
 //	public static 		HeatMap heatMap				= new HeatMap();
 	public static 		JTextArea txtOpts 			= new JTextArea();
@@ -223,6 +226,7 @@ public class UI {
 		panTrends.add(sp2D);
 		
 		maintabbed.add("Data",scSummary);
+		maintabbed.add("Visual Check", panMining);
 		maintabbed.add("Live", panLive);
 		maintabbed.add("Validation",scValidation);
 		maintabbed.add("Trends", panTrends);
@@ -230,6 +234,21 @@ public class UI {
 		maintabbed.addTab("3D",tab3D);
 		maintabbed.add("Ensemble",scEnsemble);
 		maintabbed.add("Algorithm", iconAlgo);
+		
+		tab_Summary 	= 0;
+		tab_spMining	= 1;
+		tab_Live 		= 2;
+		tab_Statistics 	= 3;
+		tab_Trends	 	= 4;
+		tab_Classify 	= 5;
+		tab_3D 			= 6;
+		tab_ensemble	= 7;
+		tab_Algo		= 8;
+
+//		tab_Opts 		= 1;
+		
+		
+		
 		
 		ChangeListener changeListener = new ChangeListener() {
 		 public void stateChanged(ChangeEvent changeEvent) {
@@ -255,15 +274,7 @@ public class UI {
 		sp2D.setXAxis("# feature");
 		sp2D.setYAxis("loadings ");
 		
-		
-		tab_Classify 	= 4;
-		tab_Live 		= 1;
-		tab_Trends	 	= 3;
-		tab_Algo		= 7;
-		tab_3D 			= 5;
-//		tab_Opts 		= 1;
-		tab_Summary 	= 0;
-		tab_Statistics 	= 2;
+
 		
 		txtOpts.setWrapStyleWord(true);
 		txtOpts.setLineWrap(true);
@@ -298,8 +309,8 @@ public class UI {
 		
 		Preferences prefs;
 	    prefs = Preferences.userRoot().node("Solver");
-		prefs.getBoolean("menuActionChk_QR", true);
-		
+		//114
+		menuActionChk_QR.setSelected(prefs.getBoolean("menuActionChk_QR", true));
 		refreshStatus();
 	
 	}
@@ -436,6 +447,7 @@ public class UI {
 		jB_Shuffle.setEnabled(false);
 		proNoBetterStop.setValue(0);
 		jbLoadEns.setEnabled(true);
+		UI.maintabbed.setEnabledAt(tab_spMining, true);
 		
 		//jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
 		jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+DS.fileName+"]");
@@ -503,6 +515,7 @@ public class UI {
 			jbLoad.setEnabled(false);
 			jbLoadEns.setEnabled(false);
 			menuActionOptions.setEnabled(false);
+			UI.maintabbed.setEnabledAt(tab_spMining, false);
 		}
 		
 		if ( !noEns)
@@ -854,12 +867,14 @@ public class UI {
 			StringBuffer outTest = new StringBuffer();
 			outTrain.append("Class");
         	for (int j=0;j< DS.numVars; j++) {
-        		outTrain.append("," + DS.AreaNames[j]);	
+        		if ( DS.selectedArea[j] )
+        			outTrain.append("," + DS.AreaNames[j]);	
         	}
         	outTrain.append("\n");
         	outTest.append("Class");
         	for (int j=0;j< DS.numVars; j++) {
-        		outTest.append("," + DS.AreaNames[j]);	
+        		if ( DS.selectedArea[j] )
+        			outTest.append("," + DS.AreaNames[j]);	
         	}
         	outTest.append("\n");
         	
@@ -886,7 +901,8 @@ public class UI {
 	                if (f == tgts.get(i)) {
 	                	outTrain.append(cls);
 	                	for (int j=0;j< DS.numVars; j++) {
-	                		outTrain.append("," + DS.rawData[f][j]);	
+	                		if ( DS.selectedArea[j] )
+	                			outTrain.append("," + DS.rawData[f][j]);	
 	                	}
 	                	outTrain.append("\n");
 	                	isIn = true;
@@ -895,7 +911,8 @@ public class UI {
 	            if ( !isIn ) {
 	            	outTest.append(cls);
                 	for (int j=0;j< DS.numVars; j++) {
-                		outTest.append("," + DS.rawData[f][j]);	
+                		if ( DS.selectedArea[j] )
+                			outTest.append("," + DS.rawData[f][j]);	
                 	}
                 	outTest.append("\n");
 	            }
@@ -943,7 +960,8 @@ public class UI {
 
 			out.append("Class");
         	for (int j=0;j< DS.numVars; j++) {
-        		out.append("," + DS.AreaNames[j].replaceAll("\"", ""));	
+        		if ( DS.selectedArea[j] )
+        			out.append("," + DS.AreaNames[j].replaceAll("\"", ""));	
         	}
         	out.append("\n");
         
@@ -955,7 +973,8 @@ public class UI {
 	        	}
 	        	out.append(cls);
 	        	for (int j=0;j< DS.numVars; j++) {
-            		out.append("," + DS.rawData[f][j]);	
+	        		if ( DS.selectedArea[j] )
+	        			out.append("," + DS.rawData[f][j]);	
             	}
 	        	out.append("\n");
 	        }

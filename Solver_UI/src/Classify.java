@@ -87,7 +87,7 @@ public class Classify {
 //		UI.tmtableClassify.setColumnCount(0);
 		
 		Object[] tHeader = new Object[DS.numClasses+7];
-		tHeader[0]	= "run";
+		tHeader[0]	= "# num";
 		tHeader[1]	= "sample";
 		tHeader[2]	= "classindex";
 		tHeader[3]	= "classname";
@@ -262,98 +262,7 @@ public class Classify {
 		}
 		UI.scClassify.setViewportView(UI.tableClassify);
 		UI.tmtableClassify.setDataVector(nData, tHeader);
-		
-//		for (int f=0;f<DS.numSamples;f++){
-//			Object[] row = new Object[DS.numClasses+add];
-//			 double max=-5;
-//			 ArrayList<Integer> all = new ArrayList<Integer>();
-//			 int index = Tools.getIndexOfTarget (DS.classIndex[f]);
-//		 
-//			 row[0] = Tools.txtLen(""+(f+1));
-//			 row[1] = DS.SampleNames[f];
-//			 row[2] = DS.classIndex[f];
-//			 row[3] = DS.ClassNames[f];
-//			 
-//			 int maxClassNum = -1;
-//			 for (int i=0;i<DS.classAllIndices.length;i++) {
-//				 double val = sumUpClassification[f][i]/fullBonusClassification[i]; 
-//				 row[i+add] = Tools.myRound(val,6);
-//				 if ( max <  val || i==0) {
-//					 max = val;
-//					 maxClassNum = i;
-//					 all.clear();
-//					 all.add(i);
-//				 }else {
-//					 if ( max == val) {
-//						 all.add(i);
-//					 }
-//				 }
-//			 }
-//			 
-//			 if ( max > -5 ) {
-//				 finalClass[f] = "";
-//				 finalClassIndex[f] = -1;
-//				 for (int i=0;i<all.size();i++) {
-//					 if ( i>0) finalClass[f] += "|";
-//					 finalClass[f] += 	 DS.classAllIndNme[all.get(i)];
-//					 finalClassIndex[f] = DS.classAllIndices[all.get(i)];
-//					 if ( finalClass[f].contains("|")) finalClassIndex[f] = -1;					// Doppeltes Match
-//				 }
-//			 }else {
-//				 finalClass[f] = "-none-";
-//				 finalClassBonus[f] = 0;
-//				 finalClassIndex[f] = -1;
-//			 }
-//			 
-//			 if ( maxClassNum > -1) 
-//				 if ( DS.fixedTrainSet != null)
-//					 if (!DS.fixedTrainSet[index][f]) {
-//						 confusionMatrixTest [Tools.getIndexOfTarget(DS.classIndex[f])][maxClassNum] ++;
-//					 }else {
-//						 confusionMatrixTrain [Tools.getIndexOfTarget(DS.classIndex[f])][maxClassNum] ++;
-//					 }
-//			 
-//			 row[4] = finalClass[f];
-//			 if (finalClass[f].equals(DS.ClassNames[f])) {						// contains
-//				 if ( (Opts.fixTrainSet && DS.fixedTrainSet != null)) {
-//					 if (DS.fixedTrainSet[index][f]) {
-//						 matchCountTrain++;
-//					 }else {
-//						 matchCountTest++;
-//					 }
-//				 }else {
-//					 matchCountTrain++;
-//				 }
-////				 matchCountTarget[Tools.getIndexOfTarget(DS.classIndex[f])]++;
-//				 row[5] = "++++++";
-//			 }else {
-//				 row[5] = "------";
-//			 }
-//			 if ( Opts.fixTrainSet && DS.fixedTrainSet != null) {
-//				 if (DS.fixedTrainSet[index][f]) {
-//					 row[6] = "training";
-//				 }else {
-//					 row[6] = "validation";
-//				 }
-//			 }else {
-//				 row[6] = " - - - ";
-//			 }
-//			 if ( (Opts.fixTrainSet && DS.fixedTrainSet != null)) {
-//				 if (DS.fixedTrainSet[index][f]) {
-//					 allCountTrain++;
-//				 }else {
-//					 allCountTest++;
-//				 }
-//			 }else {
-//				 allCountTrain++;
-//			 }
-////			 int val = Tools.getIndexOfTarget(DS.classIndex[f]);
-////             if ( val > - 1)
-////                 allCountTarget[val]++;
-//	    	  UI.tmtableClassify.addRow(row);
-//
-//		 }
-
+	
 		int[] trainRatio = new int[DS.numClasses];
 		int[] testRatio = new int[DS.numClasses];
 		
@@ -376,25 +285,7 @@ public class Classify {
 			trainRatio[i] = Math.round(100*isInTrain/(isInTrain+isOutTrain));
 			testRatio[i] = Math.round(100*isInTest/(isInTest+isOutTest));
 		}
-		
-		
-		
-		// 103
-//		out.append("SUMMARY:"+"\n");
-//		out.append(Tools.txtLen ("CLASS") + "\t");
-//		out.append(Tools.txtLen ("MATCHES") + "\t");
-//		out.append(Tools.txtLen ("MISSES") + "\t");
-//		out.append(Tools.txtLen ("RATIO") + "\n");
-//		out.append("________________\t________________\t________________\t________________"+"\n");
-//		for (int i=0;i<matchCountTarget.length;i++) {
-//			out.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
-//			out.append(Tools.txtLen (""+matchCountTarget[i])+"\t");
-//			out.append(Tools.txtLen (""+(allCountTarget[i]-matchCountTarget[i]))+"\t");
-//			out.append(Tools.txtLen (""+((100*matchCountTarget[i])/allCountTarget[i]))+"%\t");				// Possible Bug allCountTarget[i] == 0
-//			out.append("\n");
-//		}
-//		out.append("________________\t________________\t________________\t________________"+"\n");
-//		out.append("\n");
+	
 		confMatrixout = new StringBuffer();
 		StringBuffer txtOut = new StringBuffer();
 		if ( DS.fixedTrainSet != null) {
@@ -405,7 +296,6 @@ public class Classify {
 				txtOut.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
 			}
 			txtOut.append(Tools.txtLen ("RATIO [%]") + "\n");
-			//out.append("\n");
 			for (int i=0;i<DS.numClasses;i++) {
 				txtOut.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
 				confMatrixout.append(DS.classAllIndNme[i]+"|");
@@ -415,7 +305,6 @@ public class Classify {
 				}
 				txtOut.append(Tools.txtLen ("" + trainRatio [i])+"\n");
 				confMatrixout.append("\n");
-				//out.append("\n");
 			}
 			txtOut.append(""+"\n");
 			confMatrixout.append(""+"\n");
@@ -424,10 +313,8 @@ public class Classify {
 			confMatrixout.append("Vald."+"\n");
 			for (int i=0;i<DS.numClasses;i++) {
 				txtOut.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
-//				confMatrixout.append(DS.classAllIndNme[i]+"|");
 			}
 			txtOut.append(Tools.txtLen ("RATIO [%]") + "\n");
-			//out.append("\n");
 			for (int i=0;i<DS.numClasses;i++) {
 				txtOut.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
 				confMatrixout.append(DS.classAllIndNme[i]+"|");
@@ -437,7 +324,6 @@ public class Classify {
 				}
 				txtOut.append(Tools.txtLen ("" + testRatio [i])+"\n");
 				confMatrixout.append("\n");
-				//out.append("\n");
 			}
 			txtOut.append(""+"\n");
 			confMatrixout.append(""+"\n");

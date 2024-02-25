@@ -145,7 +145,12 @@ public class Runner {
 			zufi(-1);
 			logZufi();
 		}
-			
+		if ( DS.selectedArea != null)											// Omitt indiv. Features
+		for (int a=0;a<DS.numVars;a++){
+    		for (int i=0;i<Opts.numDims;i++) {
+    			if ( !DS.selectedArea[a] ) mcEigenVec[a][i] = 0;
+    		}
+		}
 		
 		 calcPlot();
 	        double ndst = 0;
@@ -164,7 +169,6 @@ public class Runner {
 	        // distanceOld!=0
 	        //102
 	        if ( (ndst* Opts.minBetter  > distanceOld )  ){
-	        	//System.out.println(ndst+"\t"+distanceOld);
 	            accuracyTrain.add((float) accuracy);
 	            accuracyTest.add((float) doClassify(false, false));
 	            dstTrain.add((float) ndst);
@@ -180,15 +184,14 @@ public class Runner {
 	            }
 	            
 	        }else{
-	        	//System.out.println("out " + ndst+"\t"+distanceOld+"\t"+notBetterCount);
 	            zuFiAgain = -1;
 	            undoZufi();
 	            notBetterCount ++;
 
 	       }
-	        if ( notBetterCount > Opts.noBetterStop ) {
-	        	
-	        	if ( (dstLatestMax  >= distanceOld* Opts.minBetter && dstLatestMax > 0)  ) {
+	       if ( notBetterCount > Opts.noBetterStop ) {
+	    	   if ( (dstLatestMax  >= distanceOld* Opts.minBetter )  ) {
+//	    	   if ( (dstLatestMax  >= distanceOld* Opts.minBetter && dstLatestMax > 0)  ) {
 	        		finish();
 	                return false;
 	            }
@@ -452,7 +455,9 @@ public class Runner {
 	}
 	private int zufi(int again){
     	
-		double large = 0.2;
+//		double large = 0.2;
+//		double small = large*0.1;
+		double large = .13;
 		double small = large*0.1;
         int z0     = (int)Math.floor(Math.random()*11);                // zufi
         Random random = ThreadLocalRandom.current();
@@ -462,7 +467,7 @@ public class Runner {
         
         if  ( again > -1)a = again;
        
-        if ( absCount < Opts.noBetterStop &&  absCount < 100 ) z0 = 99;			// Max Variation on StartUp, first noBetterStop just gambling
+        if ( absCount < Opts.noBetterStop &&  absCount < 1000 ) z0 = 99;			// Max Variation on StartUp, first noBetterStop just gambling
         
         switch(z0) {
         case 0:                                                            // EIN Area, ALLE PCA's Zufallswert
@@ -632,10 +637,12 @@ public class Runner {
        
     }
     private void calcPlot(){												// Calculate responce of Neurons
+    	
         for (int f=0;f<DS.numSamples;f++){
             double[] sum = new double[Opts.numDims];
             for (int i=0;i<Opts.numDims;i++) {
-                for (int a=0;a<DS.numVars;a++){ 
+                for (int a=0;a<DS.numVars;a++){
+                	
                 	sum[i] += DS.normData[f][a] * mcEigenVec[a][i];
                 }
                 mcPCA[i][f] = sum[i];

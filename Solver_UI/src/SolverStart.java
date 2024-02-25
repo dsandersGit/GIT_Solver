@@ -39,13 +39,7 @@ public class SolverStart {
 	 */
 	
 	/*
-	 * THOUGHTS:
-	 * Reduce Variable Count via SPEARMAN Reduktion ?
-	 * Might be beneficial to do bootstrapping for small sample sizes (resampling with duplicates )
-	 */
-	
-	
-	/*
+	 * INTERNAL CHANGELOG
 	 * 34: Fingerprint Model und Opts
 	 * 35: Vieles
 	 * 36: Validation in Table
@@ -125,38 +119,41 @@ public class SolverStart {
 	 * 110: Option Dialog, Classify_Table Background Color Gradient
 	 * 111: QR Code receipt https://github.com/nayuki/QR-Code-generator/tree/master
 	 * 112: Classify Table 'run' sortable
-	 * 113: UI.tableClassify Viewpoint solved
-	 * 
+	 * 113: UI.tableClassify Viewpoint improved
+	 * 114: Pref Selection QR Code
+	 * 115: Pan_Mining > LITE Visual Data Mining Feature for gradient and step detection + Option for Feature deactivation
 	 * 	 */
  
-	public static String 	app 			= "solver [ISI]";
-	public static String 	appAdd 			= " 0.2.113";
-	public static String 	revision 		= " 113";
-	public static boolean 	isRunning 		= false;
-	public static boolean 	immediateStop 	= false;
-	public static boolean 	immediateSkip 	= false;					// 93
-	public static boolean 	doShuffle		= false;					// 94
-	public static boolean 	doRedrawOnClick	= true;					// 94
-	public static long 		plotTimer 		= -1;
-	public static boolean 	darkMode 		= false;
-	public static Color 	backColor 		= Color.DARK_GRAY;
-	public static Color 	frontColor 		= Color.LIGHT_GRAY;
-	public static JSONObject defOptions     = null;
+	public static String 		app 			= "solver [ISI]";
+	public static String 		appAdd 			= " 0.3";
+	public static String 		revision 		= " 115";
 	
-	public static float[] rollingAccuracy			= null;    // gain / class
-	public static float[] rollingAccuracyX			= null;
-	static String[] uiColorKeys = {"control","info","nimbusBase","nimbusAlertYellow","nimbusDisabledText"+
+	public static boolean 		isRunning 		= false;
+	public static boolean 		immediateStop 	= false;
+	public static boolean 		immediateSkip 	= false;				// 93
+	public static boolean 		doShuffle		= false;				// 94
+	public static boolean 		doRedrawOnClick	= true;					// 94
+	
+	public static long 			plotTimer 		= -1;
+	public static Color 		backColor 		= Color.DARK_GRAY;
+	public static Color 		frontColor 		= Color.LIGHT_GRAY;
+	public static JSONObject 	defOptions    	= null;					// default options
+	public static float[] 		rollingAccuracy	= null;    				// gain / class
+	public static float[] 		rollingAccuracyX= null;
+	
+	// >>>>>>>>>>>>>>>>>>>>>>  Dark Color Settings
+	public static boolean 		darkMode 		= false;
+	private static String[] uiColorKeys = {"control","info","nimbusBase","nimbusAlertYellow","nimbusDisabledText"+
 			"nimbusFocus","nimbusGreen","nimbusInfoBlue","nimbusLightBackground","nimbusOrange","nimbusRed"+
 			"nimbusSelectedText","nimbusSelectionBackground","text"	};
-	static Color[] uiBaseColors = new Color[uiColorKeys.length];
-	static Color[] uiDarkColors = {new Color( 128, 128, 128),new Color(128,128,128),new Color( 18, 30, 49),
+	private static Color[] uiBaseColors = new Color[uiColorKeys.length];
+	private static Color[] uiDarkColors = {new Color( 128, 128, 128),new Color(128,128,128),new Color( 18, 30, 49),
 			 new Color( 248, 187, 0), new Color( 128, 128, 128),new Color(115,164,209),new Color(176,179,50),
 			 new Color( 66, 139, 221),new Color( 18, 30, 49),new Color(191,98,4),new Color(169,46,34),
 			 new Color( 255, 255, 255), new Color( 104, 93, 156),new Color( 230, 230, 230)};
+	// <<<<<<<<<<<<<<<<<<<<<<
 	
 	public static void main(String[] args) {
-	
-		
 		// taken from https://stackoverflow.com/questions/36128291/how-to-make-a-swing-application-have-dark-nimbus-theme-netbeans
 		if (darkMode) {
 			for (int i=0;i<uiColorKeys.length;i++) {
@@ -208,7 +205,8 @@ public class SolverStart {
 	          UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 			}catch( Exception be ) { be.printStackTrace(); }
 		}
-		defOptions = Opts.getOptsAsJson();
+		
+		defOptions = Opts.getOptsAsJson();					// save default startup options
 		new UI();
 		UI.loadEnsemble(true);
 		
@@ -224,9 +222,6 @@ public class SolverStart {
 					UI.tmtableClassify.setRowCount(0);
 					new DS();										
 					DS.normParas = Tools.doNormData ();				
-					//SolverStart.dataFileName = f.getName();
-					//DS.fileName = f.getName();
-					
 					SolverStart.analyzeRawData(f.getName());
 					UI.maintabbed.setSelectedIndex(UI.tab_Summary);
 					UI.refreshStatus();
@@ -236,22 +231,20 @@ public class SolverStart {
 		
 		if(args.length>1)
 			DS.variableID = args[1]; 
-		
-		//System.out.println("DS.variableID " + DS.variableID);
+
 	}
 	public static void trainPattern() throws IOException {
 
 		// populates with running the accuracy of train / test results
 		ArrayList<Float> rollingAccuracyTest = new ArrayList<Float>();
 		ArrayList<Float> rollingAccuracyTrain = new ArrayList<Float>();
-		@SuppressWarnings("unchecked")
 		ArrayList<Float> rollingAccuracyX = new ArrayList<Float>();
 
 		int rACount = 0;													// running counter
 		immediateStop = false;												// flag for user interrupting current training session
 		isRunning = true;													// flag for running current training session
 		
-		// cleaning stuff
+		// cleaning UI stuff
 		UI.labAccuracy.setText("Accuracy: ---");
 		UI.sp1D.dats.clear();
 		UI.sp1D.refreshPlot();
@@ -261,8 +254,8 @@ public class SolverStart {
 		UI.txtEnsemble.setText("");
 		UI.tmtableValidation.setRowCount(0);
 		UI.txtClassify.setText("");
+		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));	// UI button color
 		//72: Train/Test change only cycle wise
-		//DS.fixedTrainSet = null;
 		
 		// Basic probability of classification based on class number and population (two equal classes same population = 50% of random correct draw)
 		double prob = 0;
@@ -277,42 +270,41 @@ public class SolverStart {
 		UI.refreshStatus();													// fills status and determines user interface UI options 
 		Runner.cleanRunner();												// reset Runner > training session module
 		
+		StringBuffer out 						= new StringBuffer();
+		DateTimeFormatter dtf 					= DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+	    LocalDateTime now 						= LocalDateTime.now();
+	    
 		// Preparing Ensemble JSON
-		JSONObject QRmain = new JSONObject();
-		JSONObject main = new JSONObject();
-		main.put("creator", SolverStart.app + SolverStart.appAdd + " r" + SolverStart.revision);
-		StringBuffer out = new StringBuffer();
-		out.append(Opts.getOptsAsJson().toString(3));
-		out.append(DS.getDSsAsJson().toString(3));
-		main.put("Opts", Opts.getOptsAsJson());
-		main.put("DS", DS.getDSsAsJson());
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-	    LocalDateTime now = LocalDateTime.now();
+		JSONObject QRmain 						= new JSONObject();
+		JSONObject main 						= new JSONObject();
+		main.put("creator"						, SolverStart.app + SolverStart.appAdd + " r" + SolverStart.revision);
+		out.append(								Opts.getOptsAsJson().toString(3));
+		out.append(								DS.getDSsAsJson().toString(3));
+		main.put("Opts"							, Opts.getOptsAsJson());
+		main.put("DS"							, DS.getDSsAsJson());
 	    main.put("DateOfCreation"				, ""+dtf.format(now));
 	    main.put("ObjectType"					, "ML_Ensemble");
 	    main.put("ObjectVersion"				, "01.00"); 
 	    main.put("Support"						,"N/A");
-	    
-
-		QRmain.put("creator", SolverStart.app + SolverStart.appAdd );
-		QRmain.put("Date"				, ""+dtf.format(now));
+		QRmain.put("creator"					, SolverStart.app + SolverStart.appAdd );
+		QRmain.put("Date"						, ""+dtf.format(now));
 	    
 	    
 		// Time / run estimation
-	    long tme = System.currentTimeMillis();
-		long tmeStart = System.currentTimeMillis();
-		double tmeCount = 0;
-		double timeSum = 0;
-		int cycles = Opts.numCycles*DS.numClasses;
-		double avgTime = 0;
+	    long 	tme 							= System.currentTimeMillis();
+		long 	tmeStart 						= System.currentTimeMillis();
+		double 	tmeCount 						= 0;
+		double 	timeSum 						= 0;
+		int 	cycles 							= Opts.numCycles*DS.numClasses;
+		double 	avgTime 						= 0;
 		
 		// Activation Equation selection
-		boolean activationIsDst = false;
-		boolean activationBoth = false;
-		if ( Opts.activation.equals("DxA") )activationIsDst = true;		
-		if ( Opts.activation.equals("D+A") )activationBoth = true;
+		boolean activationIsDst 				= false;
+		boolean activationBoth 					= false;
+		if ( Opts.activation.equals("DxA") )	activationIsDst = true;		
+		if ( Opts.activation.equals("D+A") )	activationBoth = true;
 
-		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));	// UI button color
+
 		for (int i=0;i<Opts.numCycles;i++) {
 			//72: Train/Test change only cycle wise
 			//75: Fixed Trainset Init moved from DS to SolverStart
@@ -380,19 +372,15 @@ public class SolverStart {
 				DS.setEnsemble(main);
 				new Classify();
 				rACount++;
-				rollingAccuracyTest.add( (float)Classify.accuracyTest);
-				rollingAccuracyTrain.add( (float)Classify.accuracyTrain);
+				rollingAccuracyTest.add		((float)	Classify.accuracyTest);
+				rollingAccuracyTrain.add	((float)	Classify.accuracyTrain);
+				rollingAccuracyX.add		((float)	rACount);
 				
-				//
-				
-				rollingAccuracyX.add( (float)rACount);
-				
-				float[] rATest 			= new float[rollingAccuracyTest.size()];
-				float[] rATrain 		= new float[rollingAccuracyTest.size()];
-				float[] basicProb 		= new float[rollingAccuracyTest.size()];
-
-				
-				float[] rAx 		= new float[rollingAccuracyTest.size()];
+				float[] rATest 				= new float[rollingAccuracyTest.size()];
+				float[] rATrain 			= new float[rollingAccuracyTest.size()];
+				float[] basicProb 			= new float[rollingAccuracyTest.size()];
+			
+				float[] rAx 				= new float[rollingAccuracyTest.size()];
 				for (int j=0;j<rATest.length;j++) {
 					rATest[j] 	= rollingAccuracyTest.get(j);
 					rATrain[j] 	= rollingAccuracyTrain.get(j);
@@ -400,42 +388,37 @@ public class SolverStart {
 					basicProb[j] = (float)prob*100; 
 				}
 				
-				// Basic Probability
-				
-				
-				
-				
+				// Plotting
 				UI.sp1D.setXY(rAx, rATrain, 13, Color.red, "Train", true, true, true);	
 				UI.sp1D.setXY(rAx, rATest, 13, Color.blue, "Validation", true, true, true);
 				UI.sp1D.setXY(rAx, basicProb, 13, Color.black, "random", false, true, false);
+				UI.sp1D.refreshPlot();
 
-					UI.sp1D.refreshPlot();
-
-					// Loadings
-					float[][] weight = new float[DS.numClasses][DS.numVars];
-					float[] wx = new float[DS.numVars];
-					for (int j=0;j<wx.length; j++) {
-						wx[j] = j+1;
-					}
-					for (int j=0;j<DS.freezs.size(); j++) {
-						MC_Freeze mc = DS.freezs.get(j);
-						int index = mc.targetColorIndex;
-						int index0 = Tools.getIndexOfTarget(index);
-						for (int p=0;p<Opts.numDims; p++) {
-							for (int a=0; a<mc.eigenVec.length;a++) {
-								weight[index0][a] += Math.abs(mc.eigenVec[a][p]);
-							}
+				// Loadings
+				float[][] weight = new float[DS.numClasses][DS.numVars];
+				float[] wx = new float[DS.numVars];
+				for (int j=0;j<wx.length; j++) {
+					wx[j] = j+1;
+				}
+				for (int j=0;j<DS.freezs.size(); j++) {
+					MC_Freeze mc = DS.freezs.get(j);
+					int index = mc.targetColorIndex;
+					int index0 = Tools.getIndexOfTarget(index);
+					for (int p=0;p<Opts.numDims; p++) {
+						for (int a=0; a<mc.eigenVec.length;a++) {
+							weight[index0][a] += Math.abs(mc.eigenVec[a][p]);
 						}
 					}
-					UI.sp2D.dats.clear();
-					for (int a=0; a<weight.length;a++) {
-						UI.sp2D.setXY(wx, weight[a], 12,  Tools.getClassColor(a), DS.classAllIndNme[a], true, true, true);
-					}
-					UI.sp2D.refreshPlot();
+				}
+				UI.sp2D.dats.clear();
+				for (int a=0; a<weight.length;a++) {
+					UI.sp2D.setXY(wx, weight[a], 12,  Tools.getClassColor(a), DS.classAllIndNme[a], true, true, true);
+				}
+				UI.sp2D.refreshPlot();
 			}
-		}
+		}			// Cycle Loop
 		
-				
+		
 		main.remove("model");
 		main.remove("FingerPrints");
 		for (int i=0;i<DS.freezs.size();i++) {
@@ -444,7 +427,6 @@ public class SolverStart {
 			main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
 		}
 		
-		//DS.setEnsemble(main);
 		new Classify();
 		
 		UI.proStatus.setValue(0);
@@ -470,7 +452,6 @@ public class SolverStart {
 		// https://github.com/nayuki/QR-Code-generator/tree/master
 		QrCode.Ecc errCorLvl = QrCode.Ecc.LOW;  // Error correction level
 		QrCode qr = QrCode.encodeText(text, errCorLvl);  // Make the QR Code symbol
-		
 		BufferedImage img = toImage(qr, 6, 3);          // Convert to bitmap image
 		return img;
 
@@ -496,7 +477,6 @@ public class SolverStart {
 	}
 	private static void fillStatistics(String type) {
 	
-		
 		//	FILL STATISTICS
 		Object[] row = new Object[16];
 		MC_Freeze mc = DS.freezs.get(DS.freezs.size()-1);
@@ -527,9 +507,7 @@ public class SolverStart {
 		row[15] 		= Tools.myRound(((float)(mc.tp_fp_tn_fn[0][1]+ mc.tp_fp_tn_fn[2][1]))/ ((float)(mc.tp_fp_tn_fn[0][1]+mc.tp_fp_tn_fn[1][1]+mc.tp_fp_tn_fn[2][1]+mc.tp_fp_tn_fn[3][1])),4);
 		
 		UI.tmtableValidation.addRow(row);
-		
 
-//		UI.heatMap.repaint();
 	}
 	public static void classify() {
 		new Classify();
@@ -556,15 +534,12 @@ public class SolverStart {
 		}
 		Tools.sumryAdd ("\n");
 		
-//		if ( DS.numClasses > 20) {
-//			Tools.sumryAdd ("\n");	
-//		}
-				
+
 		if ( DS.numClasses < 2) {
 			Tools.sumryAdd ("Low Class number, Training is not possible. ");
 			Tools.sumryAdd ("You can apply a previously saved enemble for classification. ");
 		}else {
-				
+	
 			Tools.sumryAdd ("*Feature listing: ");
 			Tools.sumryAdd ("\n");
 			
@@ -586,6 +561,8 @@ public class SolverStart {
 				ParetoScaleAvg[a] = avg;
 				ParetoScaleSd[a] = sd;
 			}
+			
+			
 			Tools.sumryAdd (Tools.txtLen("Feature") +"\t"+ Tools.txtLen("Average") + "\t" + Tools.txtLen("Standard Dev.")+ "\t" + Tools.txtLen("AUROC max") + "\n");
 			Tools.sumryAdd ("________________\t________________\t________________\t________________" + "\n");
 			Tools.sumryAdd ("\n");
@@ -631,17 +608,30 @@ public class SolverStart {
 			}
 			Tools.sumryAdd ("\n");
 		}
-//		if ( DS.numVars*20 > 500) {
-//			int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Auto adjust Options?</H3></HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-//			if ( erg == JOptionPane.YES_OPTION) {
-//				double nnn = (DS.numVars-10)/10;
-//				int val = (int)(1500*Runner.getSigmoid(nnn));
-//				Opts.noBetterStop = val;
-//				UI.txtOpts.setText(Opts.getOptsAsJson().toString(3));
-//				
+		
+		// FUN Digits out
+//		int size = 50;
+//		BufferedImage img = new BufferedImage(size*9,size*9,BufferedImage.TYPE_BYTE_GRAY);
+//		for (int sx=0;sx<size;sx++) {
+//			for (int sy=0;sy<size;sy++) {
+//				for (int i=0;i<8;i++) {
+//					for (int j=0;j<8;j++) {
+//						int val = (int)(DS.rawData[sx*size+sy][i*8+j]);
+//						if ( (val*15)<255)
+//							img.setRGB(sx*9+i, sy*9+j, new Color(val* 15,val* 15,val* 15).getRGB());
+//					}
+//				}
 //			}
-//			
 //		}
+//		File outputfile = new File("digits.png");
+//		try {
+//			ImageIO.write(img, "png", outputfile);
+//			System.out.println(outputfile.getAbsolutePath());
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
 	}
 
 	
@@ -763,6 +753,7 @@ public class SolverStart {
 	        DS.SampleNames = new String[noFiles];
 	        DS.classIndex = new int[noFiles];
 	        DS.ClassNames = new String[noFiles];
+	        DS.timeIndex 		= null;;
 	         
 	        if ( !hasHeader ) {
 	        	for (int i=0;i<noAreas; i++) {
@@ -906,11 +897,15 @@ public class SolverStart {
         			useArea[i] = true;
         		}
         	}
-	        
+        	
 	        // [Label rausschmeissen]
+        	int posTimeIndex = -1;
 	        for(int i=4;i<test.length;i++){
 	        	if ( test[i].toLowerCase().contains("[label]")) {
 	        		useArea[i-4] = false;
+	        		if (test[i].toLowerCase().contains("timeindex") && test[i].toLowerCase().contains("[label]" )){
+	        			posTimeIndex = i;
+	        		}
 	        	}else {
 	        		if ( useArea[i-4])
 	        			noAreas++;
@@ -922,12 +917,17 @@ public class SolverStart {
 	         if ( noFiles < 1 || noAreas < 1) fail = true;
 	         
 	         
-	         DS.usedAreas = useArea;
+	         DS.usedAreas 		= useArea;
 	         DS.rawData 		= new double[noFiles][noAreas];
 	         DS.AreaNames 		= new String[noAreas];
 	         DS.SampleNames 	= new String[noFiles];
 	         DS.classIndex 		= new int[noFiles];
 	         DS.ClassNames 		= new String[noFiles];
+	         if ( posTimeIndex >= 0) {
+	        	 DS.timeIndex 		= new double[noFiles];
+	         }else{
+	        	 DS.timeIndex 		= null;;
+	         }
 //	         DS.noTrainingSet	= new boolean[noFiles];
 	         //areaIsLabel = new boolean[noAreas];
      	
@@ -964,9 +964,18 @@ public class SolverStart {
 		        			    fail = true;
 		        			}
 			        		ac++;
+			        	}else {																//	import timeIndex is available 'timeindex[label]'
+			        		if ( j == posTimeIndex ) {
+			        			try {
+				        			DS.timeIndex[i-fstLine-1] = Double.parseDouble(tmp[j]);
+				        		}catch (NumberFormatException e) {
+				        			DS.timeIndex[i-fstLine-1] = 0;
+			        			    fail = true;
+			        			}
+			        		}
 			        	}
 			        }
-		        }else{
+		        }else{					// ! "//"
 		        	// TODO: Comment
 		        }
 		     }
@@ -975,9 +984,9 @@ public class SolverStart {
 	}
 	public void makeDataUp(int numClasses, int numData) {
 		
-        DS.rawData 		= new double[numClasses*numData][numData];
+        DS.rawData 			= new double[numClasses*numData][numData];
         DS.AreaNames 		= new String[numData];
-        DS.SampleNames 	= new String[numClasses*numData];
+        DS.SampleNames 		= new String[numClasses*numData];
         DS.classIndex 		= new int[numClasses*numData];
         DS.ClassNames 		= new String[numClasses*numData];
 		
