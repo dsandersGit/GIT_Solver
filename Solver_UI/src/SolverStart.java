@@ -122,11 +122,12 @@ public class SolverStart {
 	 * 113: UI.tableClassify Viewpoint improved
 	 * 114: Pref Selection QR Code
 	 * 115: Pan_Mining > LITE Visual Data Mining Feature for gradient and step detection + Option for Feature deactivation
+	 * 116: LITE Visual Data Mining Feature plus Average Line
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.3";
-	public static String 		revision 		= " 115";
+	public static String 		revision 		= " 116";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;

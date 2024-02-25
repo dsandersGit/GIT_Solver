@@ -77,7 +77,7 @@ public class Pan_Mining extends JComponent {
 		pan_Label.setBorder(BorderFactory.createTitledBorder("WHAT and WHY"));
 		String info = "<HTML>"
 				+ "<B>Visual Mining for potential gradients / steps that might indicate underlying bias.</B>"
-				+ " Bias will weaken the classification model. Untargeted classification using complex analytics or drifting sensors is prone to such bias."
+				+ " Bias will weaken the classification model. Untargeted classification using complex analytics or drifting sensors is prone to such bias when classes distribution is not randomized/alternating."
 				+ "<BR>Move through feature's scatter plot vs. time/sample_sequence using up/down or mouse wheel, seek for gradients and steps related to time or sequence. "
 				+ "(De-)Activate by checkbox or double click on plot > Deactivated Features are omitted in Training and Saving of data sets.<BR>"
 				+ "</HTML>";
@@ -198,7 +198,7 @@ public class Pan_Mining extends JComponent {
 		
 		chkActive.setSelected( DS.selectedArea[area] );
 
-		
+	
 		if ( area < 0 )area = 0;
 		if ( area > DS.numVars-1 )area = 0;
 		 scatterPlot.dats.clear();
@@ -225,6 +225,61 @@ public class Pan_Mining extends JComponent {
 			 
 			 scatterPlot.setXY(x, y, 12, cn, DS.classAllIndNme[c], true, false, false);
 		 }
+		 
+	 
+		 // Sort
+		 double distance = 0;
+		 ArrayList<Float> 	sortData 	= new ArrayList<Float>();
+    	 ArrayList<Integer> sortDataPos 	= new ArrayList<Integer>();
+    	 for (int i=0;i<DS.numSamples; i++) {
+    		 float data  = (float)(i);
+    		 if (DS.timeIndex != null && chkTimeIndex.isSelected()) data = (float)DS.timeIndex[i];
+         	boolean isIn = false;
+             for(int j=0;j<sortData.size();j++){									
+                 if ( sortData.get(j)>data) {
+                     sortData.add	(j, data);
+                     sortDataPos.add(j, i);
+                     isIn = true;
+                     break;
+                 }
+             }
+             if ( !isIn) {
+                 sortData.add(data);
+                 sortDataPos.add(i);
+             }
+    	 }
+    	
+    	 int step = DS.numSamples/15;
+    	 float c = 0;
+    	 double colX = 0;
+    	 double colY = 0;
+    	 ArrayList<Float> 	avgX 	= new ArrayList<Float>();
+    	 ArrayList<Float> 	avgY 	= new ArrayList<Float>();
+    	 for (int i=0;i<DS.numSamples; i++) {
+    		 int sortPos = sortDataPos.get(i);
+    		 c++;
+    		 if (DS.timeIndex != null && chkTimeIndex.isSelected()) {
+    			 colX += DS.timeIndex[sortPos];
+    		 }else {
+    			 colX += sortPos;
+    		 }
+    		 colY += DS.rawData[sortPos][area];
+    		 if ( c>step) {
+    			 avgX.add((float)(colX/c));
+    			 avgY.add((float)(colY/c));
+    			 colX=0;colY=0;
+    			 c=0;
+    		 }
+    	 }
+    	 float[] avgXPlot = new float[avgX.size()];
+    	 float[] avgYPlot = new float[avgY.size()];
+    	 for (int i=0;i<avgX.size(); i++) {
+    		 avgXPlot[i] = avgX.get(i);
+    		 avgYPlot[i] = avgY.get(i);
+//    		 System.out.println( avgXPlot[i]+"\t" + avgYPlot[i]);
+    	 }
+    	 scatterPlot.setXY(avgXPlot, avgYPlot, 12, Color.red, "Line", false, true, false);
+		 
 		 scatterPlot.setBaseColor(Color.black);
 		 scatterPlot.setOuterBackGroundColor(Color.WHITE);
 		 if ( !DS.selectedArea[area] ) {
@@ -232,6 +287,7 @@ public class Pan_Mining extends JComponent {
 			 scatterPlot.setOuterBackGroundColor(Color.LIGHT_GRAY);
 		 }
 		 scatterPlot.refreshPlot();
+		 
 	}
 }
 
@@ -715,6 +771,11 @@ class SP_MiningCanvas extends JPanel{
 			  }
 		
 		// LINES
+		Stroke strokeOld = g2.getStroke();
+		Stroke stroke = new BasicStroke(1,
+	    	    BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
+	    	    new float[] { 4, 4 }, 0);
+		g2.setStroke(stroke);
 		  for(int i = 0;i<dats.size();i++){
 			  SP_PlotData pd = dats.get(i);
 			  if(pd.showLines){
@@ -738,6 +799,7 @@ class SP_MiningCanvas extends JPanel{
 				  }
 			  }
 		  }
+		  g2.setStroke(strokeOld);
 		if(show0){
 			float sdash[] = { 2.0f };
 			  g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT,
