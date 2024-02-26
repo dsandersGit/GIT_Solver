@@ -206,25 +206,7 @@ public class Pan_Mining extends JComponent {
 		 scatterPlot.setYAxis(DS.AreaNames[area]);
 		 scatterPlot.setXAxis("Sequence");
 		 if (DS.timeIndex != null && chkTimeIndex.isSelected()) scatterPlot.setXAxis("TimeIndex"); 
-		 for (int c=0;c<DS.numClasses;c++) {
-			 float[] x = new float[DS.classAllIndPop[c]];
-			 float[] y = new float[DS.classAllIndPop[c]];
-			 int cnt = 0;
-			 for (int i=0;i<DS.numSamples; i++) {
-				 if ( DS.classIndex[i]== DS.classAllIndices[c]) {
-					 if (DS.timeIndex == null || !chkTimeIndex.isSelected()) {
-						 x[cnt] = (float)i;
-					 }else {
-						 x[cnt] = (float)DS.timeIndex[i];
-					 }
-					 y[cnt] = (float)DS.rawData[i][area];
-					 cnt++;	 
-				 }
-			 }
-			 cn = Tools.getClassColor(Classify.getTargetColorIndexPos(DS.classAllIndices[c]));
-			 
-			 scatterPlot.setXY(x, y, 12, cn, DS.classAllIndNme[c], true, false, false);
-		 }
+
 		 
 		 // Sort
 		 ArrayList<Float> 	sortDataX 	= new ArrayList<Float>();									// SORTING
@@ -264,6 +246,41 @@ public class Pan_Mining extends JComponent {
                  sortDataPosY.add(i);
              }
     	 }
+    	 float[] scoreInt = new float[DS.numClasses];
+    	 int scoreAll = 0;
+    	 for(int j=0;j<sortDataY.size();j++){
+    		 int theClass = DS.classIndex[ sortDataPosY.get(j)];
+    		 int theClass012 = Classify.getTargetColorIndexPos (theClass); 
+    		 scoreInt[theClass012] += j;
+    		 scoreAll += j;
+    	 }
+//    	 System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - ");
+    	 for (int i=0;i<DS.numClasses;i++) {
+    		 scoreInt[i] = scoreInt[i]/ DS.classAllIndPop[i];
+    		 scoreInt[i] = 100 * scoreInt[i]/DS.numSamples;
+//    		 System.out.println(i+"\t"+scoreInt[i]);
+    	 }
+    	 
+    	 // Dots
+		 for (int c=0;c<DS.numClasses;c++) {
+			 float[] x = new float[DS.classAllIndPop[c]];
+			 float[] y = new float[DS.classAllIndPop[c]];
+			 int cnt = 0;
+			 for (int i=0;i<DS.numSamples; i++) {
+				 if ( DS.classIndex[i]== DS.classAllIndices[c]) {
+					 if (DS.timeIndex == null || !chkTimeIndex.isSelected()) {
+						 x[cnt] = (float)i;
+					 }else {
+						 x[cnt] = (float)DS.timeIndex[i];
+					 }
+					 y[cnt] = (float)DS.rawData[i][area];
+					 cnt++;	 
+				 }
+			 }
+			 cn = Tools.getClassColor(Classify.getTargetColorIndexPos(DS.classAllIndices[c]));
+			 
+			 scatterPlot.setXY(x, y, 12, cn, DS.classAllIndNme[c], (int)scoreInt[c], true, false, false);
+		 }
     	 
 //    	 // Spearman's rank correlation coefficient
 //    	 double p = 0;double num = 0;
@@ -301,7 +318,7 @@ public class Pan_Mining extends JComponent {
     		 if (c>0)avgY[i] /= c;
 //    		 System.out.println(i+"\t"+avgX[i]+"\t"+avgY[i]);
     	 }	 
-    	 scatterPlot.setXY(avgX, avgY, 12, Color.red, "Line", false, true, false);
+    	 scatterPlot.setXY(avgX, avgY, 12, Color.BLACK, "^ Scores",0, false, true, false);
     	 
     	 
 //    	 int step = DS.numSamples/15;																// AVG Line
@@ -641,6 +658,10 @@ class SP_MiningCanvas extends JPanel{
 		dats.add(new SP_PlotData(x,y, size,col,name,ShowDots,ShowLines,Dots3D));
 		//refreshPlot();
 	}
+	public void setXY(float[] x, float[] y, int size,Color col,String name, int labelWidth,boolean ShowDots, boolean ShowLines, boolean Dots3D){
+		dats.add(new SP_PlotData(x,y, size,col,name, labelWidth,ShowDots,ShowLines,Dots3D));
+		//refreshPlot();
+	}
 	public void setXY(float[] x, float[] y, boolean[] ok, int size,Color col,String name,boolean ShowDots, boolean ShowLines, boolean Dots3D){
 		dats.add(new SP_PlotData(x,y,ok, size,col,name,ShowDots,ShowLines,Dots3D));
 		refreshPlot();
@@ -698,7 +719,7 @@ class SP_MiningCanvas extends JPanel{
 		
 		Ymin=(float) (Ymin - (Ymax-Ymin)*0.1);
 		Ymax=(float) (Ymax + (Ymax-Ymin)*0.1);
-		xmin=(float) (xmin - (xmax-xmin)*0.05); 
+		xmin=(float) (xmin - (xmax-xmin)*0.15); 
 		
 		if ( Ymin == Ymax) {
 			Ymin = Ymin - 1;
@@ -907,10 +928,10 @@ class SP_MiningCanvas extends JPanel{
 			if(pd.label!=null) {					//;pd.label="";
 	  		 	g.setColor(pd.col);
 	  		 	//g.fill3DRect((int)w+shiftLeft+8, this.getHeight()-(int)h+(i*(height+3))+shiftTop+9, height, height, true);
-	  		 	g.fill3DRect(shiftLeft+8, this.getHeight()-(int)h+(c*(height+3))+shiftTop+9, height, height, true);
+	  		 	g.fill3DRect(shiftLeft+8, this.getHeight()-(int)h+(c*(height+3))+shiftTop+9, pd.labelWidth, height, true);
 				g.setColor(baseCol);
 //				g.drawString(pd.label, (int)w+shiftLeft+8+height+5, this.getHeight()-(int)h+(i*(height+3))+shiftTop+height+6);
-				g.drawString(pd.label, shiftLeft+8+height+5, this.getHeight()-(int)h+(c*(height+3))+shiftTop+height+6);
+				g.drawString(pd.label, shiftLeft+8+pd.labelWidth+5, this.getHeight()-(int)h+(c*(height+3))+shiftTop+height+6);
 				c++;
 			}
 		}

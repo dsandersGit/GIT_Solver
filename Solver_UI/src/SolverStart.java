@@ -124,11 +124,12 @@ public class SolverStart {
 	 * 115: Pan_Mining > LITE Visual Data Mining Feature for gradient and step detection + Option for Feature deactivation
 	 * 116: LITE Visual Data Mining Feature plus Average Line
 	 * 117: LITE Visual Data Mining Feature plus Average Line
+	 * 118: Visual Check with score label bars
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.3";
-	public static String 		revision 		= " 116";
+	public static String 		revision 		= " 118";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;
