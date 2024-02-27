@@ -109,6 +109,58 @@ public class Tools {
         
         return erg;
     }
+	static double[] calculateAuroc(int area) {
+		 // Equations: https://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test
+		
+		
+       	ArrayList<Double> 	sortData 	= new ArrayList<Double>();
+      	 	ArrayList<Integer> sortDataCol 	= new ArrayList<Integer>();
+       	for(int f=0;f<DS.numSamples;f++){                                             // FILES
+           	double data = DS.rawData [f][area];
+           	int classIndex = Tools.getIndexOfTarget(DS.classIndex[f]);
+           	boolean isIn = false;
+               for(int j=0;j<sortData.size();j++){										// SORT
+                   if ( sortData.get(j)>data) {
+                       sortData.add	(j, data);
+                       sortDataCol.add(j, classIndex);
+                       isIn = true;
+                       break;
+                   }
+               }
+               if ( !isIn) {
+                   sortData.add(data);
+                   sortDataCol.add(classIndex);
+               }
+       	}
+//      
+       
+       	int[] sum 	= new int[DS.numClasses];	// Sum of ranks per ClassIndex
+       	int[] count = new int[DS.numClasses];	// Sum of samples per ClassIndex
+       	int countAll = sortData.size();
+       	for(int i=0;i<sortData.size();i++){
+       		sum		[sortDataCol.get(i)] 	+= (i+1);
+       		count	[sortDataCol.get(i)] 	++	;
+       	}
+       	double AUROC =0 ;double U = 0;
+       	double AurocMax = 0;int pos = 0;
+       	double[] AUROC_List = new double[DS.numClasses];
+       	for (int i=0;i<DS.numClasses;i++) {
+       		if (count[i]>0) {
+       			U 		= sum[i] - (count[i]*(count[i]+1)/2.);
+       			AUROC	= U / (count[i]*(countAll-count[i]));
+       			if ( AUROC < 0.5 )AUROC = 1-AUROC;
+       			AUROC_List[i] = AUROC;
+//       			System.out.println(i+"\t"+AUROC);
+       		}
+       		if ( AurocMax < AUROC ) {
+       			AurocMax = AUROC;
+       			pos = i;
+       		}
+       	}
+
+		
+		return AUROC_List;
+	}
 	static double[][] calculateAurocs() {
 		 // Equations: https://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test
 		double[][] aurocs = new double[DS.numVars][2];

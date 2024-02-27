@@ -1162,8 +1162,8 @@ class SP_PlotData{
 	float[] ydat = null;
 	float[] xdat = null;
 	boolean[] ok = null;
-	int labelWidth = 8;
-	
+	int labStart = 0;
+	int labStop = dotSize;
 	
 	Color col = Color.white;
 	Color[] cols = null;
@@ -1208,7 +1208,7 @@ class SP_PlotData{
 		showLines = ShowLines;
 		showDots = ShowDots;
 	}
-	public SP_PlotData(float[] Xdat,float[] Ydat, int dS ,Color Col, String Label, int labWidth, boolean ShowDots, boolean ShowLines, boolean Dots3D){
+	public SP_PlotData(float[] Xdat,float[] Ydat, int dS ,Color Col, String Label, int labstart, int labstop, boolean ShowDots, boolean ShowLines, boolean Dots3D){
 		xdat = Xdat;
 		ydat = Ydat;
 		ok = new boolean [Xdat.length];
@@ -1221,7 +1221,8 @@ class SP_PlotData{
 		dots3D = Dots3D;
 		showLines = ShowLines;
 		showDots = ShowDots;
-		labelWidth = labWidth; 
+		labStart = labstart;
+		labStop = labstop;
 	}
 	public int getRows(){
 		return xdat.length;

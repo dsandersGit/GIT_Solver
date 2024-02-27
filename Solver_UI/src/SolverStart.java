@@ -125,6 +125,7 @@ public class SolverStart {
 	 * 116: LITE Visual Data Mining Feature plus Average Line
 	 * 117: LITE Visual Data Mining Feature plus Average Line
 	 * 118: Visual Check with score label bars
+	 * 119; AUROC OFF, wrong estimations (same value ranking), Status correct num features, Mining Line limited to 1000, Mining Labels AVG+-STD
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
@@ -549,20 +550,16 @@ public class SolverStart {
 			double[] ParetoScaleAvg	= new double[DS.numVars];										// AVG and SD
 			double[] ParetoScaleSd	= new double[DS.numVars];
 			double[][] aurocs = null;
-			if ( DS.numVars < 100 && DS.numSamples < 500) aurocs = Tools.calculateAurocs();
+			//if ( DS.numVars < 100 && DS.numSamples < 500) aurocs = Tools.calculateAurocs();
 			for(int a = 0;a<DS.numVars;a++){
 				double[] vals = new double[DS.numSamples];
-				double avg = 0;
-				double c = 0;
 				for(int f = 0;f<DS.numSamples;f++){
 					vals[f] = 	DS.rawData[f][a];
-					avg+=		DS.rawData[f][a];
-					c++;
 				}
-				double sd = Tools.calculateSD(vals)[1];
-				avg /= c;
-				ParetoScaleAvg[a] = avg;
-				ParetoScaleSd[a] = sd;
+				double[] sd = Tools.calculateSD(vals);
+				
+				ParetoScaleAvg[a] = sd[0];
+				ParetoScaleSd[a] = sd[1];
 			}
 			
 			

@@ -207,66 +207,94 @@ public class Pan_Mining extends JComponent {
 		 scatterPlot.setXAxis("Sequence");
 		 if (DS.timeIndex != null && chkTimeIndex.isSelected()) scatterPlot.setXAxis("TimeIndex"); 
 
+		 if ( DS.numSamples < 1000) {
+			 // Sort
+			 ArrayList<Float> 	sortDataX 	= new ArrayList<Float>();									// SORTING
+	    	 ArrayList<Integer> sortDataPosX 	= new ArrayList<Integer>();
+	    	 for (int i=0;i<DS.numSamples; i++) {
+	    		 float data  = (float)(i);
+	    		 if (DS.timeIndex != null && chkTimeIndex.isSelected()) data = (float)DS.timeIndex[i];
+	         	 boolean isIn = false;
+	             for(int j=0;j<sortDataX.size();j++){									
+	                 if ( sortDataX.get(j)>=data) {
+	                     sortDataX.add	(j, data);
+	                     sortDataPosX.add(j, i);
+	                     isIn = true;
+	                     break;
+	                 }
+	             }
+	             if ( !isIn) {
+	                 sortDataX.add(data);
+	                 sortDataPosX.add(i);
+	             }
+	    	 }
+	    	 double min = 0;
+	    	 double max = 0;
+	    	 ArrayList<Float> 	sortDataY 	= new ArrayList<Float>();									// SORTING
+	    	 ArrayList<Integer> sortDataPosY 	= new ArrayList<Integer>();
+	    	 for (int i=0;i<DS.numSamples; i++) {
+	    		 float data  = (float)DS.rawData[i][area];
+	    		 boolean isIn = false;
+	             for(int j=0;j<sortDataY.size();j++){									
+	                 if ( sortDataY.get(j)>=data) {
+	                     sortDataY.add	(j, data);
+	                     sortDataPosY.add(j, i);
+	                     isIn = true;
+	                     break;
+	                 }
+	             }
+	             if ( !isIn) {
+	                 sortDataY.add(data);
+	                 sortDataPosY.add(i);
+	             }
+	             if ( i==0 | min > data) min = data;
+	             if ( i==0 | max < data) max = data;
+	    	 }
+	    	 
+
+			
+	    	 float[] 	avgX 	= new float[DS.numSamples];								// Rolling Average
+	    	 float[] 	avgY 	= new float[DS.numSamples];
+	    	 for (int i=0;i<DS.numSamples; i++) {
+	    		 int sortPos = sortDataPosX.get(i);
+	    		 int c=0;
+	    		 for (int t=i-3;t<i+4;t++) {
+	    			 if ( t>-1 && t<DS.numSamples) {
+			    		 if (DS.timeIndex != null && chkTimeIndex.isSelected()) {
+			    			 avgX[i] += sortDataX.get(t);
+			    		 }else {
+			    			 avgX[i] += t;
+			    		 }
+			    		 c++;
+	    			 }
+	    		 }
+	    		 if (c>0)avgX[i] /= c;
+	    		 c=0;;
+	    		 for (int t=i-3;t<i+4;t++) {
+	    			 if ( t>-1 &&t<DS.numSamples) {
+		    			 avgY[i] += DS.rawData[sortDataPosX.get(t)][area];
+			    		 c++;
+	    			 }
+	    		 }
+	    		 if (c>0)avgY[i] /= c;
+	    	 }	 
+	    	 scatterPlot.setXY(avgX, avgY, 12, Color.BLACK, "...",0,0, false, true, false);
+	    	 scatterPlot.refreshPlot();
+	    	 
+		 }	// max 1000
 		 
-		 // Sort
-		 ArrayList<Float> 	sortDataX 	= new ArrayList<Float>();									// SORTING
-    	 ArrayList<Integer> sortDataPosX 	= new ArrayList<Integer>();
-    	 for (int i=0;i<DS.numSamples; i++) {
-    		 float data  = (float)(i);
-    		 if (DS.timeIndex != null && chkTimeIndex.isSelected()) data = (float)DS.timeIndex[i];
-         	 boolean isIn = false;
-             for(int j=0;j<sortDataX.size();j++){									
-                 if ( sortDataX.get(j)>=data) {
-                     sortDataX.add	(j, data);
-                     sortDataPosX.add(j, i);
-                     isIn = true;
-                     break;
-                 }
-             }
-             if ( !isIn) {
-                 sortDataX.add(data);
-                 sortDataPosX.add(i);
-             }
-    	 }
-    	 ArrayList<Float> 	sortDataY 	= new ArrayList<Float>();									// SORTING
-    	 ArrayList<Integer> sortDataPosY 	= new ArrayList<Integer>();
-    	 for (int i=0;i<DS.numSamples; i++) {
-    		 float data  = (float)DS.rawData[i][area];
-    		 boolean isIn = false;
-             for(int j=0;j<sortDataY.size();j++){									
-                 if ( sortDataY.get(j)>=data) {
-                     sortDataY.add	(j, data);
-                     sortDataPosY.add(j, i);
-                     isIn = true;
-                     break;
-                 }
-             }
-             if ( !isIn) {
-                 sortDataY.add(data);
-                 sortDataPosY.add(i);
-             }
-    	 }
-    	 float[] scoreInt = new float[DS.numClasses];
-    	 int scoreAll = 0;
-    	 for(int j=0;j<sortDataY.size();j++){
-    		 int theClass = DS.classIndex[ sortDataPosY.get(j)];
-    		 int theClass012 = Classify.getTargetColorIndexPos (theClass); 
-    		 scoreInt[theClass012] += j;
-    		 scoreAll += j;
-    	 }
-//    	 System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - ");
-    	 for (int i=0;i<DS.numClasses;i++) {
-    		 scoreInt[i] = scoreInt[i]/ DS.classAllIndPop[i];
-    		 scoreInt[i] = 100 * scoreInt[i]/DS.numSamples;
-//    		 System.out.println(i+"\t"+scoreInt[i]);
-    	 }
     	 
+
     	 // Dots
+		 double max = 0;double min = 0; 
 		 for (int c=0;c<DS.numClasses;c++) {
 			 float[] x = new float[DS.classAllIndPop[c]];
 			 float[] y = new float[DS.classAllIndPop[c]];
 			 int cnt = 0;
+			 
 			 for (int i=0;i<DS.numSamples; i++) {
+				 if ( max < DS.rawData[i][area]) max = DS.rawData[i][area];
+				 if ( min > DS.rawData[i][area] || i==0) min = DS.rawData[i][area];
 				 if ( DS.classIndex[i]== DS.classAllIndices[c]) {
 					 if (DS.timeIndex == null || !chkTimeIndex.isSelected()) {
 						 x[cnt] = (float)i;
@@ -278,82 +306,47 @@ public class Pan_Mining extends JComponent {
 				 }
 			 }
 			 cn = Tools.getClassColor(Classify.getTargetColorIndexPos(DS.classAllIndices[c]));
+			 double[] avg_atd = Tools.calculateSD(y);
+			 int start = (int)(100*(avg_atd[0]-avg_atd[1]-min)/(max-min));
+			 int stop = (int)(100*(avg_atd[0]+avg_atd[1]-min)/(max-min));
+			 scatterPlot.setXY(x, y, 12, cn, DS.classAllIndNme[c],start,stop, true, false, false);
 			 
-			 scatterPlot.setXY(x, y, 12, cn, DS.classAllIndNme[c], (int)scoreInt[c], true, false, false);
-		 }
-    	 
-//    	 // Spearman's rank correlation coefficient
-//    	 double p = 0;double num = 0;
-//    	 for (int i=0;i<sortDataY.size();i++) {
-////    		 System.out.println(sortDataPosX.get(i)+"\t"+sortDataPosY.get(i));
-//    		 p += Math.pow(sortDataPosX.get(i)-sortDataPosY.get(i),2);
-//    		 num ++;
-//    	 }
-//    	 scatterPlot.setTitle("Spearman correlation: " + Tools.myRound(( 1.-6.*p/(num*(Math.pow(num,2)-1))),3));
+		 } 
 
-
-    	 float[] 	avgX 	= new float[DS.numSamples];								// Rolling Average
-    	 float[] 	avgY 	= new float[DS.numSamples];
-    	 for (int i=0;i<DS.numSamples; i++) {
-    		 int sortPos = sortDataPosX.get(i);
-    		 int c=0;
-    		 for (int t=i-3;t<i+4;t++) {
-    			 if ( t>-1 && t<DS.numSamples) {
-		    		 if (DS.timeIndex != null && chkTimeIndex.isSelected()) {
-		    			 avgX[i] += sortDataX.get(t);
-		    		 }else {
-		    			 avgX[i] += t;
-		    		 }
-		    		 c++;
-    			 }
-    		 }
-    		 if (c>0)avgX[i] /= c;
-    		 c=0;;
-    		 for (int t=i-3;t<i+4;t++) {
-    			 if ( t>-1 &&t<DS.numSamples) {
-	    			 avgY[i] += DS.rawData[sortDataPosX.get(t)][area];
-		    		 c++;
-    			 }
-    		 }
-    		 if (c>0)avgY[i] /= c;
-//    		 System.out.println(i+"\t"+avgX[i]+"\t"+avgY[i]);
-    	 }	 
-    	 scatterPlot.setXY(avgX, avgY, 12, Color.BLACK, "^ Scores",0, false, true, false);
     	 
-    	 
-//    	 int step = DS.numSamples/15;																// AVG Line
-//    	 float c = 0;
-//    	 double colX = 0;
-//    	 double colY = 0;
-//    	 ArrayList<Float> 	avgX 	= new ArrayList<Float>();
-//    	 ArrayList<Float> 	avgY 	= new ArrayList<Float>();
-//    	 for (int i=0;i<DS.numSamples; i++) {
-//    		 int sortPos = sortDataPosX.get(i);
-//    		 c++;
-//    		 if (DS.timeIndex != null && chkTimeIndex.isSelected()) {
-//    			 colX += DS.timeIndex[sortPos];
-//    		 }else {
-//    			 colX += sortPos;
-//    		 }
-//    		 colY += DS.rawData[sortPos][area];
-//    		 if ( c>step) {
-//    			 avgX.add((float)(colX/c));
-//    			 avgY.add((float)(colY/c));
-//    			 colX=0;colY=0;
-//    			 c=0;
-//    		 }
+//    	 
+//    	 // HISTOGRAM
+//    	 float[][] histo = new float[DS.numClasses][100];
+//    	 for (int f=0;f<DS.numSamples; f++) {
+//    		 int 		cls 	= Classify.getTargetColorIndexPos(DS.classIndex[sortDataPosY.get(f)]);
+//    		 int 		val	 	= (int) ((100* (sortDataY.get(f)-min))/(max-min));
+//             if ( val > -1 && val <100) {
+//            	 histo[cls][val]+=10;
+//             }
+//             if ( val-1 > -1 && val <100) {
+//            	 histo[cls][val-1]+=3;
+//             }
+//             if ( val-2 > -1 && val <100) {
+//            	 histo[cls][val-2]+=1;
+//             }
+//             if ( val > -1 && val+1 <100) {
+//            	 histo[cls][val+1]+=3;
+//             }
+//             if ( val > -1 && val+2 <100) {
+//            	 histo[cls][val+2]+=1;
+//             }
 //    	 }
-//    	 float[] avgXPlot = new float[avgX.size()];
-//    	 float[] avgYPlot = new float[avgY.size()];
-//    	 for (int i=0;i<avgX.size(); i++) {
-//    		 avgXPlot[i] = avgX.get(i);
-//    		 avgYPlot[i] = avgY.get(i);
-////    		 System.out.println( avgXPlot[i]+"\t" + avgYPlot[i]);
+//    	 float[] hx = new float[100];
+//    	 for (float f=0;f<100; f++) {
+//    		 hx[(int)f] = (float) ((f/100.) * (max-min)+min);
 //    	 }
-//    	 scatterPlot.setXY(avgXPlot, avgYPlot, 12, Color.red, "Line", false, true, false);
-    	 
-    	
-		
+//    	 for (int c=0;c<DS.numClasses;c++) {
+//    		 cn = Tools.getClassColor(Classify.getTargetColorIndexPos(DS.classAllIndices[c]));
+//    		 scatterPlot.setXY( histo[c],hx, 12, cn, DS.classAllIndNme[c], false, true, false);
+//    	 }
+//    	 
+//  
+//		
 		 
 		 scatterPlot.setBaseColor(Color.black);
 		 scatterPlot.setOuterBackGroundColor(Color.WHITE);
@@ -658,8 +651,8 @@ class SP_MiningCanvas extends JPanel{
 		dats.add(new SP_PlotData(x,y, size,col,name,ShowDots,ShowLines,Dots3D));
 		//refreshPlot();
 	}
-	public void setXY(float[] x, float[] y, int size,Color col,String name, int labelWidth,boolean ShowDots, boolean ShowLines, boolean Dots3D){
-		dats.add(new SP_PlotData(x,y, size,col,name, labelWidth,ShowDots,ShowLines,Dots3D));
+	public void setXY(float[] x, float[] y, int size,Color col,String name, int labstart, int labstop,boolean ShowDots, boolean ShowLines, boolean Dots3D){
+		dats.add(new SP_PlotData(x,y, size,col,name, labstart, labstop,ShowDots,ShowLines,Dots3D));
 		//refreshPlot();
 	}
 	public void setXY(float[] x, float[] y, boolean[] ok, int size,Color col,String name,boolean ShowDots, boolean ShowLines, boolean Dots3D){
@@ -851,19 +844,23 @@ class SP_MiningCanvas extends JPanel{
 		
 		// LINES
 		Stroke strokeOld = g2.getStroke();
-		Stroke stroke = new BasicStroke(1,
-	    	    BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
-	    	    new float[] { 4, 4 }, 0);
-		g2.setStroke(stroke);
+		Stroke stroke = new BasicStroke(1,	    BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,  	    new float[] { 4, 4 }, 0);
+		
 		  for(int i = 0;i<dats.size();i++){
 			  SP_PlotData pd = dats.get(i);
 			  if(pd.showLines){
 				  g.setColor(pd.col);
+				  if ( pd.label.equals("...")) {
+					  g2.setStroke(stroke);
+				  }else {
+					  g2.setStroke(strokeOld);
+				  }
 				  if(activeData != i && activeData>-1) g.setColor(Color.LIGHT_GRAY);
 				  for(int x = 1; x < pd.xdat.length;x++){
 					  if(pd.ok[x] && pd.ok[x-1])
 					  g.drawLine(getX(pd.xdat[x]),getY(pd.ydat[x]),getX(pd.xdat[x-1]),getY(pd.ydat[x-1]));
 				  }
+				  
 			  }
 		  }
 		
@@ -928,10 +925,10 @@ class SP_MiningCanvas extends JPanel{
 			if(pd.label!=null) {					//;pd.label="";
 	  		 	g.setColor(pd.col);
 	  		 	//g.fill3DRect((int)w+shiftLeft+8, this.getHeight()-(int)h+(i*(height+3))+shiftTop+9, height, height, true);
-	  		 	g.fill3DRect(shiftLeft+8, this.getHeight()-(int)h+(c*(height+3))+shiftTop+9, pd.labelWidth, height, true);
+	  		 	g.fill3DRect(shiftLeft+8+pd.labStart, this.getHeight()-(int)h+(c*(height+3))+shiftTop+9, pd.labStop-pd.labStart, height, true);
 				g.setColor(baseCol);
 //				g.drawString(pd.label, (int)w+shiftLeft+8+height+5, this.getHeight()-(int)h+(i*(height+3))+shiftTop+height+6);
-				g.drawString(pd.label, shiftLeft+8+pd.labelWidth+5, this.getHeight()-(int)h+(c*(height+3))+shiftTop+height+6);
+				g.drawString(pd.label, shiftLeft+8+ pd.labStop+5, this.getHeight()-(int)h+(c*(height+3))+shiftTop+height+6);
 				c++;
 			}
 		}

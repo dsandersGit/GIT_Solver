@@ -461,9 +461,15 @@ public class UI {
 		if ( DS.numClasses < 2) {
 			noData = true;
 		}
-		labVars.setText("Features: " + DS.numVars);
+//		labVars.setText("Features: " + DS.numVars);
+		int cnt = 0;
+		for (int i=0;i<DS.numVars;i++) {
+			if ( DS.selectedArea[i] ) cnt++;	
+		}
+		labVars.setText("Features: " + cnt);
 		labSamples.setText("Samples: " + DS.numSamples);
 		labClasses.setText("Classes: " + DS.numClasses);
+		
 		if ( DS.js_Ensemble != null) {
 			ensMatchData = true;
 			String[] ensVarNames = Tools.getvarNamesFromEnsemble ( );
