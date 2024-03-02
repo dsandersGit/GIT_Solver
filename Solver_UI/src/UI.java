@@ -122,8 +122,8 @@ public class UI {
 	public static 		JTextArea txtOpts 			= new JTextArea();
 	public static 		JTextArea txtClassify		= new JTextArea();
 	static 				JScrollPane scTxtClassify	= new JScrollPane(txtClassify);
-	public static 		JTextArea txtEnsemble 		= new JTextArea();
-	static 				JScrollPane scEnsemble		= new JScrollPane(txtEnsemble);
+//	public static 		JTextArea txtEnsemble 		= new JTextArea();
+//	static 				JScrollPane scEnsemble		= new JScrollPane(txtEnsemble);
 	public static 		JTextArea txtSummary 		= new JTextArea();
 	static 				JScrollPane scSummary		= new JScrollPane(txtSummary);
 	public static 		ThreeDee tab3D = new ThreeDee();
@@ -204,12 +204,12 @@ public class UI {
 		ThreeDee.genBackColor 	=	 SolverStart.backColor;
 		ThreeDee.genFrontColor 	= SolverStart.frontColor;
 		tab3D.setOpaque(true);
-	
-		txtEnsemble.setOpaque(false);
-		txtEnsemble.setEditable(false);
-		txtEnsemble.setBackground(SolverStart.backColor);
-		txtEnsemble.setForeground(SolverStart.frontColor);
-		txtEnsemble.setFont(new Font("Consolas", Font.PLAIN, 12));
+//	
+//		txtEnsemble.setOpaque(false);
+//		txtEnsemble.setEditable(false);
+//		txtEnsemble.setBackground(SolverStart.backColor);
+//		txtEnsemble.setForeground(SolverStart.frontColor);
+//		txtEnsemble.setFont(new Font("Consolas", Font.PLAIN, 12));
 		
 		txtSummary.setOpaque(false);
 		txtSummary.setLineWrap(true);
@@ -232,8 +232,9 @@ public class UI {
 		maintabbed.add("Trends", panTrends);
 		maintabbed.add("Classification", pan_classify);
 		maintabbed.addTab("3D",tab3D);
-		maintabbed.add("Ensemble",scEnsemble);
+//		maintabbed.add("Ensemble",scEnsemble);
 		maintabbed.add("Algorithm", iconAlgo);
+		maintabbed.add("Ensemble",new EnsembleTree());
 		
 		tab_Summary 	= 0;
 		tab_spMining	= 1;
@@ -337,6 +338,7 @@ public class UI {
 			SolverStart.doShuffle = true;
 		}});
 		labStatusIcon = new JLabel(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
+		labStatusIcon.setToolTipText("Ensemble Readiness");
 		
 		panL.add(proNoBetterStop);
 		panL.add(labRun);
@@ -1377,8 +1379,9 @@ public class UI {
 		UI.txtClassify.setText("");
 		
 		if ( DS.js_Ensemble != null ) {
+			EnsembleTree.putEnsemble("Imported", "N/A", DS.js_Ensemble);
 			Classify.setOptions();
-			UI.txtEnsemble.setText(DS.js_Ensemble.toString(3));
+//			UI.txtEnsemble.setText(DS.js_Ensemble.toString(3));
 		}
 		
 	}

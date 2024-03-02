@@ -39,6 +39,7 @@ public class DS {
 	public static float[] 		sepaY 	= null;
 	
 	public static JSONObject	js_Ensemble		= null;
+	public static int			selected		= 0;
 	
 	//public static String 	    TP_FP_TN_FN		= null;
 	
@@ -79,13 +80,9 @@ public class DS {
 	
 	
 	public DS () {
-		
-		
-		
+
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
-		
 		if ( AreaNames == null) System.out.println("AreaNames is null");
-		
 		DS.numVars 	= AreaNames.length;
 		DS.numSamples = SampleNames.length;
 		
@@ -147,6 +144,7 @@ public class DS {
 		
 		// ***
 		Pan_Mining.init();
+		
 	}
 	private static void bootsStrapp(int bsBoost, int bsSet) {
 		/*
@@ -407,6 +405,7 @@ public class DS {
 	
 	public static void setEnsemble ( JSONObject ens) {
 		js_Ensemble = ens;
+	
 		UI.refreshStatus();
 	}
 	

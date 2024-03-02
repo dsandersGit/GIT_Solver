@@ -381,7 +381,7 @@ public class Tools {
 		DS.setEnsemble(main);
 		if ( DS.js_Ensemble != null ) {
 			Classify.setOptions();
-			UI.txtEnsemble.setText(DS.js_Ensemble.toString(3));
+//			UI.txtEnsemble.setText(DS.js_Ensemble.toString(3));
 		}
 	}
 	static double getSpearman_Rank_Correlation(double[] x, double[] y){

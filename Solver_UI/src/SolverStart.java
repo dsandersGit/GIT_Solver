@@ -126,11 +126,12 @@ public class SolverStart {
 	 * 117: LITE Visual Data Mining Feature plus Average Line
 	 * 118: Visual Check with score label bars
 	 * 119; AUROC OFF, wrong estimations (same value ranking), Status correct num features, Mining Line limited to 1000, Mining Labels AVG+-STD
+	 * 120: Ensemble-Tree
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.3";
-	public static String 		revision 		= " 118";
+	public static String 		revision 		= " 120";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;
@@ -255,7 +256,7 @@ public class SolverStart {
 		UI.sp2D.dats.clear();
 		UI.sp2D.refreshPlot();
 		UI.menuFile.setEnabled(false);
-		UI.txtEnsemble.setText("");
+//		UI.txtEnsemble.setText("");
 		UI.tmtableValidation.setRowCount(0);
 		UI.txtClassify.setText("");
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));	// UI button color
@@ -435,8 +436,12 @@ public class SolverStart {
 		
 		UI.proStatus.setValue(0);
 		DS.setEnsemble(main);
-		UI.txtEnsemble.setText(main.toString(3));
+//		UI.txtEnsemble.setText(main.toString(3));
+		EnsembleTree.putEnsemble(UI.labAccuracy.getText(), UI.txtClassify.getText(), main);
 		UI.labTimePerRun.setText("Process: ---");
+		UI.labAccuracy.setText("Process: ---");
+		UI.labRun.setText("Process: ---");
+		
 	    UI.menuFile.setEnabled(true);
 	    isRunning = false;
 	    UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colGreen.png")));
