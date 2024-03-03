@@ -493,12 +493,12 @@ class LogStreamReader implements Runnable {
         UI.tabPCA3D.setPreLine(-3*max,0,0, true, 0, 0, 255);
         UI.tabPCA3D.setPreLine(3*max,0,0, true, 0, 0, 255);
 
-//        float val =  (float) MultiVariate_R.eigenValuesPercental[0];
-//        UI.tabPCA3D.setText(max, max, -max,  "PC_1 ["+ SinglePCA.myRound(val,1)+"%]");
-//        val = (float) (MultiVariate_R.eigenValuesPercental[1]);
-//        UI.tabPCA3D.setText(-max, -max, -max,  "PC_2 ["+ SinglePCA.myRound(val,1)+"%]");
-//        val = (float) (MultiVariate_R.eigenValuesPercental[2]);
-//        UI.tabPCA3D.setText(-max, max, max, "PC_3 ["+ SinglePCA.myRound(val,1)+"%]");
+        float val =  (float) MultiVariate_R.eigenValuesPercental[0];
+        UI.tabPCA3D.setText(max, max, -max,  "PC_1 ["+ Tools.myRound(val,1)+"%]");
+        val = (float) (MultiVariate_R.eigenValuesPercental[1]);
+        UI.tabPCA3D.setText(-max, -max, -max,  "PC_2 ["+ Tools.myRound(val,1)+"%]");
+        val = (float) (MultiVariate_R.eigenValuesPercental[2]);
+        UI.tabPCA3D.setText(-max, max, max, "PC_3 ["+ Tools.myRound(val,1)+"%]");
         
         UI.tabPCA3D.set2DText(10, 20, "Scale: -"+max+" - "+max );
         
