@@ -1,5 +1,4 @@
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -9,21 +8,16 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 
 public class SolverStart {
@@ -127,11 +121,12 @@ public class SolverStart {
 	 * 118: Visual Check with score label bars
 	 * 119; AUROC OFF, wrong estimations (same value ranking), Status correct num features, Mining Line limited to 1000, Mining Labels AVG+-STD
 	 * 120: Ensemble-Tree
+	 * 121: Batch Processing
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.3";
-	public static String 		revision 		= " 120";
+	public static String 		revision 		= " 121";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;
@@ -212,7 +207,12 @@ public class SolverStart {
 		}
 		
 		defOptions = Opts.getOptsAsJson();					// save default startup options
-		new UI();
+		 SwingUtilities.invokeLater(new Runnable() {
+	            public void run() {
+	            	new UI();
+	            }
+	        });
+		
 		UI.loadEnsemble(true);
 		
 		if(args.length>0 && args[0].endsWith(".dat")){
@@ -238,224 +238,242 @@ public class SolverStart {
 			DS.variableID = args[1]; 
 
 	}
-	public static void trainPattern() throws IOException {
+	public static void trainPattern(int batchSize) throws IOException {
 
-		// populates with running the accuracy of train / test results
-		ArrayList<Float> rollingAccuracyTest = new ArrayList<Float>();
-		ArrayList<Float> rollingAccuracyTrain = new ArrayList<Float>();
-		ArrayList<Float> rollingAccuracyX = new ArrayList<Float>();
-
-		int rACount = 0;													// running counter
-		immediateStop = false;												// flag for user interrupting current training session
-		isRunning = true;													// flag for running current training session
-		
-		// cleaning UI stuff
-		UI.labAccuracy.setText("Accuracy: ---");
-		UI.sp1D.dats.clear();
-		UI.sp1D.refreshPlot();
-		UI.sp2D.dats.clear();
-		UI.sp2D.refreshPlot();
-		UI.menuFile.setEnabled(false);
-//		UI.txtEnsemble.setText("");
-		UI.tmtableValidation.setRowCount(0);
-		UI.txtClassify.setText("");
-		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));	// UI button color
-		//72: Train/Test change only cycle wise
-		
-		// Basic probability of classification based on class number and population (two equal classes same population = 50% of random correct draw)
-		double prob = 0;
-		for (int c=0;c<DS.numClasses;c++) {
-			prob += (double)DS.classAllIndPop[c] * ((double)DS.classAllIndPop[c] / (double)DS.numSamples);
-		}
-		prob /= (double) DS.numSamples; 
-		
-		DS.normParas = Tools.doNormData ();	// 85
-		
-		UI.labTimePerRun.setText("Process: THIS MIGHT TAKE SOME TIME");
-		UI.refreshStatus();													// fills status and determines user interface UI options 
-		Runner.cleanRunner();												// reset Runner > training session module
-		
-		StringBuffer out 						= new StringBuffer();
-		DateTimeFormatter dtf 					= DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-	    LocalDateTime now 						= LocalDateTime.now();
-	    
-		// Preparing Ensemble JSON
-		JSONObject QRmain 						= new JSONObject();
-		JSONObject main 						= new JSONObject();
-		main.put("creator"						, SolverStart.app + SolverStart.appAdd + " r" + SolverStart.revision);
-		out.append(								Opts.getOptsAsJson().toString(3));
-		out.append(								DS.getDSsAsJson().toString(3));
-		main.put("Opts"							, Opts.getOptsAsJson());
-		main.put("DS"							, DS.getDSsAsJson());
-	    main.put("DateOfCreation"				, ""+dtf.format(now));
-	    main.put("ObjectType"					, "ML_Ensemble");
-	    main.put("ObjectVersion"				, "01.00"); 
-	    main.put("Support"						,"N/A");
-		QRmain.put("creator"					, SolverStart.app + SolverStart.appAdd );
-		QRmain.put("Date"						, ""+dtf.format(now));
-	    
-	    
-		// Time / run estimation
-	    long 	tme 							= System.currentTimeMillis();
-		long 	tmeStart 						= System.currentTimeMillis();
-		double 	tmeCount 						= 0;
-		double 	timeSum 						= 0;
-		int 	cycles 							= Opts.numCycles*DS.numClasses;
-		double 	avgTime 						= 0;
-		
-		// Activation Equation selection
-		boolean activationIsDst 				= false;
-		boolean activationBoth 					= false;
-		if ( Opts.activation.equals("DxA") )	activationIsDst = true;		
-		if ( Opts.activation.equals("D+A") )	activationBoth = true;
-
-
-		for (int i=0;i<Opts.numCycles;i++) {
-			//72: Train/Test change only cycle wise
-			//75: Fixed Trainset Init moved from DS to SolverStart
-			if ( !Opts.fixTrainSet || i==0) DS.getFixedTrainSet();									// fetch the (initial) training set
-			UI.proStatus.setValue(100*i/Opts.numCycles);
-			for (int j=0;j<DS.classAllIndices.length;j++) {
-				if ( !SolverStart.immediateStop ) {	
-					if ( activationBoth) {
-						new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],false);
-						if ( DS.freezs.size() > 0) {
-							long currTime = ((System.currentTimeMillis()-tme));
-							tmeCount++;
-							timeSum+=currTime;
-							avgTime =  (timeSum/(1000*tmeCount));
-							UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
-							tme = System.currentTimeMillis();
-							if ( !SolverStart.immediateStop ) fillStatistics("D+A > A");
-						}
-						new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],true);
-						if ( DS.freezs.size() > 0) {
-							long currTime = ((System.currentTimeMillis()-tme));
-							tmeCount++;
-							timeSum+=currTime;
-							avgTime =  (timeSum/(1000*tmeCount));
-							UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
-							tme = System.currentTimeMillis();
-							if ( !SolverStart.immediateStop ) fillStatistics("D+A > DxA");
-						}
-						
-					}else {
-						new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],activationIsDst);
-						if ( DS.freezs.size() > 0) {
-							long currTime = ((System.currentTimeMillis()-tme));
-							tmeCount++;
-							timeSum+=currTime;
-							avgTime =  (timeSum/(1000*tmeCount));
-							UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
-							tme = System.currentTimeMillis();
-							if ( !SolverStart.immediateStop )
-								if ( activationIsDst) {
-									fillStatistics("DxA");
-								}else {
-									fillStatistics("A");
-								}
-						}
+		for (int batch = 0;batch < batchSize;batch++) {
+			// populates with running the accuracy of train / test results
+			ArrayList<Float> rollingAccuracyTest = new ArrayList<Float>();
+			ArrayList<Float> rollingAccuracyTrain = new ArrayList<Float>();
+			ArrayList<Float> rollingAccuracyX = new ArrayList<Float>();
 	
-					}
-										
-				}
-
-				
-			}
-			// Cycle wise Classification
-			// 73
-			if ( !SolverStart.immediateStop && Opts.showDevelopment) {	
-				UI.sp1D.dats.clear();
-				main.remove("model");
-				main.remove("FingerPrints");
-				for (int j=0;j<DS.freezs.size();j++) {
-					JSONObject modl = DS.freezs.get(j).getModelAsJson();
-					main.append("model", modl);
-					main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
-				}
-	
-				DS.setEnsemble(main);
-				new Classify();
-				rACount++;
-				rollingAccuracyTest.add		((float)	Classify.accuracyTest);
-				rollingAccuracyTrain.add	((float)	Classify.accuracyTrain);
-				rollingAccuracyX.add		((float)	rACount);
-				
-				float[] rATest 				= new float[rollingAccuracyTest.size()];
-				float[] rATrain 			= new float[rollingAccuracyTest.size()];
-				float[] basicProb 			= new float[rollingAccuracyTest.size()];
+			int rACount = 0;													// running counter
+			immediateStop = false;												// flag for user interrupting current training session
+			isRunning = true;													// flag for running current training session
 			
-				float[] rAx 				= new float[rollingAccuracyTest.size()];
-				for (int j=0;j<rATest.length;j++) {
-					rATest[j] 	= rollingAccuracyTest.get(j);
-					rATrain[j] 	= rollingAccuracyTrain.get(j);
-					rAx[j] 	= rollingAccuracyX.get(j);
-					basicProb[j] = (float)prob*100; 
+			// cleaning UI stuff
+			UI.labAccuracy.setText("Accuracy: ---");
+			UI.sp1D.dats.clear();
+			UI.sp1D.refreshPlot();
+			UI.sp2D.dats.clear();
+			UI.sp2D.refreshPlot();
+			UI.menuFile.setEnabled(false);
+	//		UI.txtEnsemble.setText("");
+			UI.tmtableValidation.setRowCount(0);
+			UI.txtClassify.setText("");
+			UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));	// UI button color
+			//72: Train/Test change only cycle wise
+			
+			// Basic probability of classification based on class number and population (two equal classes same population = 50% of random correct draw)
+			double prob = 0;
+			for (int c=0;c<DS.numClasses;c++) {
+				prob += (double)DS.classAllIndPop[c] * ((double)DS.classAllIndPop[c] / (double)DS.numSamples);
+			}
+			prob /= (double) DS.numSamples; 
+			
+			DS.normParas = Tools.doNormData ();	// 85
+			
+			UI.labTimePerRun.setText("Process: THIS MIGHT TAKE SOME TIME");
+			UI.refreshStatus();													// fills status and determines user interface UI options 
+			Runner.cleanRunner();												// reset Runner > training session module
+			
+			StringBuffer out 						= new StringBuffer();
+			DateTimeFormatter dtf 					= DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+		    LocalDateTime now 						= LocalDateTime.now();
+		    
+			// Preparing Ensemble JSON
+			JSONObject QRmain 						= new JSONObject();
+			JSONObject main 						= new JSONObject();
+			main.put("creator"						, SolverStart.app + SolverStart.appAdd + " r" + SolverStart.revision);
+			out.append(								Opts.getOptsAsJson().toString(3));
+			out.append(								DS.getDSsAsJson().toString(3));
+			main.put("Opts"							, Opts.getOptsAsJson());
+			main.put("DS"							, DS.getDSsAsJson());
+		    main.put("DateOfCreation"				, ""+dtf.format(now));
+		    main.put("ObjectType"					, "ML_Ensemble");
+		    main.put("ObjectVersion"				, "01.00"); 
+		    main.put("Support"						,"N/A");
+			QRmain.put("creator"					, SolverStart.app + SolverStart.appAdd );
+			QRmain.put("Date"						, ""+dtf.format(now));
+		    
+		    
+			// Time / run estimation
+		    long 	tme 							= System.currentTimeMillis();
+			long 	tmeStart 						= System.currentTimeMillis();
+			double 	tmeCount 						= 0;
+			double 	timeSum 						= 0;
+			int 	cycles 							= Opts.numCycles*DS.numClasses;
+			double 	avgTime 						= 0;
+			
+			// Activation Equation selection
+			boolean activationIsDst 				= false;
+			boolean activationBoth 					= false;
+			if ( Opts.activation.equals("DxA") )	activationIsDst = true;		
+			if ( Opts.activation.equals("D+A") )	activationBoth = true;
+	
+	
+			for (int i=0;i<Opts.numCycles;i++) {
+				//72: Train/Test change only cycle wise
+				//75: Fixed Trainset Init moved from DS to SolverStart
+				if ( !Opts.fixTrainSet || i==0) DS.getFixedTrainSet();									// fetch the (initial) training set
+				UI.proStatus.setValue(100*i/Opts.numCycles);
+				for (int j=0;j<DS.classAllIndices.length;j++) {
+					if ( !SolverStart.immediateStop ) {	
+						if ( activationBoth) {
+							new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],false);
+							if ( DS.freezs.size() > 0) {
+								long currTime = ((System.currentTimeMillis()-tme));
+								tmeCount++;
+								timeSum+=currTime;
+								avgTime =  (timeSum/(1000*tmeCount));
+								UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
+								tme = System.currentTimeMillis();
+								if ( !SolverStart.immediateStop ) fillStatistics("D+A > A");
+							}
+							new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],true);
+							if ( DS.freezs.size() > 0) {
+								long currTime = ((System.currentTimeMillis()-tme));
+								tmeCount++;
+								timeSum+=currTime;
+								avgTime =  (timeSum/(1000*tmeCount));
+								UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
+								tme = System.currentTimeMillis();
+								if ( !SolverStart.immediateStop ) fillStatistics("D+A > DxA");
+							}
+							
+						}else {
+							new Runner(DS.classAllIndices[j],DS.classAllIndNme[j],activationIsDst);
+							if ( DS.freezs.size() > 0) {
+								long currTime = ((System.currentTimeMillis()-tme));
+								tmeCount++;
+								timeSum+=currTime;
+								avgTime =  (timeSum/(1000*tmeCount));
+								UI.labTimePerRun.setText("Process: "+((System.currentTimeMillis()-tmeStart)/1000) + "/"+ Tools.myRound(avgTime*cycles,1)+"[s]");
+								tme = System.currentTimeMillis();
+								if ( !SolverStart.immediateStop )
+									if ( activationIsDst) {
+										fillStatistics("DxA");
+									}else {
+										fillStatistics("A");
+									}
+							}
+		
+						}
+											
+					}else {
+						cleanUI();
+						UI.refreshStatus();
+						return;
+					}
+	
+					
 				}
+				// Cycle wise Classification
+				// 73
+				if ( !SolverStart.immediateStop && Opts.showDevelopment) {	
+					UI.sp1D.dats.clear();
+					main.remove("model");
+					main.remove("FingerPrints");
+					for (int j=0;j<DS.freezs.size();j++) {
+						JSONObject modl = DS.freezs.get(j).getModelAsJson();
+						main.append("model", modl);
+						main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
+					}
+		
+					DS.setEnsemble(main);
+					new Classify();
+					rACount++;
+					rollingAccuracyTest.add		((float)	Classify.accuracyTest);
+					rollingAccuracyTrain.add	((float)	Classify.accuracyTrain);
+					rollingAccuracyX.add		((float)	rACount);
+					
+					float[] rATest 				= new float[rollingAccuracyTest.size()];
+					float[] rATrain 			= new float[rollingAccuracyTest.size()];
+					float[] basicProb 			= new float[rollingAccuracyTest.size()];
 				
-				// Plotting
-				UI.sp1D.setXY(rAx, rATrain, 13, Color.red, "Train", true, true, true);	
-				UI.sp1D.setXY(rAx, rATest, 13, Color.blue, "Validation", true, true, true);
-				UI.sp1D.setXY(rAx, basicProb, 13, Color.black, "random", false, true, false);
-				UI.sp1D.refreshPlot();
-
-				// Loadings
-				float[][] weight = new float[DS.numClasses][DS.numVars];
-				float[] wx = new float[DS.numVars];
-				for (int j=0;j<wx.length; j++) {
-					wx[j] = j+1;
-				}
-				for (int j=0;j<DS.freezs.size(); j++) {
-					MC_Freeze mc = DS.freezs.get(j);
-					int index = mc.targetColorIndex;
-					int index0 = Tools.getIndexOfTarget(index);
-					for (int p=0;p<Opts.numDims; p++) {
-						for (int a=0; a<mc.eigenVec.length;a++) {
-							weight[index0][a] += Math.abs(mc.eigenVec[a][p]);
+					float[] rAx 				= new float[rollingAccuracyTest.size()];
+					for (int j=0;j<rATest.length;j++) {
+						rATest[j] 	= rollingAccuracyTest.get(j);
+						rATrain[j] 	= rollingAccuracyTrain.get(j);
+						rAx[j] 	= rollingAccuracyX.get(j);
+						basicProb[j] = (float)prob*100; 
+					}
+					
+					// Plotting
+					UI.sp1D.setXY(rAx, rATrain, 13, Color.red, "Train", true, true, true);	
+					UI.sp1D.setXY(rAx, rATest, 13, Color.blue, "Validation", true, true, true);
+					UI.sp1D.setXY(rAx, basicProb, 13, Color.black, "random", false, true, false);
+					UI.sp1D.refreshPlot();
+	
+					// Loadings
+					float[][] weight = new float[DS.numClasses][DS.numVars];
+					float[] wx = new float[DS.numVars];
+					for (int j=0;j<wx.length; j++) {
+						wx[j] = j+1;
+					}
+					for (int j=0;j<DS.freezs.size(); j++) {
+						MC_Freeze mc = DS.freezs.get(j);
+						int index = mc.targetColorIndex;
+						int index0 = Tools.getIndexOfTarget(index);
+						for (int p=0;p<Opts.numDims; p++) {
+							for (int a=0; a<mc.eigenVec.length;a++) {
+								weight[index0][a] += Math.abs(mc.eigenVec[a][p]);
+							}
 						}
 					}
+					UI.sp2D.dats.clear();
+					for (int a=0; a<weight.length;a++) {
+						UI.sp2D.setXY(wx, weight[a], 12,  Tools.getClassColor(a), DS.classAllIndNme[a], true, true, true);
+					}
+					UI.sp2D.refreshPlot();
 				}
-				UI.sp2D.dats.clear();
-				for (int a=0; a<weight.length;a++) {
-					UI.sp2D.setXY(wx, weight[a], 12,  Tools.getClassColor(a), DS.classAllIndNme[a], true, true, true);
-				}
-				UI.sp2D.refreshPlot();
+			}			// Cycle Loop
+			
+			
+			main.remove("model");
+			main.remove("FingerPrints");
+			for (int i=0;i<DS.freezs.size();i++) {
+				JSONObject modl = DS.freezs.get(i).getModelAsJson();
+				main.append("model", modl);
+				main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
 			}
-		}			// Cycle Loop
-		
-		
-		main.remove("model");
-		main.remove("FingerPrints");
-		for (int i=0;i<DS.freezs.size();i++) {
-			JSONObject modl = DS.freezs.get(i).getModelAsJson();
-			main.append("model", modl);
-			main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
-		}
-		
-		new Classify();
-		
+			
+			new Classify();
+			
+			
+			DS.setEnsemble(main);
+	//		UI.txtEnsemble.setText(main.toString(3));
+			EnsembleTree.putEnsemble(UI.labAccuracy.getText(), UI.txtClassify.getText(), main);
+			cleanUI();
+//			UI.proStatus.setValue(0);
+//			UI.labTimePerRun.setText("Process: ---");
+//			UI.labAccuracy.setText("Process: ---");
+//			UI.labRun.setText("Process: ---");
+//		    UI.menuFile.setEnabled(true);
+//		    isRunning = false;
+//		    UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colGreen.png")));
+//		    
+		   
+		    UI.refreshStatus();
+		    
+		    
+		    //111
+		    if (UI.menuActionChk_QR.isSelected()) {
+			    String txtReceipt = QRmain.toString()+"\n"+Classify.confMatrixout.toString();
+			    txtReceipt += "\nFP: " + Tools.getFingerPrint(txtReceipt);
+			    BufferedImage image = generateBarCode(txtReceipt);
+			    JLabel picLabel = new JLabel(new ImageIcon(image));
+			    JOptionPane.showMessageDialog(null, picLabel, "Receipt", JOptionPane.PLAIN_MESSAGE, null);
+		    }
+		} // batch
+	}
+	private static void cleanUI() {
 		UI.proStatus.setValue(0);
-		DS.setEnsemble(main);
-//		UI.txtEnsemble.setText(main.toString(3));
-		EnsembleTree.putEnsemble(UI.labAccuracy.getText(), UI.txtClassify.getText(), main);
 		UI.labTimePerRun.setText("Process: ---");
 		UI.labAccuracy.setText("Process: ---");
 		UI.labRun.setText("Process: ---");
-		
 	    UI.menuFile.setEnabled(true);
 	    isRunning = false;
 	    UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colGreen.png")));
-	    UI.refreshStatus();
-	    
-	    
-	    //111
-	    if (UI.menuActionChk_QR.isSelected()) {
-		    String txtReceipt = QRmain.toString()+"\n"+Classify.confMatrixout.toString();
-		    txtReceipt += "\nFP: " + Tools.getFingerPrint(txtReceipt);
-		    BufferedImage image = generateBarCode(txtReceipt);
-		    JLabel picLabel = new JLabel(new ImageIcon(image));
-		    JOptionPane.showMessageDialog(null, picLabel, "Receipt", JOptionPane.PLAIN_MESSAGE, null);
-	    }
 	}
 	private static BufferedImage generateBarCode(String text) throws IOException {
 		// https://github.com/nayuki/QR-Code-generator/tree/master

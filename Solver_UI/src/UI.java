@@ -92,11 +92,14 @@ public class UI {
 	static JMenuItem 			menuActionClassify = new JMenuItem(" Classify"); 
 	static JMenuItem 			menuActionTrainImmediateStop = new JMenuItem(" Stop Training Now");
 	
-	static JMenuItem 			menuActionTrain = new JMenuItem(" Train"); 
+	static JMenuItem 			menuActionTrain = new JMenuItem(" Train");
+	static JMenuItem 			menuActionBatchTrain = new JMenuItem(" Train Batch"); 
 	static JMenuItem 			menuFileSaveEnsemble = new JMenuItem(" Save Ensemble"); 
 	static JMenuItem 			menuFileLoadEnsemble = new JMenuItem(" Load Ensemble"); 
 	static JMenuItem 			menuActionOptions = new JMenuItem(" Algorithm Options");
 	static JCheckBoxMenuItem 	menuActionChk_QR = new JCheckBoxMenuItem(" QR-Receipt",true);
+	static JCheckBoxMenuItem 	menuActionChk_Jump = new JCheckBoxMenuItem(" Jump to Live",true);
+	
 	static JMenu 				menuExport = new JMenu( " Export");
 	static JMenuItem 			menuFileSplitData = new JMenuItem(" Split Data");
 	static JMenuItem 			menuFileSaveData = new JMenuItem(" Save Data");  
@@ -312,6 +315,7 @@ public class UI {
 	    prefs = Preferences.userRoot().node("Solver");
 		//114
 		menuActionChk_QR.setSelected(prefs.getBoolean("menuActionChk_QR", true));
+		menuActionChk_Jump.setSelected(prefs.getBoolean("menuActionChk_Jump", true));
 		refreshStatus();
 	
 	}
@@ -442,6 +446,7 @@ public class UI {
 		jbTrain.setEnabled(true);
 		jbClassify.setEnabled(true);
 		menuActionTrain.setEnabled(true);
+		menuActionBatchTrain.setEnabled(true);
 		menuActionClassify.setEnabled(true);
 		menuActionOptions.setEnabled(true);
 		jb_Stop.setEnabled(false);
@@ -505,6 +510,7 @@ public class UI {
 			jbTrain.setEnabled(false);
 			jbClassify.setEnabled(false);
 			menuActionTrain.setEnabled(false);
+			menuActionBatchTrain.setEnabled(false);
 			menuActionClassify.setEnabled(false);
 		}
 		if ( isRunning ) {
@@ -517,6 +523,7 @@ public class UI {
 			jbSaveEns.setEnabled(false);
 			jbTrain.setEnabled(false);
 			menuActionTrain.setEnabled(false);
+			menuActionBatchTrain.setEnabled(false);
 			jb_Stop.setEnabled(true);
 			jB_Skip.setEnabled(true);
 			jB_Shuffle.setEnabled(true);
@@ -693,38 +700,38 @@ public class UI {
 	            return this;
 	        }
 	    });
-		tableValidation.addMouseListener(new MouseAdapter() {
-
-	          public void mouseReleased(MouseEvent e){
-	        	  if(e.getModifiers()!=InputEvent.BUTTON3_MASK) return;
-	        	  int selCount = tableValidation.getSelectedRows().length;
-	        	  JPopupMenu inPOP = new JPopupMenu();
-	        	  JMenuItem item=null;
-	        	  item = new JMenuItem("Delete selected models");
-	        	  if(selCount==0)item.setEnabled(false);
-	        	  inPOP.add(item);
-				  item.addActionListener(new ActionListener(){
-					  public void actionPerformed(ActionEvent e) {
-						  boolean[] killList = new boolean [DS.freezs.size()];
-						  for (int j= DS.freezs.size()-1;j>=0;j--) {
-								if(tableValidation.isRowSelected(j)) {
-									killList[j] = true;
-								}else {
-									killList[j] = false;
-								}
-						  }
-						  for (int j= DS.freezs.size()-1;j>=0;j--) {
-							  if ( killList[j] ) {
-								  DS.freezs.remove(j);
-								  tmtableValidation.removeRow(j);
-							  }
-						  }
-						  Tools.compileModels();
-						  tableValidation.repaint();
-					  }});
-				  inPOP.show(e.getComponent(), e.getX(), e.getY());
-	          	}
-	      });
+//		tableValidation.addMouseListener(new MouseAdapter() {						// 121
+//
+//	          public void mouseReleased(MouseEvent e){
+//	        	  if(e.getModifiers()!=InputEvent.BUTTON3_MASK) return;
+//	        	  int selCount = tableValidation.getSelectedRows().length;
+//	        	  JPopupMenu inPOP = new JPopupMenu();
+//	        	  JMenuItem item=null;
+//	        	  item = new JMenuItem("Delete selected models");
+//	        	  if(selCount==0)item.setEnabled(false);
+//	        	  inPOP.add(item);
+//				  item.addActionListener(new ActionListener(){
+//					  public void actionPerformed(ActionEvent e) {
+//						  boolean[] killList = new boolean [DS.freezs.size()];
+//						  for (int j= DS.freezs.size()-1;j>=0;j--) {
+//								if(tableValidation.isRowSelected(j)) {
+//									killList[j] = true;
+//								}else {
+//									killList[j] = false;
+//								}
+//						  }
+//						  for (int j= DS.freezs.size()-1;j>=0;j--) {
+//							  if ( killList[j] ) {
+//								  DS.freezs.remove(j);
+//								  tmtableValidation.removeRow(j);
+//							  }
+//						  }
+//						  Tools.compileModels();
+//						  tableValidation.repaint();
+//					  }});
+//				  inPOP.show(e.getComponent(), e.getX(), e.getY());
+//	          	}
+//	      });
 	}
 	
 	private JToolBar getControlToolBar(){
@@ -746,7 +753,7 @@ public class UI {
 			if (SolverStart.isRunning) {
 				SolverStart.immediateStop = true;
 			}else {
-				train();
+				train(1);
 			}
 		}});
 		jbLoadEns.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
@@ -807,6 +814,7 @@ public class UI {
 		// ---------------------------------------------------------------------		
 		menuAction.add(menuActionTrain);
 		menuActionTrain.setAccelerator(KeyStroke.getKeyStroke('T',InputEvent.CTRL_DOWN_MASK));
+		menuAction.add(menuActionBatchTrain);																					// 121
 		menuAction.add(menuActionTrainImmediateStop);
 		menuActionTrainImmediateStop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CANCEL, InputEvent.CTRL_DOWN_MASK));
 		menuAction.add(new JSeparator());
@@ -815,6 +823,8 @@ public class UI {
 		// ---------------------------------------------------------------------
 		menuSettings.add(menuActionOptions);
 		menuSettings.add(menuActionChk_QR);
+		menuSettings.add(menuActionChk_Jump);
+		
 		// ---------------------------------------------------------------------
 		
 		JMenuItem menuExportVectors = new JMenuItem(" Vectors"); 
@@ -1033,7 +1043,17 @@ public class UI {
 		
 		
 		menuActionTrain.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
-			train();
+			train(1);
+		}});
+		menuActionBatchTrain.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
+			String erg = JOptionPane.showInputDialog("Enter batch size");
+			if (erg==null)return;
+			int batchSize = 0;
+			try {
+				batchSize = Integer.parseInt(erg);
+			}catch(NumberFormatException ee){
+	        }
+			train(batchSize);
 		}});
 		menuActionOptions.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
 			JPanel pan = new JPanel();
@@ -1072,6 +1092,12 @@ public class UI {
 		    prefs = Preferences.userRoot().node("Solver");
 			prefs.putBoolean("menuActionChk_QR", menuActionChk_QR.isSelected());
 		}});
+		menuActionChk_Jump.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
+			Preferences prefs;
+		    prefs = Preferences.userRoot().node("Solver");
+			prefs.putBoolean("menuActionChk_Jump", menuActionChk_Jump.isSelected());
+		}});
+		
 		menuActionClassify.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 			///maintabbed.setSelectedIndex(tab_Classify);
 			SolverStart.classify();
@@ -1263,7 +1289,7 @@ public class UI {
 	}
 	
 	
-	private static void train() {
+	private static void train(int batchSize) {
 		DS.js_Ensemble = null;
 		
 		DS.freezs.clear();
@@ -1277,18 +1303,23 @@ public class UI {
 		Runner.cleanRunner ();
 		tmtableClassify.setColumnCount(0);
 		tmtableClassify.setRowCount(0);
-		maintabbed.setSelectedIndex(tab_Live);
+		if ( menuActionChk_Jump.isSelected() ) maintabbed.setSelectedIndex(tab_Live);
 		//jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+SolverStart.dataFileName+"]");
 		jF.setTitle(SolverStart.app+SolverStart.appAdd+" ["+DS.fileName+"]");
 		
 		refreshStatus();
-		
+//		try {
+//			SolverStart.trainPattern();
+//		} catch (IOException e) {
+//
+//			e.printStackTrace();
+//		}
 			Thread thread = new Thread(new Runnable()
 			{
 			   public void run()
 			   {
 				   try {
-				   SolverStart.trainPattern();
+				   SolverStart.trainPattern(batchSize);
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
@@ -1379,7 +1410,7 @@ public class UI {
 		UI.txtClassify.setText("");
 		
 		if ( DS.js_Ensemble != null ) {
-			EnsembleTree.putEnsemble("Imported", "N/A", DS.js_Ensemble);
+			EnsembleTree.putEnsemble("Imported: "+f.getName(), "N/A", DS.js_Ensemble);
 			Classify.setOptions();
 //			UI.txtEnsemble.setText(DS.js_Ensemble.toString(3));
 		}

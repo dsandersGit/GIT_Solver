@@ -112,7 +112,7 @@ public class EnsembleTree extends JComponent
 		   	}
 	    	 
 	    	// REchte Maustaste
-	    	if(e.getButton() == java.awt.event.MouseEvent.BUTTON3) {
+	    	if(e.getButton() == java.awt.event.MouseEvent.BUTTON3) {									
     			
     			JPopupMenu inPOP = new JPopupMenu();
         		JMenuItem item=null;
@@ -123,6 +123,7 @@ public class EnsembleTree extends JComponent
 				// --------------------------------------------------------------------------	    		        		
         		JLabel jLtmp = new JLabel("<html><b>ENSEMBLE</b>"); //$NON-NLS-1$
         		inPOP.add(jLtmp);
+        		inPOP.addSeparator();
         		item = new JMenuItem("Set Active");
         		inPOP.add(item);
         		item.setEnabled(true);
@@ -132,6 +133,7 @@ public class EnsembleTree extends JComponent
 		                }
 				   });
 
+				   inPOP.addSeparator();  
         		item = new JMenuItem("Remove");
         		inPOP.add(item);
         		item.setEnabled(true);
@@ -140,7 +142,14 @@ public class EnsembleTree extends JComponent
 					    	clearEns(pos); 
 		                }
 				   });
-			
+				   item = new JMenuItem("Remove All");										// 121
+	        		inPOP.add(item);
+	        		item.setEnabled(true);
+					   item.addActionListener(new ActionListener(){
+						   public void actionPerformed(ActionEvent e) {
+						    	clearEns(-1); 
+			                }
+					   });
 			  
 				inPOP.show(e.getComponent(), e.getX(), e.getY());
 			
@@ -179,9 +188,15 @@ public class EnsembleTree extends JComponent
 		
     }
     private static void clearEns(int i) {
-    	ensembles.remove(i);
-    	enLabels.remove(i);
-    	enSummaries.remove(i);
+    	if (i>=0) {
+	    	ensembles.remove(i);
+	    	enLabels.remove(i);
+	    	enSummaries.remove(i);
+    	}else {
+    		ensembles.clear();
+	    	enLabels.clear();
+	    	enSummaries.clear();
+    	}
     	putEnsemble(null,null,null);
     }
 
