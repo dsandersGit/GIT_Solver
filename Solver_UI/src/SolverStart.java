@@ -123,11 +123,12 @@ public class SolverStart {
 	 * 120: Ensemble-Tree
 	 * 121: Batch Processing
 	 * 122: new UI()
+	 * 123: PCA support vis 'The R Project for Statistical Computing'
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.3";
-	public static String 		revision 		= " 122";
+	public static String 		revision 		= " 123";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;

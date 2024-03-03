@@ -16,8 +16,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -40,7 +38,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -113,6 +110,7 @@ public class UI {
 	static int tab_Summary = 0;
 	static int tab_Statistics = 0;
 	static int tab_spMining = 0;
+	static int tab_PCA = 9;
 	
 	public static 		JTabbedPane maintabbed 		= new JTabbedPane();
 	public static 		SP_PlotCanvas sp 			= new SP_PlotCanvas();
@@ -130,6 +128,7 @@ public class UI {
 	public static 		JTextArea txtSummary 		= new JTextArea();
 	static 				JScrollPane scSummary		= new JScrollPane(txtSummary);
 	public static 		ThreeDee tab3D = new ThreeDee();
+	public static 		ThreeDee tabPCA3D = new ThreeDee();
 	static 				JLabel iconAlgo = new Icon_Solver();
 	static 				JLabel iconClassify = null;
 	
@@ -238,6 +237,8 @@ public class UI {
 //		maintabbed.add("Ensemble",scEnsemble);
 		maintabbed.add("Algorithm", iconAlgo);
 		maintabbed.add("Ensemble",new EnsembleTree());
+		maintabbed.add("PCA",tabPCA3D);
+		
 		
 		tab_Summary 	= 0;
 		tab_spMining	= 1;
@@ -248,6 +249,7 @@ public class UI {
 		tab_3D 			= 6;
 		tab_ensemble	= 8;
 		tab_Algo		= 7;
+		tab_PCA			= 9;
 
 //		tab_Opts 		= 1;
 		
@@ -266,6 +268,29 @@ public class UI {
 		        	imageIcon = new ImageIcon(newimg);  // transform it back
 
 		        	iconAlgo.setIcon(imageIcon);
+		        }
+		        if ( index == tab_PCA) {
+		        	int cnt = 0;
+		        	for (int a=0;a<DS.numVars;a++) {
+		        		if ( DS.selectedArea[a]) {
+		        			cnt++;
+		        		}
+		        	}
+		        	double[][] 	dat = new double[DS.numSamples][cnt];
+		        	String[] 	are	= new String[cnt];
+		        	cnt = 0;
+		        	for (int f=0;f<DS.numSamples;f++) {
+		        		cnt=0;
+			        	for (int a=0;a<DS.numVars;a++) {
+			        		if ( DS.selectedArea[a]) {
+			        			are[cnt]	= DS.AreaNames [a];
+			        			dat[f][cnt] = DS.normData[f][a];
+			        			cnt++;
+			        		}
+			        	}
+		        	}
+		        	new MultiVariate_R(dat,DS.SampleNames,are,DS.ClassNames, DS.classCols); 
+		        	tabPCA3D.repaint();
 		        }
 		      }
 		    };
