@@ -211,8 +211,6 @@ public class SolverStart {
 
        	new UI();							// 122
 		
-
-		
 		if(args.length>0 && args[0].endsWith(".dat")){
 			if ( new File(args[0]).exists() ) {
 				if(args[0].endsWith(".dat")){
@@ -380,6 +378,8 @@ public class SolverStart {
 		
 					DS.setEnsemble(main);
 					new Classify();
+					main.put("confusionMatrix", Classify.confMatrixout.toString());
+					
 					rACount++;
 					rollingAccuracyTest.add		((float)	Classify.accuracyTest);
 					rollingAccuracyTrain.add	((float)	Classify.accuracyTrain);
@@ -436,8 +436,9 @@ public class SolverStart {
 				main.append("FingerPrints", Tools.getFingerPrint(modl.toString()+Opts.getOptsAsJson().toString()));
 			}
 			
-			new Classify();
 			
+			new Classify();
+			main.put("confusionMatrix", Classify.confMatrixout.toString());
 			
 			DS.setEnsemble(main);
 	//		UI.txtEnsemble.setText(main.toString(3));

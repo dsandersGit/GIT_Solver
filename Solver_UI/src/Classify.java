@@ -20,6 +20,8 @@ public class Classify {
 	public static double accuracyTest = 0;
 	public static double accuracyTrain = 0;
 	public static StringBuffer confMatrixout = new StringBuffer();
+	public static int[][] confusionMatrixTrain = new int[DS.numClasses][DS.numClasses];
+	public static int[][] confusionMatrixTest = new int[DS.numClasses][DS.numClasses];
 	
 	public  Classify() {
 
@@ -158,8 +160,8 @@ public class Classify {
 		String[] finalClass = new String[DS.numSamples];
 		int[] finalClassIndex = new int[DS.numSamples];
 		double[] finalClassBonus = new double[DS.numSamples];
-		int[][] confusionMatrixTrain = new int[DS.numClasses][DS.numClasses];
-		int[][] confusionMatrixTest = new int[DS.numClasses][DS.numClasses];
+		confusionMatrixTrain = new int[DS.numClasses][DS.numClasses];
+		confusionMatrixTest = new int[DS.numClasses][DS.numClasses];
 		
 		
 		// Test Train/
@@ -289,7 +291,7 @@ public class Classify {
 		confMatrixout = new StringBuffer();
 		StringBuffer txtOut = new StringBuffer();
 		if ( DS.fixedTrainSet != null) {
-			txtOut.append("ConfusionMatrix:\n");
+			txtOut.append("ConfusionMatrix: [true\\predict]\n");
 			txtOut.append(Tools.txtLen ("Training:")+"\t");
 			confMatrixout.append("Trn."+"\n");
 			for (int i=0;i<DS.numClasses;i++) {
@@ -340,6 +342,10 @@ public class Classify {
 
 		
 	
+	}
+	public static String[] getLatestConfusionMatrix() {
+		
+		return null;
 	}
 	public static int getTargetColorIndexPos (int target) {
 		for (int i=0;i<DS.classAllIndices.length;i++) {
