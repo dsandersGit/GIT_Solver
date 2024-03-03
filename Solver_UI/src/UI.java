@@ -112,7 +112,7 @@ public class UI {
 	static int tab_ensemble = -1;
 	static int tab_Summary = 0;
 	static int tab_Statistics = 0;
-	static int tab_spMining = 8;
+	static int tab_spMining = 0;
 	
 	public static 		JTabbedPane maintabbed 		= new JTabbedPane();
 	public static 		SP_PlotCanvas sp 			= new SP_PlotCanvas();
@@ -246,8 +246,8 @@ public class UI {
 		tab_Trends	 	= 4;
 		tab_Classify 	= 5;
 		tab_3D 			= 6;
-		tab_ensemble	= 7;
-		tab_Algo		= 8;
+		tab_ensemble	= 8;
+		tab_Algo		= 7;
 
 //		tab_Opts 		= 1;
 		

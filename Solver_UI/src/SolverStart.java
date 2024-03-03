@@ -122,11 +122,12 @@ public class SolverStart {
 	 * 119; AUROC OFF, wrong estimations (same value ranking), Status correct num features, Mining Line limited to 1000, Mining Labels AVG+-STD
 	 * 120: Ensemble-Tree
 	 * 121: Batch Processing
+	 * 122: new UI()
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.3";
-	public static String 		revision 		= " 121";
+	public static String 		revision 		= " 122";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;
@@ -207,13 +208,10 @@ public class SolverStart {
 		}
 		
 		defOptions = Opts.getOptsAsJson();					// save default startup options
-		 SwingUtilities.invokeLater(new Runnable() {
-	            public void run() {
-	            	new UI();
-	            }
-	        });
+
+       	new UI();							// 122
 		
-		UI.loadEnsemble(true);
+
 		
 		if(args.length>0 && args[0].endsWith(".dat")){
 			if ( new File(args[0]).exists() ) {
@@ -237,6 +235,7 @@ public class SolverStart {
 		if(args.length>1)
 			DS.variableID = args[1]; 
 
+		UI.loadEnsemble(true);
 	}
 	public static void trainPattern(int batchSize) throws IOException {
 
