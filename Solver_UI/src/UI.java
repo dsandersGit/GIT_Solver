@@ -239,6 +239,8 @@ public class UI {
 		maintabbed.add("Ensemble",new EnsembleTree());
 		maintabbed.add("PCA",tabPCA3D);
 		
+	
+		
 		
 		tab_Summary 	= 0;
 		tab_spMining	= 1;
@@ -341,6 +343,11 @@ public class UI {
 		//114
 		menuActionChk_QR.setSelected(prefs.getBoolean("menuActionChk_QR", true));
 		menuActionChk_Jump.setSelected(prefs.getBoolean("menuActionChk_Jump", true));
+		MultiVariate_R.r_Path = prefs.get("R_Path", "");
+		MultiVariate_R.r_Script = prefs.get("R_Script", "");
+		MultiVariate_R.r_Data =  prefs.get("R_Data", "");
+		if ( MultiVariate_R.r_Path.length()<1 || MultiVariate_R.r_Script.length()<1 ||  MultiVariate_R.r_Data.length()<1) 
+			maintabbed.setEnabledAt(tab_PCA,false);
 		refreshStatus();
 	
 	}
@@ -849,6 +856,9 @@ public class UI {
 		menuSettings.add(menuActionOptions);
 		menuSettings.add(menuActionChk_QR);
 		menuSettings.add(menuActionChk_Jump);
+		JMenuItem menuSettingsRPath = new JMenuItem(" Activate PCA"); 
+		menuExport.add(menuSettingsRPath);
+		menuSettings.add(menuSettingsRPath);
 		
 		// ---------------------------------------------------------------------
 		
@@ -1132,7 +1142,10 @@ public class UI {
 			SolverStart.classify();
 		}});
 		
-	
+		menuSettingsRPath.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
+			MultiVariate_R.setPaths();
+		}});
+		
 		menuExportVectors.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 			JSONObject ensemble = DS.js_Ensemble;
 			if (ensemble== null )return;

@@ -26,8 +26,8 @@ import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class MultiVariate_R {
-	private static String r_Path = "";
-	private static String r_Script = "";
+	public static String r_Path = "";
+	public static String r_Script = "";
 	public static String r_Data = "";
 	
 	//private static Color[]ClassCols = null;
@@ -70,13 +70,7 @@ public class MultiVariate_R {
 	public static Color[] ClassCols = null;
 	
 	public MultiVariate_R(double[][] rawData,String[] sampleNames,String[] areaNames,String[] cNames, Color[] cols) {
-		
-		Preferences prefs = null;
-		prefs = Preferences.userRoot().node("Solver");
-	
-		r_Path = prefs.get("R_Path", "");
-		r_Script = prefs.get("R_Script", "");
-		r_Data =  prefs.get("R_Data", "");
+
 //		
 		if ( r_Path.length()<1 || r_Script.length()<1 ||  r_Data.length()<1) setPaths();
 		if ( r_Path.length()<1 || r_Script.length()<1 ||  r_Data.length()<1) return;
@@ -265,6 +259,7 @@ public static void setPaths(){
 			prefs.put("R_Script", r_Script);
 			prefs.put("R_Data", r_Data);
 		  
+			UI.maintabbed.setEnabledAt(UI.tab_PCA,true);
 	}
 }
 class LogStreamReader implements Runnable {
@@ -375,7 +370,6 @@ class LogStreamReader implements Runnable {
     		
     	 }
 
-    	// TEST: LDA hier brechnen anstatt übernehmen
     	// !!! VERIFIED LDA
     	 if (MultiVariate_R.LDAs != null) {
 	    	 int countPCA = 6;
@@ -395,20 +389,20 @@ class LogStreamReader implements Runnable {
 	    		
 	    	}
     	 }
-//    	  // PCA In die Mitte setzen
-//	     for(int p=0;p<n;p++){	// AREA
-//	    	 double avg = 0;
-//	    	 double count = 0;
-//	    	 for(int i=0;i<m;i++){	// files
-//		    		 avg += MultiVariate_R.PCAs[i][p];
-//		    		 count ++;
-//	    	 }
-//	    	 avg = avg/count;
-//	    	 MultiVariate_R.PC_centered[p] = avg;
-//	    	 for(int i=0;i<m;i++){	// files
-//	    		 MultiVariate_R.PCAs[i][p] -=  avg;
-//	    	 }
-//	     }
+    	  // PCA In die Mitte setzen
+	     for(int p=0;p<MultiVariate_R.eigenVectors[0].length;p++){	// AREA
+	    	 double avg = 0;
+	    	 double count = 0;
+	    	 for(int i=0;i<m;i++){	// files
+		    		 avg += MultiVariate_R.PCAs[i][p];
+		    		 count ++;
+	    	 }
+	    	 avg = avg/count;
+	    	 MultiVariate_R.PC_centered[p] = avg;
+	    	 for(int i=0;i<m;i++){	// files
+	    		 MultiVariate_R.PCAs[i][p] -=  avg;
+	    	 }
+	     }
 	
 	  
 	 

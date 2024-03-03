@@ -124,12 +124,14 @@ public class SolverStart {
 	 * 121: Batch Processing
 	 * 122: new UI()
 	 * 123: PCA support vis 'The R Project for Statistical Computing'
-	 * 124: PCA support vis 'The R Project for Statistical Computing'
+	 * 124: PCA support via 'The R Project for Statistical Computing'
+	 * 125: QR with Bacthes
+	 * 126: PCA support & Centered 
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
-	public static String 		appAdd 			= " 0.3";
-	public static String 		revision 		= " 124";
+	public static String 		appAdd 			= " 0.4";
+	public static String 		revision 		= " 126";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;
@@ -459,7 +461,7 @@ public class SolverStart {
 		    
 		    
 		    //111
-		    if (UI.menuActionChk_QR.isSelected()) {
+		    if (UI.menuActionChk_QR.isSelected() && batchSize == 1 ) {									// 125
 			    String txtReceipt = QRmain.toString()+"\n"+Classify.confMatrixout.toString();
 			    txtReceipt += "\nFP: " + Tools.getFingerPrint(txtReceipt);
 			    BufferedImage image = generateBarCode(txtReceipt);
