@@ -128,11 +128,12 @@ public class SolverStart {
 	 * 125: QR with Bacthes
 	 * 126: PCA support & Centered 
 	 * 127: CSV quotes
+	 * 128: Algo-scheme shifted
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.4";
-	public static String 		revision 		= " 126";
+	public static String 		revision 		= " 128";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;
@@ -686,10 +687,8 @@ public class SolverStart {
 		            reader = new BufferedReader(new FileReader(file));
 		            String text = null;
 	
-		            while ((text = reader.readLine()) != null) {
-		                contents.append(text)
-		                        .append("\n");
-		            }
+		            while ((text = reader.readLine()) != null) { contents.append(text).append("\n");
+		        }
 		        } catch (IOException e) {
 		            e.printStackTrace();
 		        } finally {

@@ -128,7 +128,7 @@ public class UI {
 	static 				JScrollPane scSummary		= new JScrollPane(txtSummary);
 	public static 		ThreeDee tab3D = new ThreeDee();
 	public static 		ThreeDee tabPCA3D = new ThreeDee();
-	static 				JLabel iconAlgo = new Icon_Solver();
+//	static 				JLabel iconAlgo = new Icon_Solver();
 	static 				JLabel iconClassify = null;
 	
 	static 				JButton jbLoad 	= new JButton();
@@ -205,13 +205,7 @@ public class UI {
 		ThreeDee.genBackColor 	=	 SolverStart.backColor;
 		ThreeDee.genFrontColor 	= SolverStart.frontColor;
 		tab3D.setOpaque(true);
-//	
-//		txtEnsemble.setOpaque(false);
-//		txtEnsemble.setEditable(false);
-//		txtEnsemble.setBackground(SolverStart.backColor);
-//		txtEnsemble.setForeground(SolverStart.frontColor);
-//		txtEnsemble.setFont(new Font("Consolas", Font.PLAIN, 12));
-		
+
 		txtSummary.setOpaque(false);
 		txtSummary.setLineWrap(true);
 		txtSummary.setBackground(SolverStart.backColor);
@@ -227,6 +221,7 @@ public class UI {
 		panTrends.add(sp2D);
 		
 		maintabbed.add("Data",scSummary);
+		maintabbed.add("PCA",tabPCA3D);
 		maintabbed.add("Visual Check", panMining);
 		maintabbed.add("Live", panLive);
 		maintabbed.add("Validation",scValidation);
@@ -234,23 +229,24 @@ public class UI {
 		maintabbed.add("Classification", pan_classify);
 		maintabbed.addTab("3D",tab3D);
 //		maintabbed.add("Ensemble",scEnsemble);
-		maintabbed.add("Algorithm", iconAlgo);
+//		maintabbed.add("Algorithm", iconAlgo);
 		maintabbed.add("Ensemble",new EnsembleTree());
-		maintabbed.add("PCA",tabPCA3D);
+		
 		
 	
 		
 		
 		tab_Summary 	= 0;
-		tab_spMining	= 1;
-		tab_Live 		= 2;
-		tab_Statistics 	= 3;
-		tab_Trends	 	= 4;
-		tab_Classify 	= 5;
-		tab_3D 			= 6;
+		tab_PCA			= 1;
+		tab_spMining	= 2;
+		tab_Live 		= 3;
+		tab_Statistics 	= 4;
+		tab_Trends	 	= 5;
+		tab_Classify 	= 6;
+		tab_3D 			= 7;
 		tab_ensemble	= 8;
-		tab_Algo		= 7;
-		tab_PCA			= 9;
+//		tab_Algo		= 7;
+		
 
 //		tab_Opts 		= 1;
 		
@@ -262,14 +258,7 @@ public class UI {
 		        JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent.getSource();
 		        int index = sourceTabbedPane.getSelectedIndex();
 		        SolverStart.doRedrawOnClick = true;
-		        if ( index == tab_Algo) {
-		        	ImageIcon imageIcon = new ImageIcon(ClassLoader.getSystemResource("solver_algo.png"));
-		        	Image image = imageIcon.getImage(); // transform it 
-		        	Image newimg = image.getScaledInstance(iconAlgo.getWidth(), iconAlgo.getHeight(),  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
-		        	imageIcon = new ImageIcon(newimg);  // transform it back
-
-		        	iconAlgo.setIcon(imageIcon);
-		        }
+		       
 		        if ( index == tab_PCA) {
 		        	int cnt = 0;
 		        	for (int a=0;a<DS.numVars;a++) {
@@ -324,18 +313,18 @@ public class UI {
 		jF.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		
-		jF.addComponentListener(new ComponentAdapter() 
-		{  
-		        public void componentResized(ComponentEvent evt) {
-		            Component c = (Component)evt.getSource();
-		            ImageIcon imageIcon = new ImageIcon(ClassLoader.getSystemResource("solver_algo.png"));
-		        	Image image = imageIcon.getImage(); // transform it 
-		        	Image newimg = image.getScaledInstance(iconAlgo.getWidth(), iconAlgo.getHeight(),  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
-		        	imageIcon = new ImageIcon(newimg);  // transform it back
-
-		        	iconAlgo.setIcon(imageIcon);
-		        }
-		});
+//		jF.addComponentListener(new ComponentAdapter() 
+//		{  
+//		        public void componentResized(ComponentEvent evt) {
+//		            Component c = (Component)evt.getSource();
+//		            ImageIcon imageIcon = new ImageIcon(ClassLoader.getSystemResource("solver_algo.png"));
+//		        	Image image = imageIcon.getImage(); // transform it 
+//		        	Image newimg = image.getScaledInstance(iconAlgo.getWidth(), iconAlgo.getHeight(),  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+//		        	imageIcon = new ImageIcon(newimg);  // transform it back
+//
+//		        	iconAlgo.setIcon(imageIcon);
+//		        }
+//		});
 		
 		Preferences prefs;
 	    prefs = Preferences.userRoot().node("Solver");
@@ -855,8 +844,9 @@ public class UI {
 		menuSettings.add(menuActionChk_QR);
 		menuSettings.add(menuActionChk_Jump);
 		JMenuItem menuSettingsRPath = new JMenuItem(" Activate PCA"); 
-		menuExport.add(menuSettingsRPath);
 		menuSettings.add(menuSettingsRPath);
+		JMenuItem menuSettingsAlgo = new JMenuItem(" Show Algorithm"); 
+		menuSettings.add(menuSettingsAlgo);
 		
 		// ---------------------------------------------------------------------
 		
@@ -1053,6 +1043,9 @@ public class UI {
 		menuSettingsRPath.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 			MultiVariate_R.setPaths();
 		}});
+		menuSettingsAlgo.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
+			new Icon_Solver();
+		}});
 		
 		menuExportVectors.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 			JSONObject ensemble = DS.js_Ensemble;
@@ -1191,19 +1184,20 @@ public class UI {
 			    g.setFont(panTrends.getFont());
 			    panTrends.paintAll(g);
 			 }
-			if(maintabbed.getSelectedIndex()==tab_Algo ){
-				 img = new BufferedImage(iconAlgo.getWidth(), iconAlgo.getHeight(), BufferedImage.TYPE_INT_RGB);
-			    Graphics g = img.getGraphics();
-			    g.setColor(iconAlgo.getForeground());
-			    g.setFont(iconAlgo.getFont());
-			    iconAlgo.paintAll(g);
-			 }
+
 			if(maintabbed.getSelectedIndex()==tab_3D ){
 				 img = new BufferedImage(tab3D.getWidth(), tab3D.getHeight(), BufferedImage.TYPE_INT_RGB);
 			    Graphics g = img.getGraphics();
 			    g.setColor(tab3D.getForeground());
 			    g.setFont(tab3D.getFont());
 			    tab3D.paintAll(g);
+			 }
+			if(maintabbed.getSelectedIndex()==tab_PCA ){
+				 img = new BufferedImage(tabPCA3D.getWidth(), tabPCA3D.getHeight(), BufferedImage.TYPE_INT_RGB);
+			    Graphics g = img.getGraphics();
+			    g.setColor(tabPCA3D.getForeground());
+			    g.setFont(tabPCA3D.getFont());
+			    tabPCA3D.paintAll(g);
 			 }
 			 if(img!=null){
 				    ImageTransferable it = new ImageTransferable(img);
@@ -1216,10 +1210,10 @@ public class UI {
 		menuAboutAbout.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			JOptionPane.showMessageDialog(jF, "<HTML><H3>"+SolverStart.app+" rev."+SolverStart.revision+"</H3>"
 					+ "<I>Copyright 2009-2024 Daniel Sanders</I><BR>Check for updates:<BR>"
-					+ "https://github.com/dsandersGit/GIT_Solver/tags");
+					+ "https://github.com/dsandersGit/GIT_Solver/<BR></HTML>");
 		}});
 		menuAboutLicense.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
-			JOptionPane.showMessageDialog(jF, "<HTML><I>Licensed under GNU General Public License v3.0</I>", SolverStart.app,  JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(jF, "<HTML><I>Licensed under GNU General Public License v3.0</I></HTML>", SolverStart.app,  JOptionPane.INFORMATION_MESSAGE);
 		}});
 		menuAboutCredits.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){		
 			JOptionPane.showMessageDialog(null, "<HTML> used libraries and dependencies: <ul>"
@@ -1228,7 +1222,7 @@ public class UI {
 					+ "<li>QR Code:<BR>Copyright © 2024 Project Nayuki. (MIT License)<BR>" + 
 					"https://www.nayuki.io/page/qr-code-generator-library</li>"
 					//+ "<li>FlatLaf - Flat Look and Feel Theme</li>"
-					+ "</ul><BR>"
+					+ "</ul><BR></HTML>"
 					+ "", "CREDITS", JOptionPane.INFORMATION_MESSAGE);
 		}});
 		//-------------------------------------------------------------------------------------------------------------------

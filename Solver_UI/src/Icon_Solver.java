@@ -1,7 +1,12 @@
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
+import java.awt.GridLayout;
 
-public class Icon_Solver extends JLabel{
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+public class Icon_Solver extends JDialog{
 	/**
 	 * 
 	 */
@@ -9,8 +14,17 @@ public class Icon_Solver extends JLabel{
 	private static final long serialVersionUID = 1L;
 
 	public Icon_Solver() {
-		this.setIcon(new ImageIcon(ClassLoader.getSystemResource("solver_algo.png")));
+		this.setTitle(SolverStart.app);
+		JPanel main = new JPanel();
+		main.setLayout(new GridLayout(1,1));
+		main.setBorder(BorderFactory.createTitledBorder("SCHEME ALGORITHM"));
 		
+		JLabel labAlgo = new JLabel(new ImageIcon(ClassLoader.getSystemResource("solver_algo.png")));
+		main.add(labAlgo);
+		this.add(main);
+		this.pack();
+		this.setLocationRelativeTo(null);
+		this.setVisible(true);
 	}
 	public void zoom() {
 		
