@@ -127,6 +127,7 @@ public class SolverStart {
 	 * 124: PCA support via 'The R Project for Statistical Computing'
 	 * 125: QR with Bacthes
 	 * 126: PCA support & Centered 
+	 * 127: CSV quotes
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
@@ -660,7 +661,9 @@ public class SolverStart {
 //		}
 		
 	}
-
+	private static String cleanTxt(String txt) {
+		return '\"'+txt.replaceAll("\"", "")+'\"';
+	}
 	
 	public static boolean importDataCSV(String datei){								// nur ClassenName und Daten
 		
@@ -714,6 +717,7 @@ public class SolverStart {
 				}
 				contents.append(data);
 		  }
+		  
 		  
 		    String[] lines = contents.toString().split("\n");
 	        String[] test = lines[1].split(split);
@@ -798,13 +802,14 @@ public class SolverStart {
 
 			    	test = lines[0].split(split);
 			    	for (int i=0;i<test.length; i++) {
-		        		 if ( i!= classNamesPos) { DS.AreaNames [c] = '\"'+test[i]+'\"';
+		        		 if ( i!= classNamesPos) {
+		        			 DS.AreaNames [c] = cleanTxt(test[i]); //
 			        		 c++;
 		        		 }
 		        	}
 			    }else {
 			    	for (int i=0;i< DS.AreaNames.length; i++) {
-			    		 DS.AreaNames[i] = '\"'+"var_"+i+'\"';
+			    		 DS.AreaNames[i] = cleanTxt("var_"+i);
 			    	}
 			    }
 			    
@@ -815,7 +820,7 @@ public class SolverStart {
 	        if ( hasHeader) fstLine = 1;
 	        ArrayList<String> allClassNames = new ArrayList<String>(); 
 	        for(int i=fstLine;i<lines.length;i++){
-	        	DS.SampleNames[i-fstLine] = "Sample: "+ (1+i-fstLine);
+	        	DS.SampleNames[i-fstLine] = cleanTxt("Sample: "+ (1+i-fstLine));
 	        	String lne = lines[i]; 
 	        	if ( commaAsDecimalSep) lne = lne.replace(",", ".");
 	        	test = lne.split(split);
@@ -831,13 +836,13 @@ public class SolverStart {
 		        			}
 	        			 
 	        		 }else {
-	        			 DS.ClassNames[i-fstLine] = test[j];
+	        			 DS.ClassNames[i-fstLine] = cleanTxt(test[j]);;
 	        			 boolean isIn = false;
 	        			 for (int k=0;k<allClassNames.size();k++) {
 	        				 if (DS.ClassNames[i-fstLine].equals(allClassNames.get(k)))isIn = true; 
 	        			 }
 	        			 if (!isIn) {
-	        				 allClassNames.add(test[j]);
+	        				 allClassNames.add(cleanTxt(test[j]));
 	        			 }
 	        		 }
 	        		 
@@ -963,7 +968,7 @@ public class SolverStart {
 	        int ac = 0;
 	        for(int i=4;i<test.length;i++){
 	        	if ( useArea[i-4]) {
-	        		DS.AreaNames[ac] = '\"'+test[i]+'\"';
+	        		DS.AreaNames[ac] = cleanTxt(test[i]);//;'\"'+test[i].replaceAll("\"", "")+'\"';
 	        		ac++;
 	        	}
 	        }
@@ -974,13 +979,13 @@ public class SolverStart {
 	        	UI.proStatus.setValue((100*i)/lines.length);
 		        if(!lines[i].startsWith("#")){
 		        	String[] tmp = lines[i].split("\t");
-		        	String ClassName = tmp[1];
+		        	String ClassName = cleanTxt(tmp[1]);
 		        	int ClassColIndex = (int)Integer.parseInt(tmp[2]);
 		        	DS.classIndex[i-fstLine-1] = ClassColIndex;
 		        	DS.ClassNames[i-fstLine-1] = ClassName;
 //		        	if (ClassColIndex ==0 && ClassName.equals("unknown"))DS.noTrainingSet[i-fstLine-1] = true;
 		        	if ( DS.ClassNames[i-fstLine-1].equals("")) DS.ClassNames[i-fstLine-1] = "undefined";
-		        	DS.SampleNames[i-fstLine-1] = tmp[3];
+		        	DS.SampleNames[i-fstLine-1] = cleanTxt(tmp[3]);
 		        	ac=0;
 			        for(int j=4;j<tmp.length;j++){
 			        	if ( useArea[j-4]) {

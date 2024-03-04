@@ -98,7 +98,6 @@ public class UI {
 	static JCheckBoxMenuItem 	menuActionChk_Jump = new JCheckBoxMenuItem(" Jump to Live",true);
 	
 	static JMenu 				menuExport = new JMenu( " Export");
-	static JMenuItem 			menuFileSplitData = new JMenuItem(" Split Data");
 	static JMenuItem 			menuFileSaveData = new JMenuItem(" Save Data");  
 	
 	static int tab_Classify = 0;
@@ -834,7 +833,6 @@ public class UI {
 		menuFile.add(menuFileLoadClip);
 		menuFile.add(new JSeparator());
 		menuFile.add(menuFileSaveData);
-		menuFile.add(menuFileSplitData);
 		menuFile.add(new JSeparator());
 		menuFile.add(menuFileLoadEnsemble);
 		menuFile.add(menuFileSaveEnsemble);
@@ -914,107 +912,17 @@ public class UI {
 			SolverStart.analyzeRawData("Clipboard");
 			UI.maintabbed.setSelectedIndex(UI.tab_Summary);
 		}});
-		menuFileSplitData.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
-			//refreshOptions();
-			StringBuffer outTrain = new StringBuffer();
-			StringBuffer outTest = new StringBuffer();
-			outTrain.append("Class");
-        	for (int j=0;j< DS.numVars; j++) {
-        		if ( DS.selectedArea[j] )
-        			outTrain.append("," + DS.AreaNames[j]);	
-        	}
-        	outTrain.append("\n");
-        	outTest.append("Class");
-        	for (int j=0;j< DS.numVars; j++) {
-        		if ( DS.selectedArea[j] )
-        			outTest.append("," + DS.AreaNames[j]);	
-        	}
-        	outTest.append("\n");
-        	
-			int targetCount=0;
-			ArrayList<Integer> tgts = new ArrayList<Integer>();
-			for (int f=0;f<DS.numSamples;f++){
-                tgts.add(f);
-                targetCount++;
-	        }
-			int count = 0;
-	        while (count < targetCount*(1.-Opts.trainRatio)) {
-	            int rnd = (int) (Math.random()*tgts.size());
-	            tgts.remove(rnd);
-	            count++;
-	        }
-	        for (int f=0;f<DS.numSamples;f++){
-	        	String cls = DS.ClassNames[f];
-	        	
-	        	if ( cls.length()<1 || Tools.isNumeric(cls) ) {
-	        		cls = "class"+DS.classAllIndices[Tools.getIndexOfTarget(DS.classIndex[f])];
-	        	}
-	        	boolean isIn = false;
-	            for (int i=0;i<tgts.size();i++){
-	                if (f == tgts.get(i)) {
-	                	outTrain.append(cls);
-	                	for (int j=0;j< DS.numVars; j++) {
-	                		if ( DS.selectedArea[j] )
-	                			outTrain.append("," + DS.rawData[f][j]);	
-	                	}
-	                	outTrain.append("\n");
-	                	isIn = true;
-	                }
-	            }
-	            if ( !isIn ) {
-	            	outTest.append(cls);
-                	for (int j=0;j< DS.numVars; j++) {
-                		if ( DS.selectedArea[j] )
-                			outTest.append("," + DS.rawData[f][j]);	
-                	}
-                	outTest.append("\n");
-	            }
-	        }
-			
-			Preferences prefs;
-		    prefs = Preferences.userRoot().node("Solver");
-		    String path = prefs.get("path", ".");
-		    String[] type = {"CSV"};
-		    String[] sht = {"CSV"};
-			File f = Tools.getFile("Select file to save", path,type,sht, true);
-			if ( f == null) return;
+	
 
-			File fTrain = new File(f.getAbsolutePath()+"_Train.csv");
-			File fTest  = new File(f.getAbsolutePath()+"_Test.csv");
-			
-			FileWriter fwTrain = null;
-			FileWriter fwTest = null;
-			try {
-				fwTrain = new FileWriter(fTrain, false);
-				fwTest = new FileWriter(fTest, false);
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		    BufferedWriter bwTrain = new BufferedWriter(fwTrain);
-		    BufferedWriter bwTest = new BufferedWriter(fwTest);
-		    try {
-		    	fwTrain.write(outTrain.toString());
-		    	fwTest.write(outTest.toString());
-			} catch (JSONException | IOException e1) {
-				e1.printStackTrace();
-			}
-		  
-		    try {
-		    	bwTrain.close();
-		    	bwTest.close();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		}});
 		menuFileSaveData.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
 			// 98
 			//refreshOptions();
 			StringBuffer out = new StringBuffer();
 
-			out.append("Class");
+			out.append("\"Class\"");
         	for (int j=0;j< DS.numVars; j++) {
         		if ( DS.selectedArea[j] )
-        			out.append("," + DS.AreaNames[j].replaceAll("\"", ""));	
+        			out.append("," + DS.AreaNames[j]);	
         	}
         	out.append("\n");
         
