@@ -94,8 +94,9 @@ public class UI {
 	static JMenuItem 			menuFileSaveEnsemble = new JMenuItem(" Save Ensemble"); 
 	static JMenuItem 			menuFileLoadEnsemble = new JMenuItem(" Load Ensemble"); 
 	static JMenuItem 			menuActionOptions = new JMenuItem(" Algorithm Options");
-	static JCheckBoxMenuItem 	menuActionChk_QR = new JCheckBoxMenuItem(" QR-Receipt",true);
-	static JCheckBoxMenuItem 	menuActionChk_Jump = new JCheckBoxMenuItem(" Jump to Live",true);
+	static JMenuItem 			menuActionChk_QR = new JCheckBoxMenuItem(" QR-Receipt",true);
+	static JCheckBoxMenuItem 	menuActionChk_Jump = new JCheckBoxMenuItem(" Jump Tabs",true);
+	static JCheckBoxMenuItem 	menuActionChk_SendEns = new JCheckBoxMenuItem(" Dump Ensemble on Save",false);				// 129 Send Ensemble to Caller
 	
 	static JMenu 				menuExport = new JMenu( " Export");
 	static JMenuItem 			menuFileSaveData = new JMenuItem(" Save Data");  
@@ -329,8 +330,9 @@ public class UI {
 		Preferences prefs;
 	    prefs = Preferences.userRoot().node("Solver");
 		//114
-		menuActionChk_QR.setSelected(prefs.getBoolean("menuActionChk_QR", true));
+		menuActionChk_QR.setSelected(prefs.getBoolean("menuActionChk_QR", false));
 		menuActionChk_Jump.setSelected(prefs.getBoolean("menuActionChk_Jump", true));
+		menuActionChk_SendEns.setSelected(prefs.getBoolean("menuActionChk_SendEns", false));
 		MultiVariate_R.r_Path = prefs.get("R_Path", "");
 		MultiVariate_R.r_Script = prefs.get("R_Script", "");
 		MultiVariate_R.r_Data =  prefs.get("R_Data", "");
@@ -841,12 +843,16 @@ public class UI {
 		
 		// ---------------------------------------------------------------------
 		menuSettings.add(menuActionOptions);
-		menuSettings.add(menuActionChk_QR);
-		menuSettings.add(menuActionChk_Jump);
 		JMenuItem menuSettingsRPath = new JMenuItem(" Activate PCA"); 
 		menuSettings.add(menuSettingsRPath);
 		JMenuItem menuSettingsAlgo = new JMenuItem(" Show Algorithm"); 
 		menuSettings.add(menuSettingsAlgo);
+		menuSettings.add(new JSeparator());
+		menuSettings.add(menuActionChk_QR);									
+		menuSettings.add(menuActionChk_Jump);
+		menuSettings.add(menuActionChk_SendEns);
+
+		
 		
 		// ---------------------------------------------------------------------
 		
@@ -1029,6 +1035,11 @@ public class UI {
 			Preferences prefs;
 		    prefs = Preferences.userRoot().node("Solver");
 			prefs.putBoolean("menuActionChk_Jump", menuActionChk_Jump.isSelected());
+		}});
+		menuActionChk_SendEns.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
+			Preferences prefs;
+		    prefs = Preferences.userRoot().node("Solver");
+			prefs.putBoolean("menuActionChk_SendEns", menuActionChk_SendEns.isSelected());
 		}});
 		
 		menuActionClassify.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
@@ -1293,7 +1304,7 @@ public class UI {
 	    BufferedWriter bw = new BufferedWriter(fw);
 	    try {
 			bw.write(DS.js_Ensemble.toString(3));
-			System.out.println(DS.js_Ensemble.toString(3));					// 97 System.out of ensemble to external LogStreamReader
+			if ( menuActionChk_SendEns.isSelected() ) System.out.println(DS.js_Ensemble.toString(3));					// 97 System.out of ensemble to external LogStreamReader
 		} catch (JSONException | IOException e1) {
 			e1.printStackTrace();
 		}
