@@ -102,7 +102,7 @@ public class Runner {
 //        	trainSet = getTrainSet();
 //        }
         int i = Tools.getIndexOfTarget (target);
-        trainSet = DS.fixedTrainSet[i];
+        trainSet = DS.fixedTrainSet;
 
         int step = 100;
         while ( reDo( -1 ) && !SolverStart.immediateStop && !SolverStart.immediateSkip) {

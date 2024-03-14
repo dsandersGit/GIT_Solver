@@ -129,12 +129,13 @@ public class SolverStart {
 	 * 126: PCA support & Centered 
 	 * 127: CSV quotes
 	 * 128: Algo-scheme shifted
-	 * 129: Send Ensemble to Caller
+	 * 129: Option: Send Ensemble to Caller
+	 * 130: BUGFIX: Train/Validation Fixed Trainset was by CLASS, not GLOBAL -> System 'learned' foes
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
-	public static String 		appAdd 			= " 0.4";
-	public static String 		revision 		= " 129";
+	public static String 		appAdd 			= " 0.5";
+	public static String 		revision 		= " 130";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;

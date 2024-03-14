@@ -70,6 +70,7 @@ public class UI {
 	static 				JScrollPane scValidation= new JScrollPane(tableValidation);
 	public static 		DefaultTableModel tmtableValidation;
 	
+	
 	static 		JMenuBar 		mBar 				= null;
 	static 		JLabel			labVars				= new JLabel("Features: 0");
 	static 		JLabel			labSamples			= new JLabel("Samples: 0");
@@ -1304,7 +1305,11 @@ public class UI {
 	    BufferedWriter bw = new BufferedWriter(fw);
 	    try {
 			bw.write(DS.js_Ensemble.toString(3));
-			if ( menuActionChk_SendEns.isSelected() ) System.out.println(DS.js_Ensemble.toString(3));					// 97 System.out of ensemble to external LogStreamReader
+			if ( menuActionChk_SendEns.isSelected() ) {
+				System.out.println(DS.js_Ensemble.toString(3));					// 97 System.out of ensemble to external LogStreamReader
+			}else {
+				System.out.println("Nothing to see here . . .");
+			}
 		} catch (JSONException | IOException e1) {
 			e1.printStackTrace();
 		}

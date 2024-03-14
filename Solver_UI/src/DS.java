@@ -21,7 +21,8 @@ public class DS {
 	public static int[]			classAllIndices	= null;					// [] Index of present Classes
 	public static int[]			classAllIndPop	= null;					// [] Population of each Classes, index like classIndices
 	public static String[]		classAllIndNme	= null;					// [] Population of each Classes, index like classIndices
-	public static boolean[][]	fixedTrainSet	= null;					//
+	public static boolean[][]	fixedTrainSetOld	= null;					//
+	public static boolean[]	fixedTrainSet	= null;					//
 	//public static boolean[]		noTrainingSet	= null;					//
 	
 	public static double[] timeIndex;									// timeIndex from sample if available
@@ -280,54 +281,96 @@ public class DS {
 		
 		
 	}
+//	public static void getFixedTrainSetOLD() {
+//		
+//		
+//		fixedTrainSet = new boolean[numClasses][DS.numSamples];
+//		for (int c = 0;c <numClasses;c++) {									// GGFs nur einmal für alle Klassen
+//	        boolean[] tSet = new boolean[DS.numSamples];
+//	        float numOfTargets = 0;
+//	        for (int f=0;f<DS.numSamples;f++){                                // anzahl targets
+//	            if ( DS.classIndex[f] == classAllIndices[c] ) numOfTargets++;
+//	        }
+//	        float targetCount = 0;float foeCount=0;
+//	        ArrayList<Integer> tgts = new ArrayList<Integer>();
+//	        ArrayList<Integer> rest = new ArrayList<Integer>();
+//	        for (int f=0;f<DS.numSamples;f++){
+//	            if ( DS.classIndex[f] == classAllIndices[c] ) {
+//	                tgts.add(f);
+//	                targetCount++;
+//	            }else {
+//	                rest.add(f);
+//	                foeCount++;
+//	            }
+//	        }
+//	        int count = 0;
+//
+//	        while (count < targetCount*(1.-Opts.trainRatio)) {
+//	            int rnd = (int) (Math.random()*tgts.size());
+//	            tgts.remove(rnd);
+//	            count++;
+//	        }
+//	        count = 0;
+//	        while (count < foeCount*(1.-Opts.trainRatio)) {
+//	            int rnd = (int) (Math.random()*rest.size());
+//	            rest.remove(rnd);
+//	            count++;
+//	        }
+//	        for (int f=0;f<DS.numSamples;f++){
+//	            tSet[f] = false;
+//	            for (int i=0;i<tgts.size();i++){
+//	                if (f == tgts.get(i))tSet[f] = true;
+//	            }
+//	            for (int i=0;i<rest.size();i++){
+//	                if (f == rest.get(i))tSet[f] = true;
+//	            }
+//	        }
+//	        fixedTrainSet[c] = tSet;
+//		}
+//		System.out.println("NumClasses "+numClasses);
+//		String[] tr = new String[DS.numSamples];
+//		for (int f=0;f<DS.numSamples;f++){
+//			for (int c = 0;c <numClasses;c++) {
+//				tr[f] += "\t"+c+"\t"+f+"\t"+fixedTrainSet[c][f] + DS.ClassNames[f];
+//			}
+//		}
+//		for (int f=0;f<DS.numSamples;f++){
+//			System.out.println(tr[f]);
+//		}
+//		System.exit(0);
+//	}
 	public static void getFixedTrainSet() {
 		
 		
-		fixedTrainSet = new boolean[numClasses][DS.numSamples];
-		for (int c = 0;c <numClasses;c++) {
-	        boolean[] tSet = new boolean[DS.numSamples];
-	        float numOfTargets = 0;
-	        for (int f=0;f<DS.numSamples;f++){                                // anzahl targets
-	            if ( DS.classIndex[f] == classAllIndices[c] ) numOfTargets++;
-	        }
-	        float targetCount = 0;float foeCount=0;
-	        ArrayList<Integer> tgts = new ArrayList<Integer>();
-	        ArrayList<Integer> rest = new ArrayList<Integer>();
-	        for (int f=0;f<DS.numSamples;f++){
+		fixedTrainSet = new boolean[DS.numSamples];
+	    for (int c = 0;c <numClasses;c++) {									// GGFs nur einmal für alle Klassen
+	    	float numOfTargets = 0;
+	    	float targetCount = 0;
+	    	ArrayList<Integer> tgts = new ArrayList<Integer>();
+		    for (int f=0;f<DS.numSamples;f++){                                // anzahl targets
 	            if ( DS.classIndex[f] == classAllIndices[c] ) {
 	                tgts.add(f);
 	                targetCount++;
-	            }else {
-	                rest.add(f);
-	                foeCount++;
 	            }
 	        }
-	        int count = 0;
-
-	        while (count < targetCount*(1.-Opts.trainRatio)) {
+		    int count = 0;
+		    while (count < targetCount*(1.-Opts.trainRatio)) {
 	            int rnd = (int) (Math.random()*tgts.size());
 	            tgts.remove(rnd);
 	            count++;
 	        }
 	        count = 0;
-	        while (count < foeCount*(1.-Opts.trainRatio)) {
-	            int rnd = (int) (Math.random()*rest.size());
-	            rest.remove(rnd);
-	            count++;
-	        }
 	        for (int f=0;f<DS.numSamples;f++){
-	            tSet[f] = false;
 	            for (int i=0;i<tgts.size();i++){
-	                if (f == tgts.get(i))tSet[f] = true;
-	            }
-	            for (int i=0;i<rest.size();i++){
-	                if (f == rest.get(i))tSet[f] = true;
+	                if (f == tgts.get(i))fixedTrainSet[f] = true;
 	            }
 	        }
-	        fixedTrainSet[c] = tSet;
-		}
-	     
+	    }
+//	    for (int f=0;f<DS.numSamples;f++){
+//	    	System.out.println(DS.classIndex[f]+"\t"+fixedTrainSet[f]);
+//	    }
 	}
+	    
 
 //	
 	public static JSONObject getDSsAsJson() {

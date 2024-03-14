@@ -95,7 +95,7 @@ public class Classify {
 		tHeader[3]	= "classname";
 		tHeader[4]	= "classification";
 		tHeader[5]	= "match";
-		tHeader[6]	= "train/validation";
+		tHeader[6]	= "train/validation[TARGET]";
 		for (int j=0;j<DS.numClasses;j++) {
 			tHeader[7+j] = DS.classAllIndNme[j];
 		}
@@ -221,7 +221,7 @@ public class Classify {
 			 
 			 if ( maxClassNum > -1) 
 				 if ( DS.fixedTrainSet != null)
-					 if (!DS.fixedTrainSet[index][f]) {
+					 if (!DS.fixedTrainSet[f]) {
 						 confusionMatrixTest [Tools.getIndexOfTarget(DS.classIndex[f])][maxClassNum] ++;
 					 }else {
 						 confusionMatrixTrain [Tools.getIndexOfTarget(DS.classIndex[f])][maxClassNum] ++;
@@ -230,7 +230,7 @@ public class Classify {
 			 nData[f][4] = finalClass[f];
 			 if (finalClass[f].equals(DS.ClassNames[f])) {						// contains
 				 if ( (Opts.fixTrainSet && DS.fixedTrainSet != null)) {
-					 if (DS.fixedTrainSet[index][f]) {
+					 if (DS.fixedTrainSet[f]) {
 						 matchCountTrain++;
 					 }else {
 						 matchCountTest++;
@@ -244,7 +244,7 @@ public class Classify {
 				 nData[f][5] = "------";
 			 }
 			 if ( Opts.fixTrainSet && DS.fixedTrainSet != null) {
-				 if (DS.fixedTrainSet[index][f]) {
+				 if (DS.fixedTrainSet[f]) {
 					 nData[f][6] = "training";
 				 }else {
 					 nData[f][6] = "validation";
@@ -253,7 +253,7 @@ public class Classify {
 				 nData[f][6] = " - - - ";
 			 }
 			 if ( (Opts.fixTrainSet && DS.fixedTrainSet != null)) {
-				 if (DS.fixedTrainSet[index][f]) {
+				 if (DS.fixedTrainSet[f]) {
 					 allCountTrain++;
 				 }else {
 					 allCountTest++;
