@@ -76,11 +76,11 @@ public class Runner {
 		}else {
 			targetName = tName;
 		}
-		if ( mcEigenVec == null) {
+		//if ( mcEigenVec == null) {
 	        mcEigenVec             	= new double [DS.numVars][Opts.numDims];
 	        mcEigenVecOld         	= new double [DS.numVars][Opts.numDims];
 	        mcPCA                 	= new double [Opts.numDims][DS.numSamples];
-		}
+		//}
 //		if ( booster == null) {
 //			booster = new int[DS.numSamples][DS.numClasses];
 //		}

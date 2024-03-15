@@ -131,11 +131,12 @@ public class SolverStart {
 	 * 128: Algo-scheme shifted
 	 * 129: Option: Send Ensemble to Caller
 	 * 130: BUGFIX: Train/Validation Fixed Trainset was by CLASS, not GLOBAL -> System 'learned' foes
+	 * 131: Always new Eigenvectors
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.5";
-	public static String 		revision 		= " 130";
+	public static String 		revision 		= " 131";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;
@@ -245,6 +246,8 @@ public class SolverStart {
 	}
 	public static void trainPattern(int batchSize) throws IOException {
 
+		DS.getFixedTrainSet();	
+		
 		for (int batch = 0;batch < batchSize;batch++) {
 			// populates with running the accuracy of train / test results
 			ArrayList<Float> rollingAccuracyTest = new ArrayList<Float>();
@@ -319,7 +322,7 @@ public class SolverStart {
 			for (int i=0;i<Opts.numCycles;i++) {
 				//72: Train/Test change only cycle wise
 				//75: Fixed Trainset Init moved from DS to SolverStart
-				if ( !Opts.fixTrainSet || i==0) DS.getFixedTrainSet();									// fetch the (initial) training set
+				if ( !Opts.fixTrainSet ) DS.getFixedTrainSet();									// fetch the (initial) training set
 				UI.proStatus.setValue(100*i/Opts.numCycles);
 				for (int j=0;j<DS.classAllIndices.length;j++) {
 					if ( !SolverStart.immediateStop ) {	
