@@ -132,11 +132,12 @@ public class SolverStart {
 	 * 129: Option: Send Ensemble to Caller
 	 * 130: BUGFIX: Train/Validation Fixed Trainset was by CLASS, not GLOBAL -> System 'learned' foes
 	 * 131: Always new Eigenvectors
+	 * 132: PC-Export, enables running PCA-ML
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.5";
-	public static String 		revision 		= " 131";
+	public static String 		revision 		= " 132";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;

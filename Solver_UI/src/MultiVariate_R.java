@@ -69,7 +69,12 @@ public class MultiVariate_R {
 	public static Thread threadIn = null;
 	public static Color[] ClassCols = null;
 	
-	public MultiVariate_R(double[][] rawData,String[] sampleNames,String[] areaNames,String[] cNames, Color[] cols) {
+	public static StringBuffer pcaExport;
+	public static String[]	sNames;
+	public static String[]	cNames;
+	public static String[]	aNames;
+	
+	public MultiVariate_R(double[][] rawData,String[] sampleNames,String[] areaNames,String[] classNames, Color[] cols) {
 
 //		
 		if ( r_Path.length()<1 || r_Script.length()<1 ||  r_Data.length()<1) setPaths();
@@ -80,6 +85,9 @@ public class MultiVariate_R {
 		int fNum = rawData.length;
 		int aNum = rawData[0].length;
 		
+		sNames = sampleNames;
+		aNames = areaNames;
+		cNames = classNames;
 		// HACK TO R
 				// Schreibe Daten in Table
 	
@@ -143,7 +151,7 @@ public class MultiVariate_R {
 	}
 	
 	
-public static void setPaths(){
+	public static void setPaths(){
 		
 		  JPanel tmp = new JPanel();
 		  tmp.setLayout(new BoxLayout(tmp,BoxLayout.Y_AXIS));
@@ -370,25 +378,26 @@ class LogStreamReader implements Runnable {
     		
     	 }
 
+    	 // NO NEED YET FOR LDA
     	// !!! VERIFIED LDA
-    	 if (MultiVariate_R.LDAs != null) {
-	    	 int countPCA = 6;
-	    	 if ( countPCA > MultiVariate_R.LDAsvariances.length )countPCA = MultiVariate_R.LDAsvariances.length; //PCAs / LDA
-	    	 MultiVariate_R.LDA_numPCA = MultiVariate_R.LDAscales.length;
-	    	 
-	    	 if ( MultiVariate_R.LDAs == null ) MultiVariate_R.LDAs = new double[m][countPCA]; // Samples / LDA
-	    	 for(int files=0;files<m;files++){	// files
-	    		 for(int lda=0;lda<MultiVariate_R.LDAscales[0].length;lda++){	 // [PC]
-	        		 double sum=0;
-	    			 for(int pcs=0;pcs<MultiVariate_R.LDAscales.length;pcs++){	 // [area]
-	    				 sum += MultiVariate_R.PCAs[files][pcs]* MultiVariate_R.LDAscales[pcs][lda];
-	    			 }
-	    			 MultiVariate_R.LDAs[files][lda] =  sum;
-	    		 }
-	    		 //;
-	    		
-	    	}
-    	 }
+//    	 if (MultiVariate_R.LDAs != null) {
+//	    	 int countPCA = 6;
+//	    	 if ( countPCA > MultiVariate_R.LDAsvariances.length )countPCA = MultiVariate_R.LDAsvariances.length; //PCAs / LDA
+//	    	 MultiVariate_R.LDA_numPCA = MultiVariate_R.LDAscales.length;
+//	    	 
+//	    	 if ( MultiVariate_R.LDAs == null ) MultiVariate_R.LDAs = new double[m][countPCA]; // Samples / LDA
+//	    	 for(int files=0;files<m;files++){	// files
+//	    		 for(int lda=0;lda<MultiVariate_R.LDAscales[0].length;lda++){	 // [PC]
+//	        		 double sum=0;
+//	    			 for(int pcs=0;pcs<MultiVariate_R.LDAscales.length;pcs++){	 // [area]
+//	    				 sum += MultiVariate_R.PCAs[files][pcs]* MultiVariate_R.LDAscales[pcs][lda];
+//	    			 }
+//	    			 MultiVariate_R.LDAs[files][lda] =  sum;
+//	    		 }
+//	    		 //;
+//	    		
+//	    	}
+//    	 }
     	  // PCA In die Mitte setzen
 	     for(int p=0;p<MultiVariate_R.eigenVectors[0].length;p++){	// AREA
 	    	 double avg = 0;
@@ -441,17 +450,68 @@ class LogStreamReader implements Runnable {
 	if ( MultiVariate_R.minAllPCA > MultiVariate_R.minPCA4 ) MultiVariate_R.minAllPCA = MultiVariate_R.minPCA4;
 
 	
-	 Path source = Paths.get(MultiVariate_R.r_Data);
+	
+	
+		 Path source = Paths.get(MultiVariate_R.r_Data);
+		
+		  try{
+		
+		    // rename a file in the same directory
+			  Files.move(source, source.resolveSibling(new File(MultiVariate_R.r_Data).getName()+".bak"),StandardCopyOption.REPLACE_EXISTING);
+		
+		  } catch (IOException e) {
+		    e.printStackTrace();
+		  }
+		  set3D_PCA();
+		  
+		MultiVariate_R.pcaExport = new StringBuffer ();
+		  
+		MultiVariate_R.pcaExport.append("PC"	+ "\n");
+		// Header PCA Eigenvectors
+		MultiVariate_R.pcaExport.append("Files");
+		for(int pc=0;pc<MultiVariate_R.eigenVectors[0].length;pc++){	 // [PC]
+			MultiVariate_R.pcaExport.append("\t");
+			MultiVariate_R.pcaExport.append("PC_"+(pc+1));
+		}
+		MultiVariate_R.pcaExport.append("\n");
+		// PCA Eigenvectors
+		for(int files=0;files<m;files++){	// files
+			MultiVariate_R.pcaExport.append(MultiVariate_R.cNames[files]);  
+	 		for(int pc=0;pc<MultiVariate_R.PCAs[0].length;pc++){	 // [PC]
+	 			MultiVariate_R.pcaExport.append("\t");
+	 			MultiVariate_R.pcaExport.append(MultiVariate_R.PCAs[files][pc]);
+	 		}
+	 		MultiVariate_R.pcaExport.append("\n");
+	 	}
+		MultiVariate_R.pcaExport.append("\n");
+		MultiVariate_R.pcaExport.append("PCA Center");
+		for(int p=0;p<MultiVariate_R.eigenVectors[0].length;p++){
+			MultiVariate_R.pcaExport.append("\t");
+			MultiVariate_R.pcaExport.append(MultiVariate_R.PC_centered[p]);
+		}
+		MultiVariate_R.pcaExport.append("\n");
+		
+		MultiVariate_R.pcaExport.append("PCA Variance");
+		for(int pc=0;pc<MultiVariate_R.eigenVectors[0].length;pc++){	 // [PC]
+			MultiVariate_R.pcaExport.append("\t");
+			MultiVariate_R.pcaExport.append(MultiVariate_R.eigenValuesPercental[pc]);
+		}
+		MultiVariate_R.pcaExport.append("\n");
+		MultiVariate_R.pcaExport.append("\n");
+		MultiVariate_R.pcaExport.append("PCA Eigenvectors"	+ "\n");
+		for(int area=0;area<MultiVariate_R.eigenVectors.length;area++){	 // [area]
+			MultiVariate_R.pcaExport.append(MultiVariate_R.aNames[area]);
+			for(int pc=0;pc<MultiVariate_R.eigenVectors[0].length;pc++){	 // [PC]
+				MultiVariate_R.pcaExport.append("\t");
+				MultiVariate_R.pcaExport.append(MultiVariate_R.eigenVectors[area][pc]);
+			}
+			MultiVariate_R.pcaExport.append("\n");
+		}
+		MultiVariate_R.pcaExport.append("\n");
 
-	  try{
 
-	    // rename a file in the same directory
-	    Files.move(source, source.resolveSibling(new File(MultiVariate_R.r_Data).getName()+".bak"),StandardCopyOption.REPLACE_EXISTING);
-
-	  } catch (IOException e) {
-	    e.printStackTrace();
-	  }
-	  set3D_PCA();
+ 
+	
     }
 
     private void set3D_PCA() {

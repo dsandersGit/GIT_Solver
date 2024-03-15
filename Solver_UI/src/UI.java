@@ -870,6 +870,8 @@ public class UI {
 		menuExport.addSeparator();
 		JMenuItem menuExportPlot = new JMenuItem(" Copy current plot "); 
 		menuExport.add(menuExportPlot);
+		JMenuItem menuExportPCA = new JMenuItem(" Recent PCA result"); 
+		menuExport.add(menuExportPCA);
 		// ---------------------------------------------------------------------
 		JMenu menuAbout = new JMenu( " About");
 		JMenuItem menuAboutAbout = new JMenuItem(" About "+SolverStart.app); 
@@ -1180,6 +1182,15 @@ public class UI {
 		    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		    clipboard.setContents( stringSelection, stringSelection );
 		}});
+		menuExportPCA.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
+			if ( MultiVariate_R.pcaExport == null || maintabbed.getSelectedIndex()!=tab_PCA ) {
+				JOptionPane.showMessageDialog(null, "Export available from PC-Analysis TAB", "PCA Export", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			StringSelection stringSelection = new StringSelection(  MultiVariate_R.pcaExport.toString() );
+		    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		    clipboard.setContents( stringSelection, stringSelection );
+		}});
 		menuExportPlot.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
 			BufferedImage img=null;
 			if(maintabbed.getSelectedIndex()==tab_Live ){
@@ -1400,6 +1411,7 @@ public class UI {
 		
 		//if ( !loadSuccess )return;
 		
+		MultiVariate_R.pcaExport = null;
 		DS.fixedTrainSet = null;
 		DS.txtSummary = null;
 		DS.fileName =  f.getName();

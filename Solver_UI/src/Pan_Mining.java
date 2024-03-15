@@ -193,6 +193,8 @@ public class Pan_Mining extends JComponent {
 	}
 	public static void plot() {
 		
+		MultiVariate_R.pcaExport = null;
+		
 		pro_area.setValue(100*area/DS.numVars);
 		pro_area.setString("pos: "+(100*area/DS.numVars)+"%");
 		
