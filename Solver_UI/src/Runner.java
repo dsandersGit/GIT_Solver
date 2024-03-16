@@ -14,6 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Runner {
 	public int targetColorIndex 	= -1;
+	public int targetListIndex 		= -1;
 	public String targetName		 	= null;
 	public double[][] mcEigenVec 	= null;
 	public double[][] mcEigenVecOld = null;
@@ -48,7 +49,7 @@ public class Runner {
     static ArrayList<Float> dstTrain = new ArrayList<Float>();
     static boolean doDistxAccur = false;									// activation function
     static boolean doAccur = false;
-    double[] mappedSigmoid = null;
+    static double[] mappedSigmoid = null;
     float[] xSigmoid = null;
     float[] ySigmoid = null;
     
@@ -58,19 +59,22 @@ public class Runner {
 	public Runner(int target, String tName, boolean activationIsDst) {
 		SolverStart.immediateSkip 	= false;
 		SolverStart.doShuffle		= false;
-		absCount =0 ;
-		mappedSigmoid = new double[200];
-		for (double i=-10;i<10;i+=0.1) {
-			mappedSigmoid[(int)((i + 10)*10.)] = getSigmoid(i);	
+		absCount =0 ;														// Trial Counter
+		if ( mappedSigmoid == null) {
+			mappedSigmoid = new double[200];
+			for (double i=-10;i<10;i+=0.1) {
+				mappedSigmoid[(int)((i + 10)*10.)] = getSigmoid(i);	
+			}
+			xSigmoid = new float[200];
+	        ySigmoid = new float[200];
+	        for (int i=0;i<xSigmoid.length;i++) {
+	        	xSigmoid[i] = (float) ((float)i/200.);
+	        	ySigmoid[i] = DS.numSamples * (float) getMappedSigmoid(((float)i/200. - 0.5f)*10);
+	        }
 		}
-		xSigmoid = new float[200];
-        ySigmoid = new float[200];
-        for (int i=0;i<xSigmoid.length;i++) {
-        	xSigmoid[i] = (float) ((float)i/200.);
-        	ySigmoid[i] = DS.numSamples * (float) getMappedSigmoid(((float)i/200. - 0.5f)*10);
-        }
-		
 		targetColorIndex 		= target;
+		targetListIndex			= Classify.getTargetColorIndexPos (targetColorIndex);
+		
 		if ( tName == null) {
 			targetName = "c"+target;
 		}else {

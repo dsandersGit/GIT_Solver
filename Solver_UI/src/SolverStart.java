@@ -133,11 +133,12 @@ public class SolverStart {
 	 * 130: BUGFIX: Train/Validation Fixed Trainset was by CLASS, not GLOBAL -> System 'learned' foes
 	 * 131: Always new Eigenvectors
 	 * 132: PC-Export, enables running PCA-ML
+	 * 133: PC-Analysis > Dataset, enables running PCA-ML
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.5";
-	public static String 		revision 		= " 132";
+	public static String 		revision 		= " 133";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;
@@ -672,9 +673,10 @@ public class SolverStart {
 		return '\"'+txt.replaceAll("\"", "")+'\"';
 	}
 	
-	public static boolean importDataCSV(String datei){								// nur ClassenName und Daten
+	public static boolean importDataCSV(String datei, String split){								// nur ClassenName und Daten
 		
-		 String split = ","; char cSplit = ',';
+		 //String split = ",";
+		 char cSplit = split.charAt(0);
 		 boolean fromClip = false;
 		 boolean commaAsDecimalSep = false;
 		 

@@ -130,6 +130,7 @@ public class UI {
 	static 				JScrollPane scSummary		= new JScrollPane(txtSummary);
 	public static 		ThreeDee tab3D = new ThreeDee();
 	public static 		ThreeDee tabPCA3D = new ThreeDee();
+	public static 		JPanel panPCA3D = new JPanel();
 //	static 				JLabel iconAlgo = new Icon_Solver();
 	static 				JLabel iconClassify = null;
 	
@@ -222,8 +223,73 @@ public class UI {
 		panTrends.add(sp1D);
 		panTrends.add(sp2D);
 		
+		panPCA3D.setLayout(new BorderLayout());
+		panPCA3D.add(tabPCA3D, BorderLayout.CENTER);
+		JButton jb_SavePCA = new JButton("Copy PCA & Model");
+		jb_SavePCA.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
+			StringBuffer out = new StringBuffer();
+			out.append(MultiVariate_R.pcaDataExport);
+			out.append(MultiVariate_R.pcaModelExport);
+			StringSelection stringSelection = new StringSelection(  out.toString() );
+		    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		    clipboard.setContents( stringSelection, stringSelection );
+		}});
+		//JButton jb_ApplyPCA = new JButton("Apply PCA Model");
+		JButton jb_SetPcaData = new JButton("Set PCA Model as DataSet");
+		jb_SetPcaData.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
+			if ( MultiVariate_R.pcaDataExport == null ) return;
+			File f = null;
+			try {
+				f = File.createTempFile("temp", null);
+			} catch (IOException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
+			if ( f== null ) return;
+	        f.deleteOnExit();
+			FileWriter fw = null;
+			try {
+				fw = new FileWriter(f, false);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		    BufferedWriter bw = new BufferedWriter(fw);
+		    try {
+		    	fw.write(MultiVariate_R.pcaDataExport.toString());
+			} catch (JSONException | IOException e1) {
+				e1.printStackTrace();
+			}
+		  
+		    try {
+		    	bw.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		    SolverStart.importDataCSV(f.getAbsolutePath(), "\t");
+			DS.txtSummary = null;
+			DS.fileName =  "PCA";
+			DS.filePath = null;
+			tmtableClassify.setColumnCount(0);
+			tmtableClassify.setRowCount(0);
+			new DS();												// INITS
+			DS.normParas = Tools.doNormData ();				// Daten Normalisieren
+			UI.maintabbed.setSelectedIndex(UI.tab_Summary);
+			refreshStatus();
+			SolverStart.analyzeRawData(DS.fileName );
+			UI.maintabbed.setSelectedIndex(UI.tab_Summary);
+		}});
+
+		
+		
+		JPanel pan_actPca = new JPanel();
+		pan_actPca.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		pan_actPca.add(jb_SavePCA);
+		//pan_actPca.add(jb_ApplyPCA);
+		pan_actPca.add(jb_SetPcaData);
+		panPCA3D.add(pan_actPca,BorderLayout.SOUTH);
+		
 		maintabbed.add("Data",scSummary);
-		maintabbed.add("PCA",tabPCA3D);
+		maintabbed.add("PCA",panPCA3D);
 		maintabbed.add("Visual Check", panMining);
 		maintabbed.add("Live", panLive);
 		maintabbed.add("Validation",scValidation);
@@ -870,8 +936,8 @@ public class UI {
 		menuExport.addSeparator();
 		JMenuItem menuExportPlot = new JMenuItem(" Copy current plot "); 
 		menuExport.add(menuExportPlot);
-		JMenuItem menuExportPCA = new JMenuItem(" Recent PCA result"); 
-		menuExport.add(menuExportPCA);
+//		JMenuItem menuExportPCA = new JMenuItem(" Recent PCA result"); 
+//		menuExport.add(menuExportPCA);
 		// ---------------------------------------------------------------------
 		JMenu menuAbout = new JMenu( " About");
 		JMenuItem menuAboutAbout = new JMenuItem(" About "+SolverStart.app); 
@@ -891,7 +957,7 @@ public class UI {
 			loadData();
 		}});
 		menuFileLoadClip.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
-			SolverStart.importDataCSV(null);
+			SolverStart.importDataCSV(null,"\t");
 			new DS();												// INITS
 			DS.normParas = Tools.doNormData ();				// Daten Normalisieren
 
@@ -1182,15 +1248,7 @@ public class UI {
 		    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		    clipboard.setContents( stringSelection, stringSelection );
 		}});
-		menuExportPCA.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
-			if ( MultiVariate_R.pcaExport == null || maintabbed.getSelectedIndex()!=tab_PCA ) {
-				JOptionPane.showMessageDialog(null, "Export available from PC-Analysis TAB", "PCA Export", JOptionPane.INFORMATION_MESSAGE);
-				return;
-			}
-			StringSelection stringSelection = new StringSelection(  MultiVariate_R.pcaExport.toString() );
-		    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-		    clipboard.setContents( stringSelection, stringSelection );
-		}});
+		
 		menuExportPlot.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
 			BufferedImage img=null;
 			if(maintabbed.getSelectedIndex()==tab_Live ){
@@ -1405,13 +1463,12 @@ public class UI {
 			loadSuccess = true;
 		}
 		if ( f.getName().toLowerCase().endsWith(".csv")) {
-			loadSuccess = SolverStart.importDataCSV(f.getAbsolutePath());
+			loadSuccess = SolverStart.importDataCSV(f.getAbsolutePath(),",");
 		}
 		
 		
 		//if ( !loadSuccess )return;
 		
-		MultiVariate_R.pcaExport = null;
 		DS.fixedTrainSet = null;
 		DS.txtSummary = null;
 		DS.fileName =  f.getName();

@@ -69,7 +69,8 @@ public class MultiVariate_R {
 	public static Thread threadIn = null;
 	public static Color[] ClassCols = null;
 	
-	public static StringBuffer pcaExport;
+	public static StringBuffer pcaDataExport;
+	public static StringBuffer pcaModelExport;
 	public static String[]	sNames;
 	public static String[]	cNames;
 	public static String[]	aNames;
@@ -281,16 +282,16 @@ class LogStreamReader implements Runnable {
 
     public void run() {
     	
-		int m = MultiVariate_R.data.length;//file
-		int n = MultiVariate_R.data[0].length;//area
+		int numFiles = MultiVariate_R.data.length;//file
+		int numVars = MultiVariate_R.data[0].length;//area
 		
 		MultiVariate_R.eigenVectors = null;// new double[n][n];	// 
-		MultiVariate_R.eigenValuesPercental = new double[n];	// 
-		MultiVariate_R.eigenValues = new double[n];	//
-		MultiVariate_R.means = new double[n];
-		MultiVariate_R.variances  = new double[n];
-		MultiVariate_R.PC_centered = new double[n];
-		MultiVariate_R.PCAs = new double[m][n]; // Samples / PCA
+		MultiVariate_R.eigenValuesPercental = new double[numVars];	// 
+		MultiVariate_R.eigenValues = new double[numVars];	//
+		MultiVariate_R.means = new double[numVars];
+		MultiVariate_R.variances  = new double[numVars];
+		MultiVariate_R.PC_centered = new double[numVars];
+		MultiVariate_R.PCAs = new double[numFiles][numVars]; // Samples / PCA
 		MultiVariate_R.LDAs = null;// new double[m][2]; // Samples / LDA
 		MultiVariate_R.LDAsvariances = null;
 		MultiVariate_R.LDAscales = null;
@@ -315,7 +316,7 @@ class LogStreamReader implements Runnable {
             			numArea 					= Integer.parseInt(elms[2]);
             			MultiVariate_R.eigenVectors 	= new double[numArea][numPC];
             			MultiVariate_R.eigenValuesPercental	= new double[numPC];
-            			MultiVariate_R.PCAs				= new double[m][numPC];
+            			MultiVariate_R.PCAs				= new double[numFiles][numPC];
             		}
             		if(elms[0].endsWith("rotation")) {
             			int a 						=   Integer.parseInt(elms[1])-1;
@@ -333,7 +334,7 @@ class LogStreamReader implements Runnable {
             			numPCinLDA 					= Integer.parseInt(elms[2]);
             			MultiVariate_R.LDAsvariances 	= new double[numLDA];
             			MultiVariate_R.LDAscales 		= new double[numPCinLDA][numLDA];
-            			MultiVariate_R.LDAs  			= new double[m][numLDA];
+            			MultiVariate_R.LDAs  			= new double[numFiles][numLDA];
             		}
             		if(elms[0].endsWith("LDA_variance")) {
             			int p 						= Integer.parseInt(elms[1])-1;
@@ -360,22 +361,21 @@ class LogStreamReader implements Runnable {
         
 
         //MultiVariate_R.r_Output = in.toString();
-        finishPCA(m, n);
+        finishPCA(numFiles, numVars);
     }
-    private void finishPCA(int m, int n){
+    private void finishPCA(int numFiles, int numVars){
     	
     	// TEST: PCA hier brechnen anstatt übernehmen
     	// !!! VERIFIED PCA
-    	 for(int files=0;files<m;files++){	// files
+    	 for(int files=0;files<numFiles;files++){	// files
     		 for(int pc=0;pc<MultiVariate_R.eigenVectors[0].length;pc++){	 // [PC]
     			 double sum=0;	 
     			 for(int area=0;area<MultiVariate_R.eigenVectors.length;area++){	 // [area]
     				 sum += MultiVariate_R.data[files][area]* MultiVariate_R.eigenVectors[area][pc];
     			 }
     			 MultiVariate_R.PCAs[files][pc] =  sum;
-    		
+    			 
     		 }
-    		
     	 }
 
     	 // NO NEED YET FOR LDA
@@ -402,13 +402,13 @@ class LogStreamReader implements Runnable {
 	     for(int p=0;p<MultiVariate_R.eigenVectors[0].length;p++){	// AREA
 	    	 double avg = 0;
 	    	 double count = 0;
-	    	 for(int i=0;i<m;i++){	// files
+	    	 for(int i=0;i<numFiles;i++){	// files
 		    		 avg += MultiVariate_R.PCAs[i][p];
 		    		 count ++;
 	    	 }
 	    	 avg = avg/count;
 	    	 MultiVariate_R.PC_centered[p] = avg;
-	    	 for(int i=0;i<m;i++){	// files
+	    	 for(int i=0;i<numFiles;i++){	// files
 	    		 MultiVariate_R.PCAs[i][p] -=  avg;
 	    	 }
 	     }
@@ -464,50 +464,51 @@ class LogStreamReader implements Runnable {
 		  }
 		  set3D_PCA();
 		  
-		MultiVariate_R.pcaExport = new StringBuffer ();
+		MultiVariate_R.pcaDataExport = new StringBuffer ();
+		MultiVariate_R.pcaModelExport = new StringBuffer ();
 		  
-		MultiVariate_R.pcaExport.append("PC"	+ "\n");
+		//MultiVariate_R.pcaDataExport.append("PC"	+ "\n");
 		// Header PCA Eigenvectors
-		MultiVariate_R.pcaExport.append("Files");
+		MultiVariate_R.pcaDataExport.append("Files");
 		for(int pc=0;pc<MultiVariate_R.eigenVectors[0].length;pc++){	 // [PC]
-			MultiVariate_R.pcaExport.append("\t");
-			MultiVariate_R.pcaExport.append("PC_"+(pc+1));
+			MultiVariate_R.pcaDataExport.append("\t");
+			MultiVariate_R.pcaDataExport.append("PC_"+(pc+1));
 		}
-		MultiVariate_R.pcaExport.append("\n");
+		MultiVariate_R.pcaDataExport.append("\n");
 		// PCA Eigenvectors
-		for(int files=0;files<m;files++){	// files
-			MultiVariate_R.pcaExport.append(MultiVariate_R.cNames[files]);  
+		for(int files=0;files<numFiles;files++){	// files
+			MultiVariate_R.pcaDataExport.append(MultiVariate_R.cNames[files]);  
 	 		for(int pc=0;pc<MultiVariate_R.PCAs[0].length;pc++){	 // [PC]
-	 			MultiVariate_R.pcaExport.append("\t");
-	 			MultiVariate_R.pcaExport.append(MultiVariate_R.PCAs[files][pc]);
+	 			MultiVariate_R.pcaDataExport.append("\t");
+	 			MultiVariate_R.pcaDataExport.append(MultiVariate_R.PCAs[files][pc]);
 	 		}
-	 		MultiVariate_R.pcaExport.append("\n");
+	 		MultiVariate_R.pcaDataExport.append("\n");
 	 	}
-		MultiVariate_R.pcaExport.append("\n");
-		MultiVariate_R.pcaExport.append("PCA Center");
+		MultiVariate_R.pcaModelExport.append("\n");
+		MultiVariate_R.pcaModelExport.append("PCA Center");
 		for(int p=0;p<MultiVariate_R.eigenVectors[0].length;p++){
-			MultiVariate_R.pcaExport.append("\t");
-			MultiVariate_R.pcaExport.append(MultiVariate_R.PC_centered[p]);
+			MultiVariate_R.pcaModelExport.append("\t");
+			MultiVariate_R.pcaModelExport.append(MultiVariate_R.PC_centered[p]);
 		}
-		MultiVariate_R.pcaExport.append("\n");
+		MultiVariate_R.pcaModelExport.append("\n");
 		
-		MultiVariate_R.pcaExport.append("PCA Variance");
+		MultiVariate_R.pcaModelExport.append("PCA Variance");
 		for(int pc=0;pc<MultiVariate_R.eigenVectors[0].length;pc++){	 // [PC]
-			MultiVariate_R.pcaExport.append("\t");
-			MultiVariate_R.pcaExport.append(MultiVariate_R.eigenValuesPercental[pc]);
+			MultiVariate_R.pcaModelExport.append("\t");
+			MultiVariate_R.pcaModelExport.append(MultiVariate_R.eigenValuesPercental[pc]);
 		}
-		MultiVariate_R.pcaExport.append("\n");
-		MultiVariate_R.pcaExport.append("\n");
-		MultiVariate_R.pcaExport.append("PCA Eigenvectors"	+ "\n");
+		MultiVariate_R.pcaModelExport.append("\n");
+		MultiVariate_R.pcaModelExport.append("\n");
+		MultiVariate_R.pcaModelExport.append("PCA Eigenvectors"	+ "\n");
 		for(int area=0;area<MultiVariate_R.eigenVectors.length;area++){	 // [area]
-			MultiVariate_R.pcaExport.append(MultiVariate_R.aNames[area]);
+			MultiVariate_R.pcaModelExport.append(MultiVariate_R.aNames[area]);
 			for(int pc=0;pc<MultiVariate_R.eigenVectors[0].length;pc++){	 // [PC]
-				MultiVariate_R.pcaExport.append("\t");
-				MultiVariate_R.pcaExport.append(MultiVariate_R.eigenVectors[area][pc]);
+				MultiVariate_R.pcaModelExport.append("\t");
+				MultiVariate_R.pcaModelExport.append(MultiVariate_R.eigenVectors[area][pc]);
 			}
-			MultiVariate_R.pcaExport.append("\n");
+			MultiVariate_R.pcaModelExport.append("\n");
 		}
-		MultiVariate_R.pcaExport.append("\n");
+		MultiVariate_R.pcaModelExport.append("\n");
 
 
  
@@ -588,17 +589,13 @@ class LogStreamReader implements Runnable {
        	UI.tabPCA3D.setPreLine(m,max,-max, true, 200, 200, 200);
         }
         
-        
         for(int i=0;i<MultiVariate_R.PCAs.length;i++){
-//       	 System.out.println(MultiVariate_R.PCAs[i][0]+"\t"+MultiVariate_R.PCAs[i][1]+"\t"+MultiVariate_R.PCAs[i][2]);
 			int x = (int)MultiVariate_R.PCAs[i][0];
 			int y = (int)MultiVariate_R.PCAs[i][1];
 			int z = (int)MultiVariate_R.PCAs[i][2];
 			Color c = MultiVariate_R.ClassCols[DS.listClassIndex[i]];
 			Color cn = new Color(c.getRed(),c.getGreen(),c.getBlue(), 150 );
-			//if ( plotBuilder.doShowLabel)tab3D_PCA.setCube(x, y, z, plotBuilder.pointSize*5, cn, PerformPCA.SampleNames[i]);//(px,py,wert-min,ads,red,green,blue);
-    			UI.tabPCA3D.setCube(x, y, z, 15, cn, null);//(px,py,wert-min,ads,red,green,blue);
-//    			System.out.println(x+"\t"+ y+"\t"+ z);
+   			UI.tabPCA3D.setCube(x, y, z, 15, cn, null);//(px,py,wert-min,ads,red,green,blue);
         }
         UI.tabPCA3D.repaint();
 	}
