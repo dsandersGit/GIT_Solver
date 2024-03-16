@@ -71,6 +71,7 @@ public class MultiVariate_R {
 	
 	public static StringBuffer pcaDataExport;
 	public static StringBuffer pcaModelExport;
+	public static JSONObject pcaModel;
 	public static String[]	sNames;
 	public static String[]	cNames;
 	public static String[]	aNames;
@@ -466,6 +467,8 @@ class LogStreamReader implements Runnable {
 		  
 		MultiVariate_R.pcaDataExport = new StringBuffer ();
 		MultiVariate_R.pcaModelExport = new StringBuffer ();
+		MultiVariate_R.pcaModel = new JSONObject();
+		String[][] pcaModl = new String[MultiVariate_R.eigenVectors[0].length][MultiVariate_R.eigenVectors.length+2];	// PC's / area
 		  
 		//MultiVariate_R.pcaDataExport.append("PC"	+ "\n");
 		// Header PCA Eigenvectors
@@ -489,6 +492,7 @@ class LogStreamReader implements Runnable {
 		for(int p=0;p<MultiVariate_R.eigenVectors[0].length;p++){
 			MultiVariate_R.pcaModelExport.append("\t");
 			MultiVariate_R.pcaModelExport.append(MultiVariate_R.PC_centered[p]);
+			pcaModl[p][0] = ""+MultiVariate_R.PC_centered[p];
 		}
 		MultiVariate_R.pcaModelExport.append("\n");
 		
@@ -496,6 +500,7 @@ class LogStreamReader implements Runnable {
 		for(int pc=0;pc<MultiVariate_R.eigenVectors[0].length;pc++){	 // [PC]
 			MultiVariate_R.pcaModelExport.append("\t");
 			MultiVariate_R.pcaModelExport.append(MultiVariate_R.eigenValuesPercental[pc]);
+			pcaModl[pc][1] = ""+MultiVariate_R.eigenValuesPercental[pc];
 		}
 		MultiVariate_R.pcaModelExport.append("\n");
 		MultiVariate_R.pcaModelExport.append("\n");
@@ -505,14 +510,26 @@ class LogStreamReader implements Runnable {
 			for(int pc=0;pc<MultiVariate_R.eigenVectors[0].length;pc++){	 // [PC]
 				MultiVariate_R.pcaModelExport.append("\t");
 				MultiVariate_R.pcaModelExport.append(MultiVariate_R.eigenVectors[area][pc]);
+				pcaModl[pc][2+area] = "" + MultiVariate_R.eigenVectors[area][pc];
 			}
 			MultiVariate_R.pcaModelExport.append("\n");
 		}
 		MultiVariate_R.pcaModelExport.append("\n");
 
+		String head = "PC Avgerage,PC Variance";
+		for(int area=0;area<MultiVariate_R.eigenVectors.length;area++){
+			head += "," + MultiVariate_R.aNames[area];
+		}
+		MultiVariate_R.pcaModel.put("Format", head);
+		for (int i=0;i<pcaModl.length;i++) {
+			String in = "";
+			for (int j=0;j<pcaModl[0].length;j++) {
+				if ( j>0) in+=",";
+				in += pcaModl[i][j];
+			}
+			MultiVariate_R.pcaModel.put("PC"+(i+1), in);
+		}
 
- 
-	
     }
 
     private void set3D_PCA() {

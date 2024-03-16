@@ -42,7 +42,7 @@ public class DS {
 	public static JSONObject	js_Ensemble		= null;
 	public static int			selected		= 0;
 	
-	//public static String 	    TP_FP_TN_FN		= null;
+	public static boolean 		isPCA			= false;	
 	
 	public static StringBuffer 	txtSummary		= null;
 	//public static Color[]		classCols 		= null;
@@ -82,6 +82,7 @@ public class DS {
 	
 	public DS () {
 
+		isPCA = false;
 		UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
 		if ( AreaNames == null) System.out.println("AreaNames is null");
 		DS.numVars 	= AreaNames.length;

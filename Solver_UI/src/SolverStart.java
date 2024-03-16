@@ -134,11 +134,12 @@ public class SolverStart {
 	 * 131: Always new Eigenvectors
 	 * 132: PC-Export, enables running PCA-ML
 	 * 133: PC-Analysis > Dataset, enables running PCA-ML
+	 * 134: PC-Analysis > Dataset, PCA Mod in Ensemble
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.5";
-	public static String 		revision 		= " 133";
+	public static String 		revision 		= " 134";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;
@@ -302,6 +303,9 @@ public class SolverStart {
 		    main.put("ObjectType"					, "ML_Ensemble");
 		    main.put("ObjectVersion"				, "01.00"); 
 		    main.put("Support"						,"N/A");
+		    if (DS.isPCA && MultiVariate_R.pcaModel != null) {
+		    	main.put("PCA"						,MultiVariate_R.pcaModel);	
+		    }
 			QRmain.put("creator"					, SolverStart.app + SolverStart.appAdd );
 			QRmain.put("Date"						, ""+dtf.format(now));
 		    

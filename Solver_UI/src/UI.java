@@ -268,11 +268,13 @@ public class UI {
 		    SolverStart.importDataCSV(f.getAbsolutePath(), "\t");
 			DS.txtSummary = null;
 			DS.fileName =  "PCA";
+			
 			DS.filePath = null;
 			tmtableClassify.setColumnCount(0);
 			tmtableClassify.setRowCount(0);
 			new DS();												// INITS
 			DS.normParas = Tools.doNormData ();				// Daten Normalisieren
+			DS.isPCA = true;
 			UI.maintabbed.setSelectedIndex(UI.tab_Summary);
 			refreshStatus();
 			SolverStart.analyzeRawData(DS.fileName );
