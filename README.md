@@ -32,5 +32,6 @@ Datasets with up to approx. 5000 samples and 100 variables are processed within 
 The algorithm sums up to this graphical representation:
 ![image](https://github.com/dsandersGit/GIT_Solver/assets/140900940/cef8ff88-c168-493e-b4f5-1472ebfa8b1e)
 
+If 'R: The R Project for Statistical Computing' is installed, data can be compressed to the top variant principal components (>5%) using the given R script. 
 
 Credits: Json.org JAVA libraries are used
