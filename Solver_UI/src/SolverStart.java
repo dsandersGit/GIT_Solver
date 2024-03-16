@@ -16,7 +16,6 @@ import java.util.Objects;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 
@@ -135,6 +134,7 @@ public class SolverStart {
 	 * 132: PC-Export, enables running PCA-ML
 	 * 133: PC-Analysis > Dataset, enables running PCA-ML
 	 * 134: PC-Analysis > Dataset, PCA Mod in Ensemble
+	 * 135: UI upgardes, clear freezes in batches
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
@@ -221,6 +221,7 @@ public class SolverStart {
 		
 		defOptions = Opts.getOptsAsJson();					// save default startup options
 
+		
        	new UI();							// 122
 		
 		if(args.length>0 && args[0].endsWith(".dat")){
@@ -252,6 +253,9 @@ public class SolverStart {
 		DS.getFixedTrainSet();	
 		
 		for (int batch = 0;batch < batchSize;batch++) {
+			
+			DS.freezs.clear();
+			
 			// populates with running the accuracy of train / test results
 			ArrayList<Float> rollingAccuracyTest = new ArrayList<Float>();
 			ArrayList<Float> rollingAccuracyTrain = new ArrayList<Float>();
@@ -458,6 +462,9 @@ public class SolverStart {
 			main.put("confusionMatrix", Classify.confMatrixout.toString());
 			
 			DS.setEnsemble(main);
+			
+//			System.out.println(Classify.accuracyTrain );//+ "\t" + Classify.accuracyTest); 
+			
 	//		UI.txtEnsemble.setText(main.toString(3));
 			EnsembleTree.putEnsemble(UI.labAccuracy.getText(), UI.txtClassify.getText(), main);
 			cleanUI();

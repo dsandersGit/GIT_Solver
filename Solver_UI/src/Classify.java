@@ -388,7 +388,7 @@ public class Classify {
 			distances[f] /= maxDst;
 		}
 		}else {
-			System.out.println("WARNING: maxDst = 0");
+			//System.out.println("WARNING: maxDst = 0");
 			for (int f=0;f<DS.numSamples;f++){
 				distances[f] = 0;
 			}

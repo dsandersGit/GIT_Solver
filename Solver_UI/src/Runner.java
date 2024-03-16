@@ -113,7 +113,7 @@ public class Runner {
         	absCount++;
         	if ( absCount%step == 0 ) {
         		UI.labRun.setText("Run: " + absCount);
-        		UI.proNoBetterStop.setValue(notBetterCount*100 / Opts.noBetterStop );
+//        		UI.proNoBetterStop.setValue(notBetterCount*100 / Opts.noBetterStop );
         	}
         	if ( absCount > 3000 ) step = 1000;
         }
@@ -1015,7 +1015,8 @@ public class Runner {
 //				cn = Color.orange;
 //			}
 			cn = Tools.getClassColor(Classify.getTargetColorIndexPos(DS.classIndex[i]));
-    		UI.tab3D.setCube(x, y, z, pointSize*5, cn, null);
+			Color cnt = new Color(cn.getRed(),cn.getGreen(),cn.getBlue(), 150 );
+    		UI.tab3D.setCube(x, y, z, pointSize*5, cnt, null);
         }
 
 	}

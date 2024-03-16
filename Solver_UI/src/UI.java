@@ -79,7 +79,7 @@ public class UI {
 	static 		JLabel			labStatusIcon		= null;
 	static 		JLabel			labAccuracy			= new JLabel("---");
 	static 		JProgressBar	proStatus			= new JProgressBar();
-	static 		JProgressBar	proNoBetterStop		= new JProgressBar();
+//	static 		JProgressBar	proNoBetterStop		= new JProgressBar();
 	static 		JLabel			labTimePerRun		= new JLabel("Process: ---");
 	static 		JLabel			labRun				= new JLabel("RUN: ---");
 	
@@ -435,8 +435,10 @@ public class UI {
 		labStatusIcon = new JLabel(new ImageIcon(ClassLoader.getSystemResource("colBlue.png")));
 		labStatusIcon.setToolTipText("Ensemble Readiness");
 		
-		panL.add(proNoBetterStop);
+//		panL.add(proNoBetterStop);
 		panL.add(labRun);
+		Dimension d = labRun.getPreferredSize();
+		labRun.setPreferredSize(new Dimension(d.width+100,d.height));
 		panL.add(labAccuracy);
 		panL.add(labSamples);
 		panL.add(labVars);
@@ -543,7 +545,7 @@ public class UI {
 		jb_Stop.setEnabled(false);
 		jB_Skip.setEnabled(false);
 		jB_Shuffle.setEnabled(false);
-		proNoBetterStop.setValue(0);
+//		proNoBetterStop.setValue(0);
 		jbLoadEns.setEnabled(true);
 		UI.maintabbed.setEnabledAt(tab_spMining, true);
 		

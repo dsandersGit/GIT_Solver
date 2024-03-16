@@ -451,8 +451,6 @@ class LogStreamReader implements Runnable {
 	if ( MultiVariate_R.minAllPCA > MultiVariate_R.minPCA4 ) MultiVariate_R.minAllPCA = MultiVariate_R.minPCA4;
 
 	
-	
-	
 		 Path source = Paths.get(MultiVariate_R.r_Data);
 		
 		  try{
