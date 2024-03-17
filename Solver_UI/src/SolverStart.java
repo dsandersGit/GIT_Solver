@@ -135,11 +135,12 @@ public class SolverStart {
 	 * 133: PC-Analysis > Dataset, enables running PCA-ML
 	 * 134: PC-Analysis > Dataset, PCA Mod in Ensemble
 	 * 135: UI upgardes, clear freezes in batches
+	 * 136: UnitTest
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.5";
-	public static String 		revision 		= " 134";
+	public static String 		revision 		= " 136";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;
@@ -489,6 +490,9 @@ public class SolverStart {
 			    JOptionPane.showMessageDialog(null, picLabel, "Receipt", JOptionPane.PLAIN_MESSAGE, null);
 		    }
 		} // batch
+		if ( UnitTest.logResult)UnitTest.result.add(DS.fileName + "\t"+Classify.accuracyTrain);
+		System.out.println(DS.fileName + "\t"+Classify.accuracyTrain);
+		UnitTest.next = true;
 	}
 	private static void cleanUI() {
 		UI.proStatus.setValue(0);
@@ -635,9 +639,12 @@ public class SolverStart {
 						+ ", no testing data will be created. The resulting model is unvalidated and generalization to new data is likely poor."
 						+ " Use such models only for evaluation, not for production/publishing."+"\n");
 				
-				int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Low class population number</H3>Set trainRatio to 1.0? <BR> 100% data will be used for training, no testing</HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-				if ( erg == JOptionPane.YES_OPTION) Opts.trainRatio = 1;
-				UI.txtOpts.setText(Opts.getOptsAsJson().toString(3));
+				if ( !UnitTest.logResult) {
+					int erg = JOptionPane.showConfirmDialog(UI.jF, "<HTML><H3>Low class population number</H3>Set trainRatio to 1.0? <BR> 100% data will be used for training, no testing</HTML>", SolverStart.app, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+					if ( erg == JOptionPane.YES_OPTION) Opts.trainRatio = 1;
+					UI.txtOpts.setText(Opts.getOptsAsJson().toString(3));
+				}
+				
 			}
 			
 		

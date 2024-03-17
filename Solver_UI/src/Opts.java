@@ -20,7 +20,7 @@ public class Opts {
 	public static int 		numCycles				= 10;					// Count of runs per index
 	public static int 		noBetterStop 			= 500;					// Akzeptierte Fehlversuche
 	public static double	minBetter 				= 0.999d;				// Mindest Verbesserung nach akzeptierten Fehlveruchen
-	public static int		plotTimer				= 50;					// Plot wird gezeigt alle NNN Millisekunden
+	public static int		plotTimer				= 200;					// Plot wird gezeigt alle NNN Millisekunden
 	public static boolean	fixTrainSet 			= true;					// One Trainset for full ensemble (true) or per cycle (false)
 
 //	public static double	largeStep	 			= 0.2;					// Random step

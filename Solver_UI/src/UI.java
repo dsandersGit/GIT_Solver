@@ -637,7 +637,7 @@ public class UI {
 				jbClassify.setEnabled(true);
 			}
 		
-		
+		jF.repaint();
 	}
 	
 	private static void initTables() {
@@ -903,7 +903,12 @@ public class UI {
 		JMenuItem menuFileExit = new JMenuItem(" Quit"); 
 		menuFileExit.setAccelerator(KeyStroke.getKeyStroke('Q',InputEvent.CTRL_DOWN_MASK));
 		menuFile.add(menuFileExit);	
-		// ---------------------------------------------------------------------		
+		// ---------------------------------------------------------------------
+		JMenuItem menuActionUnitTest = new JMenuItem(" [Benchmark]");
+		menuActionUnitTest.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
+			new UnitTest();
+		}});
+		
 		menuAction.add(menuActionTrain);
 		menuActionTrain.setAccelerator(KeyStroke.getKeyStroke('T',InputEvent.CTRL_DOWN_MASK));
 		menuAction.add(menuActionBatchTrain);																					// 121
@@ -911,6 +916,8 @@ public class UI {
 		menuActionTrainImmediateStop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CANCEL, InputEvent.CTRL_DOWN_MASK));
 		menuAction.add(new JSeparator());
 		menuAction.add(menuActionClassify);
+		menuAction.add(new JSeparator());
+		menuAction.add(menuActionUnitTest);
 		
 		// ---------------------------------------------------------------------
 		menuSettings.add(menuActionOptions);
@@ -1315,15 +1322,9 @@ public class UI {
 	}
 	
 	
-	private static void train(int batchSize) {
+	public static void train(int batchSize) {
 		DS.js_Ensemble = null;
-		
 		DS.freezs.clear();
-		
-//		if ( !refreshOptions() ) {
-//			JOptionPane.showMessageDialog(jF, "<HTML><H3>Options malformed > set to last well-formed</H3>");
-//			return;
-//		}
 		
 		SolverStart.immediateStop = false;
 		Runner.cleanRunner ();
