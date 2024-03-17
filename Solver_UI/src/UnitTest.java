@@ -115,10 +115,10 @@ public class UnitTest {
 		new DS();												// INITS
 		DS.normParas = Tools.doNormData ();				// Daten Normalisieren
 		DS.isPCA = false;
-		UI.maintabbed.setSelectedIndex(UI.tab_Summary);
+		//UI.maintabbed.setSelectedIndex(UI.tab_Summary);
 		UI.refreshStatus();
 		SolverStart.analyzeRawData(DS.fileName );
-		UI.maintabbed.setSelectedIndex(UI.tab_Summary);
+		if ( UI.menuActionChk_Jump.isSelected() )UI.maintabbed.setSelectedIndex(UI.tab_Summary);
 		
 		UI.train(1) ;
 	}

@@ -275,10 +275,10 @@ public class UI {
 			new DS();												// INITS
 			DS.normParas = Tools.doNormData ();				// Daten Normalisieren
 			DS.isPCA = true;
-			UI.maintabbed.setSelectedIndex(UI.tab_Summary);
+			
 			refreshStatus();
 			SolverStart.analyzeRawData(DS.fileName );
-			UI.maintabbed.setSelectedIndex(UI.tab_Summary);
+			if ( UI.menuActionChk_Jump.isSelected() )UI.maintabbed.setSelectedIndex(UI.tab_Summary);
 		}});
 
 		
@@ -983,10 +983,10 @@ public class UI {
 			
 			DS.normParas = Tools.doNormData ();				// Daten Normalisieren
 		
-			UI.maintabbed.setSelectedIndex(UI.tab_Summary);
+			
 			refreshStatus();
 			SolverStart.analyzeRawData("Clipboard");
-			UI.maintabbed.setSelectedIndex(UI.tab_Summary);
+			if ( UI.menuActionChk_Jump.isSelected() )UI.maintabbed.setSelectedIndex(UI.tab_Summary);
 		}});
 	
 
@@ -1488,7 +1488,7 @@ public class UI {
 		//SolverStart.dataFileName = f.getName();
 		DS.fileName= f.getName();
 		SolverStart.analyzeRawData(f.getName());
-		UI.maintabbed.setSelectedIndex(UI.tab_Summary);
+		if ( UI.menuActionChk_Jump.isSelected() )UI.maintabbed.setSelectedIndex(UI.tab_Summary);
 		refreshStatus();
 	}
 	

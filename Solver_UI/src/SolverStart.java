@@ -448,6 +448,7 @@ public class SolverStart {
 					}
 					UI.sp2D.refreshPlot();
 				}
+				if ( !SolverStart.immediateStop )  UnitTest.next = false;
 			}			// Cycle Loop
 			
 			

@@ -54,7 +54,8 @@ public class Runner {
     float[] ySigmoid = null;
     
     int absCount =0 ;
-    
+    long startTime = 0;
+    long minTime = 100;					// minimal Runner Time
 	
 	public Runner(int target, String tName, boolean activationIsDst) {
 		SolverStart.immediateSkip 	= false;
@@ -74,6 +75,7 @@ public class Runner {
 		}
 		targetColorIndex 		= target;
 		targetListIndex			= Classify.getTargetColorIndexPos (targetColorIndex);
+		startTime 				= System.currentTimeMillis();
 		
 		if ( tName == null) {
 			targetName = "c"+target;
@@ -193,7 +195,7 @@ public class Runner {
 	            notBetterCount ++;
 
 	       }
-	       if ( notBetterCount > Opts.noBetterStop ) {
+	       if ( notBetterCount > Opts.noBetterStop && (System.currentTimeMillis()-startTime) > minTime) {
 	    	   if ( (dstLatestMax  >= distanceOld* Opts.minBetter )  ) {
 //	    	   if ( (dstLatestMax  >= distanceOld* Opts.minBetter && dstLatestMax > 0)  ) {
 	        		finish();
