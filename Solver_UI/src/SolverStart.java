@@ -136,11 +136,12 @@ public class SolverStart {
 	 * 134: PC-Analysis > Dataset, PCA Mod in Ensemble
 	 * 135: UI upgardes, clear freezes in batches
 	 * 136: UnitTest
+	 * 137: fireTableDataChanged();
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.5";
-	public static String 		revision 		= " 136";
+	public static String 		revision 		= " 137";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;
@@ -491,7 +492,7 @@ public class SolverStart {
 		    }
 		} // batch
 		if ( UnitTest.logResult)UnitTest.result.add(DS.fileName + "\t"+Classify.accuracyTrain);
-		System.out.println(DS.fileName + "\t"+Classify.accuracyTrain);
+//		System.out.println(DS.fileName + "\t"+Classify.accuracyTrain);
 		UnitTest.next = true;
 	}
 	private static void cleanUI() {
@@ -562,6 +563,7 @@ public class SolverStart {
 		row[15] 		= Tools.myRound(((float)(mc.tp_fp_tn_fn[0][1]+ mc.tp_fp_tn_fn[2][1]))/ ((float)(mc.tp_fp_tn_fn[0][1]+mc.tp_fp_tn_fn[1][1]+mc.tp_fp_tn_fn[2][1]+mc.tp_fp_tn_fn[3][1])),4);
 		
 		UI.tmtableValidation.addRow(row);
+		UI.tmtableValidation.fireTableDataChanged();
 
 	}
 	public static void classify() {

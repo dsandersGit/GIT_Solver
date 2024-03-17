@@ -264,6 +264,7 @@ public class Classify {
 		}
 		UI.scClassify.setViewportView(UI.tableClassify);
 		UI.tmtableClassify.setDataVector(nData, tHeader);
+		UI.tmtableClassify.fireTableDataChanged();
 	
 		int[] trainRatio = new int[DS.numClasses];
 		int[] testRatio = new int[DS.numClasses];
