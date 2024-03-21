@@ -137,11 +137,12 @@ public class SolverStart {
 	 * 135: UI upgardes, clear freezes in batches
 	 * 136: UnitTest
 	 * 137: fireTableDataChanged();
+	 * 138: R ErrorStream
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.5";
-	public static String 		revision 		= " 137";
+	public static String 		revision 		= " 138";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;

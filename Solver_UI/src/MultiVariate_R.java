@@ -79,6 +79,11 @@ public class MultiVariate_R {
 	public MultiVariate_R(double[][] rawData,String[] sampleNames,String[] areaNames,String[] classNames, Color[] cols) {
 
 //		
+		
+		UI.tabPCA3D.clearAll();
+		UI.tabPCA3D.repaint();
+		
+		
 		if ( r_Path.length()<1 || r_Script.length()<1 ||  r_Data.length()<1) setPaths();
 		if ( r_Path.length()<1 || r_Script.length()<1 ||  r_Data.length()<1) return;
 		if(rawData==null || rawData.length<1)return;
@@ -270,6 +275,13 @@ public class MultiVariate_R {
 			prefs.put("R_Data", r_Data);
 		  
 			UI.maintabbed.setEnabledAt(UI.tab_PCA,true);
+	}
+	public static void showError (String txt) {
+		//MultiVariate_R.working = false;
+		if ( txt.length()>0)
+			   JOptionPane.showMessageDialog(null, txt, "Error Excecuting R_Script", JOptionPane.ERROR_MESSAGE);
+
+//		System.out.println(txt);
 	}
 }
 class LogStreamReader implements Runnable {
@@ -641,7 +653,7 @@ class LogErrorStreamReader implements Runnable {
             	}
             }
             reader.close();
-           // MultiVariate_R.showError(logger.toString());
+           MultiVariate_R.showError(logger.toString());
         } catch (IOException e) {
             e.printStackTrace();
             
