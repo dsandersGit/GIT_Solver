@@ -138,11 +138,12 @@ public class SolverStart {
 	 * 136: UnitTest
 	 * 137: fireTableDataChanged();
 	 * 138: R ErrorStream
+	 * 139: R PM
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.5";
-	public static String 		revision 		= " 138";
+	public static String 		revision 		= " 139";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;

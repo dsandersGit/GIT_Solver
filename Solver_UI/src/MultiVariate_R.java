@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ProgressMonitor;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class MultiVariate_R {
@@ -76,9 +77,13 @@ public class MultiVariate_R {
 	public static String[]	cNames;
 	public static String[]	aNames;
 	
+	public static ProgressMonitor pm = new ProgressMonitor(UI.jF, "Receiving R data", "PCA", 0, 100);
+	
 	public MultiVariate_R(double[][] rawData,String[] sampleNames,String[] areaNames,String[] classNames, Color[] cols) {
 
 //		
+		pm.setProgress(0);
+		pm.setNote("Init");
 		
 		UI.tabPCA3D.clearAll();
 		UI.tabPCA3D.repaint();
@@ -111,6 +116,7 @@ public class MultiVariate_R {
 					out.append("\"" + sampleNames[f] +"\",");	
 					out.append("\"" + cNames[f] +"\"");	
 					for(int a = 0;a<aNum;a++){
+						
 							out.append("," + data[f][a]);
 					}
 					out.append("\n");
@@ -132,12 +138,16 @@ public class MultiVariate_R {
 				} 
 				
 			 	
+				pm.setProgress(33);
+				pm.setNote("Start R");
 			 	// > R
 			 	ProcessBuilder pb = null;
 			 	pb = new ProcessBuilder(r_Path, r_Script);
 			
 				
 				if (pb == null)return;
+				if (pm.isCanceled())return;
+				
 				pb.redirectErrorStream(false);
 				try {
 					  p = pb.start();
@@ -295,6 +305,8 @@ class LogStreamReader implements Runnable {
 
     public void run() {
     	
+    	if (MultiVariate_R.pm.isCanceled())return;
+    	
 		int numFiles = MultiVariate_R.data.length;//file
 		int numVars = MultiVariate_R.data[0].length;//area
 		
@@ -315,11 +327,18 @@ class LogStreamReader implements Runnable {
 		int numArea = 0;
 		int numLDA = 0;
 		int numPCinLDA = 0;
-		
+		int c = 0;
         try {
             String line = reader.readLine();
+            
             while (line != null && !kill) {
 
+            	c++;
+                if ( c>99 ) c=0;
+                MultiVariate_R.pm.setProgress(c);
+                
+                if (MultiVariate_R.pm.isCanceled()) return;
+            	
 //           	System.out.println(line);
             	//in.append(line);
             	String[] elms = line.replace("\"", "").split(":");
@@ -372,6 +391,7 @@ class LogStreamReader implements Runnable {
             e.printStackTrace();
         }
         
+        MultiVariate_R.pm.close();
 
         //MultiVariate_R.r_Output = in.toString();
         finishPCA(numFiles, numVars);

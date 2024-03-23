@@ -349,8 +349,17 @@ public class UI {
 			        		}
 			        	}
 		        	}
-		        	new MultiVariate_R(dat,DS.SampleNames,are,DS.ClassNames, DS.classCols); 
-		        	tabPCA3D.repaint();
+		        	Thread thread = new Thread(new Runnable()
+					{
+					   public void run()
+					   {
+						   new MultiVariate_R(dat,DS.SampleNames,are,DS.ClassNames, DS.classCols);
+				        	tabPCA3D.repaint();
+					   }
+					});
+					thread.start();
+		        	
+
 		        }
 		      }
 		    };
