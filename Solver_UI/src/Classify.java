@@ -82,7 +82,7 @@ public class Classify {
 		
 		// ***
 		// 87
-		doNormData ();
+		Tools.doNormData ();
 		//
 		
 //		UI.tmtableClassify.setRowCount(0);

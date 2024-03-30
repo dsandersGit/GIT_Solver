@@ -77,11 +77,17 @@ public class MultiVariate_R {
 	public static String[]	cNames;
 	public static String[]	aNames;
 	
-	public static ProgressMonitor pm = new ProgressMonitor(UI.jF, "Receiving R data", "PCA", 0, 100);
+	public static ProgressMonitor pm = null; //new ProgressMonitor(UI.jF, "Receiving R data", "PCA", 0, 100);
 	
 	public MultiVariate_R(double[][] rawData,String[] sampleNames,String[] areaNames,String[] classNames, Color[] cols) {
 
 //		
+		// 140: R no data 
+		if ( r_Path.length()<1 || r_Script.length()<1 ||  r_Data.length()<1) setPaths();
+		if ( r_Path.length()<1 || r_Script.length()<1 ||  r_Data.length()<1) return;
+		if(rawData==null || rawData.length<1)return;
+		
+		pm = new ProgressMonitor(UI.jF, "Receiving R data", "PCA", 0, 100);
 		pm.setProgress(0);
 		pm.setNote("Init");
 		
@@ -89,9 +95,6 @@ public class MultiVariate_R {
 		UI.tabPCA3D.repaint();
 		
 		
-		if ( r_Path.length()<1 || r_Script.length()<1 ||  r_Data.length()<1) setPaths();
-		if ( r_Path.length()<1 || r_Script.length()<1 ||  r_Data.length()<1) return;
-		if(rawData==null || rawData.length<1)return;
 		data = rawData;
 		ClassCols = cols;
 		int fNum = rawData.length;

@@ -139,6 +139,7 @@ public class SolverStart {
 	 * 137: fireTableDataChanged();
 	 * 138: R ErrorStream
 	 * 139: R PM
+	 * 140: R no data 
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
