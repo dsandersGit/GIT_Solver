@@ -140,11 +140,13 @@ public class SolverStart {
 	 * 138: R ErrorStream
 	 * 139: R PM
 	 * 140: R no data 
+	 * 141: Loadings normalized
+	 * 142: Loadings vectorized
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.5";
-	public static String 		revision 		= " 139";
+	public static String 		revision 		= " 142";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;
@@ -429,25 +431,65 @@ public class SolverStart {
 					UI.sp1D.setXY(rAx, basicProb, 13, Color.black, "random", false, true, false);
 					UI.sp1D.refreshPlot();
 	
-					// Loadings
-					float[][] weight = new float[DS.numClasses][DS.numVars];
+					// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+					// Loadings New
 					float[] wx = new float[DS.numVars];
+					float[][] sumLoadings = new float[DS.numClasses][DS.numVars];
+					float[] loadingVec = new float[DS.numVars];
 					for (int j=0;j<wx.length; j++) {
 						wx[j] = j+1;
 					}
-					for (int j=0;j<DS.freezs.size(); j++) {
+					for (int j=0;j<DS.freezs.size(); j++) {		
 						MC_Freeze mc = DS.freezs.get(j);
 						int index = mc.targetColorIndex;
 						int index0 = Tools.getIndexOfTarget(index);
-						for (int p=0;p<Opts.numDims; p++) {
-							for (int a=0; a<mc.eigenVec.length;a++) {
-								weight[index0][a] += Math.abs(mc.eigenVec[a][p]);
+						
+						for (int a=0; a<mc.eigenVec.length;a++) {
+							double vec = 0;
+							for (int p=0;p<Opts.numDims; p++) {						// 142
+								vec += Math.pow(mc.eigenVec[a][p], 2);
 							}
+							vec = Math.sqrt(vec);
+							loadingVec[a] =  (float) vec;
+						}
+						double max = 0;
+						for (int a=0; a<mc.eigenVec.length;a++) {
+							if ( max < loadingVec[a] )
+								max = loadingVec[a];
+						}
+						for (int a=0; a<mc.eigenVec.length;a++) {
+							sumLoadings[index0][a] += (float) (loadingVec[a]/max);
 						}
 					}
+					// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+					
+					
+					// Loadings
+//					float[][] weight = new float[DS.numClasses][DS.numVars];
+//					float[] wx = new float[DS.numVars];
+//					for (int j=0;j<wx.length; j++) {
+//						wx[j] = j+1;
+//					}
+//					for (int j=0;j<DS.freezs.size(); j++) {		
+//						MC_Freeze mc = DS.freezs.get(j);
+//						int index = mc.targetColorIndex;
+//						int index0 = Tools.getIndexOfTarget(index);
+//						double max = 0;
+//						for (int p=0;p<Opts.numDims; p++) {						// 141
+//							for (int a=0; a<mc.eigenVec.length;a++) {
+//								if (max < Math.abs(mc.eigenVec[a][p]))
+//									max = Math.abs(mc.eigenVec[a][p]);
+//							}
+//						}
+//						for (int p=0;p<Opts.numDims; p++) {
+//							for (int a=0; a<mc.eigenVec.length;a++) {
+//								weight[index0][a] += Math.abs(mc.eigenVec[a][p])/max;
+//							}
+//						}
+//					}
 					UI.sp2D.dats.clear();
-					for (int a=0; a<weight.length;a++) {
-						UI.sp2D.setXY(wx, weight[a], 12,  Tools.getClassColor(a), DS.classAllIndNme[a], true, true, true);
+					for (int a=0; a<sumLoadings.length;a++) {
+						UI.sp2D.setXY(wx, sumLoadings[a], 12,  Tools.getClassColor(a), DS.classAllIndNme[a], true, true, true);
 					}
 					UI.sp2D.refreshPlot();
 				}
