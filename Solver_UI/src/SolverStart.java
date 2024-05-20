@@ -1,6 +1,8 @@
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
@@ -142,11 +144,12 @@ public class SolverStart {
 	 * 140: R no data 
 	 * 141: Loadings normalized
 	 * 142: Loadings vectorized
+	 * 143: Loadings normalized + exportable
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.5";
-	public static String 		revision 		= " 142";
+	public static String 		revision 		= " 143";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;
@@ -171,11 +174,15 @@ public class SolverStart {
 			 new Color( 248, 187, 0), new Color( 128, 128, 128),new Color(115,164,209),new Color(176,179,50),
 			 new Color( 66, 139, 221),new Color( 18, 30, 49),new Color(191,98,4),new Color(169,46,34),
 			 new Color( 255, 255, 255), new Color( 104, 93, 156),new Color( 230, 230, 230)};
+	public static Color backOrange = Color.decode("#ffeeda");
+	public static Color backGreen = Color.decode("#abf7B1");
 	// <<<<<<<<<<<<<<<<<<<<<<
 	
 	public static void main(String[] args) {
 		// taken from https://stackoverflow.com/questions/36128291/how-to-make-a-swing-application-have-dark-nimbus-theme-netbeans
 		if (darkMode) {
+			backOrange = Color.decode("#E07117");
+			backGreen = Color.decode("#007958");
 			for (int i=0;i<uiColorKeys.length;i++) {
 				uiBaseColors[i] = UIManager.getColor(uiColorKeys[i]);
 			}
@@ -334,8 +341,7 @@ public class SolverStart {
 			boolean activationBoth 					= false;
 			if ( Opts.activation.equals("DxA") )	activationIsDst = true;		
 			if ( Opts.activation.equals("D+A") )	activationBoth = true;
-	
-	
+		
 			for (int i=0;i<Opts.numCycles;i++) {
 				//72: Train/Test change only cycle wise
 				//75: Fixed Trainset Init moved from DS to SolverStart
@@ -392,7 +398,7 @@ public class SolverStart {
 	
 					
 				}
-				// Cycle wise Classification
+				// Cycle wise Classification and loadings calculation
 				// 73
 				if ( !SolverStart.immediateStop && Opts.showDevelopment) {	
 					UI.sp1D.dats.clear();
@@ -442,6 +448,7 @@ public class SolverStart {
 					for (int j=0;j<DS.freezs.size(); j++) {		
 						MC_Freeze mc = DS.freezs.get(j);
 						int index = mc.targetColorIndex;
+						double maxDst = mc.maxDistance;
 						int index0 = Tools.getIndexOfTarget(index);
 						
 						for (int a=0; a<mc.eigenVec.length;a++) {
@@ -462,31 +469,7 @@ public class SolverStart {
 						}
 					}
 					// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-					
-					
-					// Loadings
-//					float[][] weight = new float[DS.numClasses][DS.numVars];
-//					float[] wx = new float[DS.numVars];
-//					for (int j=0;j<wx.length; j++) {
-//						wx[j] = j+1;
-//					}
-//					for (int j=0;j<DS.freezs.size(); j++) {		
-//						MC_Freeze mc = DS.freezs.get(j);
-//						int index = mc.targetColorIndex;
-//						int index0 = Tools.getIndexOfTarget(index);
-//						double max = 0;
-//						for (int p=0;p<Opts.numDims; p++) {						// 141
-//							for (int a=0; a<mc.eigenVec.length;a++) {
-//								if (max < Math.abs(mc.eigenVec[a][p]))
-//									max = Math.abs(mc.eigenVec[a][p]);
-//							}
-//						}
-//						for (int p=0;p<Opts.numDims; p++) {
-//							for (int a=0; a<mc.eigenVec.length;a++) {
-//								weight[index0][a] += Math.abs(mc.eigenVec[a][p])/max;
-//							}
-//						}
-//					}
+
 					UI.sp2D.dats.clear();
 					for (int a=0; a<sumLoadings.length;a++) {
 						UI.sp2D.setXY(wx, sumLoadings[a], 12,  Tools.getClassColor(a), DS.classAllIndNme[a], true, true, true);
@@ -495,7 +478,6 @@ public class SolverStart {
 				}
 				if ( !SolverStart.immediateStop )  UnitTest.next = false;
 			}			// Cycle Loop
-			
 			
 			main.remove("model");
 			main.remove("FingerPrints");

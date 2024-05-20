@@ -368,7 +368,7 @@ public class UI {
 		sp1D.setTitle("Accuracy Development");
 		sp1D.setXAxis("# cycle");
 		sp1D.setYAxis("accuracy [%]");
-		sp2D.setTitle("Sum of Loadings");
+		sp2D.setTitle("Sum of Normalized Loadings");
 		sp2D.setXAxis("# feature");
 		sp2D.setYAxis("loadings ");
 		
@@ -775,9 +775,11 @@ public class UI {
             }
 	            if ( column == 5)
 	            	if ( value.equals("------")) {
-	            		setBackground(Color.decode("#ffeeda"));
+	            		//setBackground(Color.decode("#ffeeda"));
+	            		setBackground(SolverStart.backOrange);
 	            	}else {
-	            		setBackground(Color.decode("#abf7B1"));
+	            		//setBackground(Color.decode("#abf7B1"));
+	            		setBackground(SolverStart.backGreen);
 	            	}
 	            return this;
 	        }
@@ -794,10 +796,12 @@ public class UI {
 	            label.setFont(font.deriveFont(Font.PLAIN));
 	            setBackground(SolverStart.backColor);setForeground(SolverStart.frontColor);
 	            if ( column>2 && column<9) {
-	            	setBackground(Color.decode("#F8D568")); // 248 213 104
+	            	//setBackground(Color.decode("#F8D568")); // 248 213 104
+	            	setBackground(SolverStart.backOrange);
 	            }
 	            if ( column>8 && column<16) {
-	            	setBackground(new Color(0,255, 147));
+	            	//setBackground(new Color(0,255, 147));
+	            	setBackground(SolverStart.backGreen);
 	            }
 	            return this;
 	        }
@@ -942,9 +946,10 @@ public class UI {
 		
 		
 		// ---------------------------------------------------------------------
-		
+
 		JMenuItem menuExportVectors = new JMenuItem(" Vectors"); 
 		menuExport.add(menuExportVectors);
+		
 		JMenuItem menuExportClassification = new JMenuItem(" Classification"); 
 		menuExport.add(menuExportClassification);
 		JMenuItem menuExportTP_FP_TN_FN = new JMenuItem(" Validation"); 
@@ -1150,36 +1155,85 @@ public class UI {
 		menuExportVectors.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 			JSONObject ensemble = DS.js_Ensemble;
 			if (ensemble== null )return;
-			JSONArray models = ensemble.getJSONArray("model");
+			int numClasses 		= ensemble.getJSONObject("DS").getString("classAllIndices").split(",").length;
+			String[] varNames 	= ensemble.getJSONObject("DS").getString("VariableNames").split(",");
 			
+			int numVars 		= varNames.length;
+			int numDims 		= ensemble.getJSONObject("Opts").getInt("numDims");
+			int numCylces 		= ensemble.getJSONObject("Opts").getInt("numCycles");
+			
+			
+			JSONArray models = ensemble.getJSONArray("model");
 			StringBuffer out = new StringBuffer();
 			out.append("Model Vectors"+"\n");
 			out.append("#model\tdim\tTargetClass");
-			for (int i=0;i<DS.AreaNames.length; i++) {
-				out.append("\t"+DS.AreaNames[i]);
+			for (int i=0;i<varNames.length; i++) {
+				out.append("\t"+varNames[i]);
 			}
 			out.append("\n");
+			double[][][] loadings = new double[numDims][numVars][models.length()] ;
+			String[] varClasses = new String[models.length()];
+			double[] maxDst = new double[models.length()];
+			
 			for (int i=0;i<models.length(); i++) {
 				JSONObject in = models.getJSONObject(i);
-				int numDims = in.getInt("Opts.numDims");
 				//
+				maxDst[i] = in.getDouble("maxDistance");
 				for (int p=0;p<numDims; p++) {
 					out.append(i+"\t");
 					out.append(p+"\t"+in.getString("targetLabel"));
+					varClasses[i] = in.getString("targetLabel");
 					String vTemp = in.getString(		"Vector"+p);
 					String[] line = vTemp.split(","); 
 					for (int a=0; a<line.length;a++) {
 						out.append("\t"+Double.parseDouble(line[a].trim()));
+						loadings[p][a][i] = Double.parseDouble(line[a].trim()); 
 					}
 					out.append("\n");
 				}
-
 			}
+			double[][] normLoadings = new double[numVars][models.length()];
+			for (int i=0;i<models.length(); i++) {
+				for (int a=0;a<numVars; a++) {
+					double ldng = 0;
+					for (int j=0;j<numDims; j++) {
+						ldng += loadings[j][a][i]*loadings[j][a][i]; 
+					}
+					ldng = Math.sqrt(ldng);
+					normLoadings[a][i] = ldng ;
+					if ( a>0 ) out.append("\t");
+				}
+			}
+			out.append("\n");
+			out.append("Normalized Loadings");
+			out.append("\n");
+			out.append("model\ttargetClass\t");
+			for (int a=0; a<varNames.length;a++) {
+				if ( a > 0 )out.append("\t");
+				out.append(varNames[a]);
+			}
+			out.append("\tmaxDst");
+			out.append("\n");
+			for (int i=0;i<models.length(); i++) {
+				double max = 0;
+				for (int a=0;a<numVars; a++) {	
+					if ( max < normLoadings[a][i] )
+						max = normLoadings[a][i];
+				}
+				out.append((i+1)+"\t"+varClasses[i]);
+				for (int a=0;a<numVars; a++) {
+					out.append("\t");
+					out.append(normLoadings[a][i]/max);
+				}
+				out.append("\t"+maxDst[i]);
+				out.append("\n");
+			}
+			
 			StringSelection stringSelection = new StringSelection( out.toString() );
 		    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		    clipboard.setContents( stringSelection, stringSelection );
 		}});
-	
+		
 		menuExportClassification.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){	
 			
 			StringBuffer out = new StringBuffer();
