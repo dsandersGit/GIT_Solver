@@ -450,7 +450,8 @@ public class ThreeDee extends JPanel{
 					int w = i;
 					if (sort.size()>0) w = sort.get(i);
 					
-		   			int[] xyz = getXYZ(sin_X,cos_X, sin_Y,cos_Y,  DDCubeX.get(w),  DDCubeY.get(w), DDCubeZ.get(w));
+					int[] xyz = null;
+		   			xyz = getXYZ(sin_X,cos_X, sin_Y,cos_Y,  DDCubeX.get(w),  DDCubeY.get(w), DDCubeZ.get(w));
 			    	 xNeu=xyz[0];
 		   			 yNeu=xyz[1];
 		   			 zNeu=xyz[2];

@@ -145,11 +145,12 @@ public class SolverStart {
 	 * 141: Loadings normalized
 	 * 142: Loadings vectorized
 	 * 143: Loadings normalized + exportable
+	 * 144: Mismatch Feature labels softened
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.5";
-	public static String 		revision 		= " 143";
+	public static String 		revision 		= " 144";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;
@@ -448,7 +449,6 @@ public class SolverStart {
 					for (int j=0;j<DS.freezs.size(); j++) {		
 						MC_Freeze mc = DS.freezs.get(j);
 						int index = mc.targetColorIndex;
-						double maxDst = mc.maxDistance;
 						int index0 = Tools.getIndexOfTarget(index);
 						
 						for (int a=0; a<mc.eigenVec.length;a++) {
@@ -467,12 +467,18 @@ public class SolverStart {
 						for (int a=0; a<mc.eigenVec.length;a++) {
 							sumLoadings[index0][a] += (float) (loadingVec[a]/max);
 						}
+						
 					}
+
 					// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 					UI.sp2D.dats.clear();
-					for (int a=0; a<sumLoadings.length;a++) {
-						UI.sp2D.setXY(wx, sumLoadings[a], 12,  Tools.getClassColor(a), DS.classAllIndNme[a], true, true, true);
+					for (int j=0; j<sumLoadings.length;j++) {
+						float[] dat = new float[sumLoadings[j].length];
+						for (int a=0; a<sumLoadings[j].length;a++) {
+							dat[a]  = 100 * sumLoadings[j][a] / (DS.freezs.size()/DS.numClasses);
+						}
+						UI.sp2D.setXY(wx, dat, 12,  Tools.getClassColor(j), DS.classAllIndNme[j], true, true, true);
 					}
 					UI.sp2D.refreshPlot();
 				}

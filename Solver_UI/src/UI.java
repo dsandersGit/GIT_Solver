@@ -16,6 +16,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -159,7 +161,8 @@ public class UI {
 		scClassify.setBackground(SolverStart.backColor);
 		//scClassify.setPreferredSize(new Dimension (500,400));
 		JPanel pan_classify = new JPanel();
-		pan_classify.setLayout(new BoxLayout(pan_classify,BoxLayout.Y_AXIS));
+		//pan_classify.setLayout(new BoxLayout(pan_classify,BoxLayout.Y_AXIS));
+		pan_classify.setLayout(new GridLayout(2,1));
 		pan_classify.add(scClassify);
 		pan_classify.add(scTxtClassify);
 		
@@ -225,6 +228,7 @@ public class UI {
 		
 		panPCA3D.setLayout(new BorderLayout());
 		panPCA3D.add(tabPCA3D, BorderLayout.CENTER);
+		
 		JButton jb_SavePCA = new JButton("Copy PCA & Model");
 		jb_SavePCA.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
 			StringBuffer out = new StringBuffer();
@@ -368,7 +372,7 @@ public class UI {
 		sp1D.setTitle("Accuracy Development");
 		sp1D.setXAxis("# cycle");
 		sp1D.setYAxis("accuracy [%]");
-		sp2D.setTitle("Sum of Normalized Loadings");
+		sp2D.setTitle("Avg. Loadings/Importance [%]");
 		sp2D.setXAxis("# feature");
 		sp2D.setYAxis("loadings ");
 		
@@ -585,8 +589,8 @@ public class UI {
 			if ( ensVarNames.length != DS.numVars) {
 				ensMatchData = false;
 			}else {
-				for (int i=0;i<DS.numVars;i++) {
-					if ( !DS.AreaNames[i].equals(ensVarNames[i]) && !DS.AreaNames[i].equals('\"'+ensVarNames[i]+'\"'))ensMatchData = false;	
+				for (int i=0;i<DS.numVars;i++) {				// 144
+					if ( !DS.AreaNames[i].equals(ensVarNames[i]) && !DS.AreaNames[i].replace("\"", "").equals(ensVarNames[i].replace("\"", ""))) ensMatchData = false;	
 				}
 			}
 			// 91
@@ -637,6 +641,7 @@ public class UI {
 		
 		if ( !noEns)
 			if ( !ensMatchData ) {	
+//				if (DS.js_Ensemble	!= null )JOptionPane.showMessageDialog(jF, "Ensemble feature label / count does not match data set", "Solver", JOptionPane.INFORMATION_MESSAGE);
 				UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colRed.png")));
 				menuActionClassify.setEnabled(false);
 				jbClassify.setEnabled(false);
