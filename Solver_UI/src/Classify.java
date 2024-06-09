@@ -23,6 +23,7 @@ public class Classify {
 	public static int[][] confusionMatrixTrain = new int[DS.numClasses][DS.numClasses];
 	public static int[][] confusionMatrixTest = new int[DS.numClasses][DS.numClasses];
 	
+	
 	public  Classify() {
 
 		JSONObject ensemble = DS.js_Ensemble;
@@ -85,8 +86,6 @@ public class Classify {
 		Tools.doNormData ();
 		//
 		
-//		UI.tmtableClassify.setRowCount(0);
-//		UI.tmtableClassify.setColumnCount(0);
 		
 		Object[] tHeader = new Object[DS.numClasses+7];
 		tHeader[0]	= "# num";
@@ -292,47 +291,72 @@ public class Classify {
 		confMatrixout = new StringBuffer();
 		StringBuffer txtOut = new StringBuffer();
 		if ( DS.fixedTrainSet != null) {
-			txtOut.append("ConfusionMatrix: [true\\predict]\n");
-			txtOut.append(Tools.txtLen ("Training:")+"\t");
+			txtOut.append("ConfusionMatrix: [actual\\predict]\n");
+			txtOut.append( ("Training:")+"\t");
 			confMatrixout.append("Trn."+"\n");
 			for (int i=0;i<DS.numClasses;i++) {
-				txtOut.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
+				txtOut.append( (DS.classAllIndNme[i])+"\t");
 			}
-			txtOut.append(Tools.txtLen ("RATIO [%]") + "\n");
+			txtOut.append( ("RATIO [%]") + "\n");
 			for (int i=0;i<DS.numClasses;i++) {
-				txtOut.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
-				confMatrixout.append(DS.classAllIndNme[i]+"|");
+				txtOut.append((DS.classAllIndNme[i])+"\t");
+				confMatrixout.append(DS.classAllIndNme[i]+"/");
 				for (int j=0;j<DS.numClasses;j++) {
-					txtOut.append(Tools.txtLen ("" + confusionMatrixTrain [i][j])+"\t");
-					confMatrixout.append("" + confusionMatrixTrain [i][j]+"|");
+					txtOut.append( ("" + confusionMatrixTrain [i][j])+"\t");
+					confMatrixout.append("" + confusionMatrixTrain [i][j]+"/");
 				}
-				txtOut.append(Tools.txtLen ("" + trainRatio [i])+"\n");
+				txtOut.append( ("" + trainRatio [i])+"\n");
 				confMatrixout.append("\n");
 			}
 			txtOut.append(""+"\n");
 			confMatrixout.append(""+"\n");
 			
-			txtOut.append(Tools.txtLen ("Validation:")+"\t");
+			txtOut.append( ("Validation:")+"\t");
 			confMatrixout.append("Vald."+"\n");
 			for (int i=0;i<DS.numClasses;i++) {
-				txtOut.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
+				txtOut.append( (DS.classAllIndNme[i])+"\t");
 			}
 			txtOut.append(Tools.txtLen ("RATIO [%]") + "\n");
 			for (int i=0;i<DS.numClasses;i++) {
-				txtOut.append(Tools.txtLen (DS.classAllIndNme[i])+"\t");
-				confMatrixout.append(DS.classAllIndNme[i]+"|");
+				txtOut.append( (DS.classAllIndNme[i])+"\t");
+				confMatrixout.append(DS.classAllIndNme[i]+"/");
 				for (int j=0;j<DS.numClasses;j++) {
-					txtOut.append(Tools.txtLen ("" + confusionMatrixTest [i][j])+"\t");
-					confMatrixout.append("" + confusionMatrixTest [i][j]+"|");
+					txtOut.append( ("" + confusionMatrixTest [i][j])+"\t");
+					confMatrixout.append("" + confusionMatrixTest [i][j]+"/");
 				}
-				txtOut.append(Tools.txtLen ("" + testRatio [i])+"\n");
+				txtOut.append( ("" + testRatio [i])+"\n");
 				confMatrixout.append("\n");
 			}
 			txtOut.append(""+"\n");
 			confMatrixout.append(""+"\n");
+			
+			String tmpTxt = txtOut.toString();
+			String[] lnes = tmpTxt.split("\n");
+			UI.tmConfusionMatrix.setColumnCount(0);
+			UI.tmConfusionMatrix.setRowCount(0);
+			
+			UI.tmConfusionMatrix.addColumn("CLASS" );
+			for (int i=0;i<DS.numClasses;i++) {
+				UI.tmConfusionMatrix.addColumn( (DS.classAllIndNme[i]));
+			}
+			UI.tmConfusionMatrix.addColumn("RATIO [%]" );
+			
+//			for (int i=0;i<DS.numClasses+2;i++) {
+//				UI.tmConfusionMatrix.addColumn("Col" + (i+1));	
+//			}
+			for (int i=0;i<lnes.length;i++) {
+				String[] elms = lnes[i].split("\t");
+			
+				Object[] obj = new Object[elms.length];
+				for ( int j=0;j<elms.length;j++) {
+					obj[j] = elms[j];
+				}
+				UI.tmConfusionMatrix.addRow(obj);
+			}
+			UI.tmtableClassify.fireTableDataChanged();
 		}
 		
-		UI.txtClassify.setText(txtOut.toString());
+		
 		accuracyTrain = Tools.myRound(100* (matchCountTrain/allCountTrain),1);
 		accuracyTest = Tools.myRound(100* (matchCountTest/allCountTest),1);
 		if (  allCountTest == 0) {

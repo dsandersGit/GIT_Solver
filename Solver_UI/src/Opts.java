@@ -17,7 +17,7 @@ public class Opts {
 	//
 	public static int 		numDims			 		= 3; 					// Number of Neurons / Dimensions
 	public static double 	trainRatio				= 0.7;					// test / train > ratio of training to sample data  0 = full target 1 - no rget
-	public static int 		numCycles				= 10;					// Count of runs per index
+	public static int 		numCycles				= 5;					// Count of runs per index
 	public static int 		noBetterStop 			= 1000;					// Akzeptierte Fehlversuche
 	public static double	minBetter 				= 0.999d;				// Mindest Verbesserung nach akzeptierten Fehlveruchen
 	public static int		plotTimer				= 200;					// Plot wird gezeigt alle NNN Millisekunden

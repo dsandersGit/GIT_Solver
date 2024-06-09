@@ -148,11 +148,12 @@ public class SolverStart {
 	 * 144: Mismatch Feature labels softened
 	 * 145: zuFi > FAC smaller when notBetterCount / 2	>> leads to smaller Opts.notBetterCount
 	 * 146: OPTS.maxTime: [min] allowed time to create full ensemble, can be faster > see OPTS.noBetterStop
+	 * 147: ConfusionMatrix as JTable
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.6";
-	public static String 		revision 		= " 146";
+	public static String 		revision 		= " 147";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;
@@ -291,7 +292,8 @@ public class SolverStart {
 			UI.menuFile.setEnabled(false);
 	//		UI.txtEnsemble.setText("");
 			UI.tmtableValidation.setRowCount(0);
-			UI.txtClassify.setText("");
+			UI.tmConfusionMatrix.setColumnCount(0);
+			UI.tmConfusionMatrix.setRowCount(0);
 			UI.labStatusIcon.setIcon(new ImageIcon(ClassLoader.getSystemResource("colYellow.png")));	// UI button color
 			//72: Train/Test change only cycle wise
 			
@@ -504,7 +506,7 @@ public class SolverStart {
 //			System.out.println(Classify.accuracyTrain );//+ "\t" + Classify.accuracyTest); 
 			
 	//		UI.txtEnsemble.setText(main.toString(3));
-			EnsembleTree.putEnsemble(UI.labAccuracy.getText(), UI.txtClassify.getText(), main);
+			EnsembleTree.putEnsemble(UI.labAccuracy.getText(), Classify.confMatrixout.toString(), main);
 			cleanUI();
 //			UI.proStatus.setValue(0);
 //			UI.labTimePerRun.setText("Process: ---");

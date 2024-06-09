@@ -68,6 +68,10 @@ public class UI {
 	static 				JScrollPane scClassify= new JScrollPane(tableClassify);
 	public static 		DefaultTableModel tmtableClassify;
 	
+	public static 		JTable tableConfusionMatrix = new JTable();
+	static 				JScrollPane scConfusionMatrix= new JScrollPane(tableConfusionMatrix);
+	public static 		DefaultTableModel tmConfusionMatrix;
+	
 	public static 		JTable tableValidation = new JTable();
 	static 				JScrollPane scValidation= new JScrollPane(tableValidation);
 	public static 		DefaultTableModel tmtableValidation;
@@ -125,8 +129,7 @@ public class UI {
 	//public static 		SP_PlotCanvas spSpread 		= new SP_PlotCanvas();
 //	public static 		HeatMap heatMap				= new HeatMap();
 	public static 		JTextArea txtOpts 			= new JTextArea();
-	public static 		JTextArea txtClassify		= new JTextArea();
-	static 				JScrollPane scTxtClassify	= new JScrollPane(txtClassify);
+
 //	public static 		JTextArea txtEnsemble 		= new JTextArea();
 //	static 				JScrollPane scEnsemble		= new JScrollPane(txtEnsemble);
 	public static 		JTextArea txtSummary 		= new JTextArea();
@@ -161,12 +164,18 @@ public class UI {
 		scClassify = new JScrollPane(tableClassify);
 		scClassify.setOpaque(false);
 		scClassify.setBackground(SolverStart.backColor);
+		
+		
+		scConfusionMatrix =  new JScrollPane(tableConfusionMatrix );
+		scConfusionMatrix.setOpaque(false);
+		scConfusionMatrix.setBackground(SolverStart.backColor);
+		
 		//scClassify.setPreferredSize(new Dimension (500,400));
 		JPanel pan_classify = new JPanel();
 		//pan_classify.setLayout(new BoxLayout(pan_classify,BoxLayout.Y_AXIS));
 		pan_classify.setLayout(new GridLayout(2,1));
 		pan_classify.add(scClassify);
-		pan_classify.add(scTxtClassify);
+		pan_classify.add(scConfusionMatrix);
 		
 		scValidation = new JScrollPane(tableValidation);
 		scValidation.setOpaque(false);
@@ -199,17 +208,11 @@ public class UI {
 		sp2D.setBaseColor(SolverStart.frontColor);
 		
 		txtSummary.setEditable(false);
-		txtClassify.setEditable(false);
-
+		
 		txtOpts.setOpaque(false);
 		txtOpts.setBackground(SolverStart.backColor);
 		txtOpts.setForeground(SolverStart.frontColor);
 		txtOpts.setFont(new Font("Consolas", Font.PLAIN, 20));
-		
-		txtClassify.setOpaque(false);
-		txtClassify.setBackground(SolverStart.backColor);
-		txtClassify.setForeground(SolverStart.frontColor);
-		txtClassify.setFont(new Font("Consolas", Font.PLAIN, 12));
 		
 		ThreeDee.genBackColor 	=	 SolverStart.backColor;
 		ThreeDee.genFrontColor 	= SolverStart.frontColor;
@@ -677,6 +680,22 @@ public class UI {
 		tableClassify.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		tableClassify.setAutoCreateRowSorter(true);
 		
+		tableConfusionMatrix = new JTable() {
+	        private static final long serialVersionUID = 1L;
+	        public boolean isCellEditable(int row, int column) {                
+	                return false;               
+	        };
+	    };
+	    tmConfusionMatrix =(DefaultTableModel) tableConfusionMatrix.getModel();
+	    tableConfusionMatrix.getTableHeader().setOpaque(false);
+	    tableConfusionMatrix.getTableHeader().setBackground(SolverStart.backColor);
+		fnt = tableConfusionMatrix.getTableHeader().getFont(); 
+		tableConfusionMatrix.getTableHeader().setFont(fnt.deriveFont(Font.BOLD));
+		
+		tableConfusionMatrix.getTableHeader().setReorderingAllowed(false);
+		tableConfusionMatrix.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
+		tableConfusionMatrix.setAutoCreateRowSorter(false);
+		
 		
 		tableValidation= new JTable() {
 	        private static final long serialVersionUID = 1L;
@@ -723,38 +742,6 @@ public class UI {
 	            Font font = label.getFont();
 	            label.setFont(font.deriveFont(Font.PLAIN));
 	            setBackground(SolverStart.backColor);setForeground(SolverStart.frontColor);
-	           
-//	            if ( column>6) {
-//		            double val =  0;
-//		            try {
-//		            	val = Double.parseDouble((String)(""+value));
-//		            }catch(NumberFormatException ee){
-//		        	}
-//
-//		            setForeground(Color.BLACK);
-//		            int red = 170;
-//		            int green = 170;
-//		            int blue = 170;
-//		            if ( val > 0) {
-//		            	red 	+= (int) (val * 80);
-//		            	green 	+= (int) (val * 80);
-//		            	blue	+= (int) (val * 80);
-//		            	setForeground(Color.BLACK);
-//		            }else {
-//		            	red 	+= (int) (val * 170);
-//		            	green 	+= (int) (val * 170);
-//		            	blue	+= (int) (val * 170);
-//		            	setForeground(Color.WHITE);
-//		            }
-//		            if ( red < 0) red = 0;
-//		            if ( green < 0) green = 0;
-//		            if ( blue < 0) blue = 0;
-//		            if ( red > 255) red = 200;
-//		            if ( green > 255) green = 200;
-//		            if ( blue > 255) blue = 200;
-//		            
-//		            setBackground(new Color(red,green, blue));
-//	            }
 	            
 	            if ( column>6) {
 	            double val =  0;
@@ -816,38 +803,7 @@ public class UI {
 	            return this;
 	        }
 	    });
-//		tableValidation.addMouseListener(new MouseAdapter() {						// 121
-//
-//	          public void mouseReleased(MouseEvent e){
-//	        	  if(e.getModifiers()!=InputEvent.BUTTON3_MASK) return;
-//	        	  int selCount = tableValidation.getSelectedRows().length;
-//	        	  JPopupMenu inPOP = new JPopupMenu();
-//	        	  JMenuItem item=null;
-//	        	  item = new JMenuItem("Delete selected models");
-//	        	  if(selCount==0)item.setEnabled(false);
-//	        	  inPOP.add(item);
-//				  item.addActionListener(new ActionListener(){
-//					  public void actionPerformed(ActionEvent e) {
-//						  boolean[] killList = new boolean [DS.freezs.size()];
-//						  for (int j= DS.freezs.size()-1;j>=0;j--) {
-//								if(tableValidation.isRowSelected(j)) {
-//									killList[j] = true;
-//								}else {
-//									killList[j] = false;
-//								}
-//						  }
-//						  for (int j= DS.freezs.size()-1;j>=0;j--) {
-//							  if ( killList[j] ) {
-//								  DS.freezs.remove(j);
-//								  tmtableValidation.removeRow(j);
-//							  }
-//						  }
-//						  Tools.compileModels();
-//						  tableValidation.repaint();
-//					  }});
-//				  inPOP.show(e.getComponent(), e.getX(), e.getY());
-//	          	}
-//	      });
+	
 	}
 	
 	private JToolBar getControlToolBar(){
@@ -1518,7 +1474,8 @@ public class UI {
 			DS.js_Ensemble = null;
 		}
 		refreshStatus();
-		UI.txtClassify.setText("");
+		UI.tmConfusionMatrix.setColumnCount(0);
+		UI.tmConfusionMatrix.setRowCount(0);
 		
 		if ( DS.js_Ensemble != null ) {
 			EnsembleTree.putEnsemble("Imported: "+f.getName(), "N/A", DS.js_Ensemble);
