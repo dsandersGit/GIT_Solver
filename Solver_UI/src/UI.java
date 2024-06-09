@@ -121,6 +121,7 @@ public class UI {
 	public static 		SP_PlotCanvas sp1D 			= new SP_PlotCanvas();
 	public static 		SP_PlotCanvas sp2D 			= new SP_PlotCanvas();
 	public static 		Pan_Mining	 panMining		= new Pan_Mining();
+	
 	//public static 		SP_PlotCanvas spSpread 		= new SP_PlotCanvas();
 //	public static 		HeatMap heatMap				= new HeatMap();
 	public static 		JTextArea txtOpts 			= new JTextArea();
@@ -148,6 +149,7 @@ public class UI {
 	
 	static JPanel panLive = new JPanel();
 	static JPanel panTrends = new JPanel();
+	
 	
 	public UI() {
 
@@ -179,6 +181,7 @@ public class UI {
 		sp.setInnerBackGroundColor(SolverStart.backColor);
 		sp.setOuterBackGroundColor(SolverStart.backColor);
 		sp.setBaseColor(SolverStart.frontColor);
+
 		
 		spDst.setTitle("SCORES");
 		spDst.setXAxis("score");
@@ -221,6 +224,7 @@ public class UI {
 		panLive.setLayout(new GridLayout(2,1));
 		panLive.add(sp);
 		panLive.add(spDst);
+		
 		
 		panTrends.setLayout(new GridLayout(2,1));
 		panTrends.add(sp1D);
@@ -305,8 +309,6 @@ public class UI {
 //		maintabbed.add("Ensemble",scEnsemble);
 //		maintabbed.add("Algorithm", iconAlgo);
 		maintabbed.add("Ensemble",new EnsembleTree());
-		
-		
 	
 		
 		
@@ -482,16 +484,17 @@ public class UI {
 		 // 89 
 		 if ( checkOptions(jo_Opts)== null ) {
 			 try {
-				if (jo_Opts.has("normType")) 	Opts.normType 		= jo_Opts.getString("normType");
-				if (jo_Opts.has("numDims")) 	Opts.numDims 		= jo_Opts.getInt("numDims");
-				if (jo_Opts.has("trainRatio"))	Opts.trainRatio 	= jo_Opts.getDouble("trainRatio");
-				if (jo_Opts.has("numCycles")) 	Opts.numCycles 		= jo_Opts.getInt("numCycles");
-				if (jo_Opts.has("noBetterStop"))Opts.noBetterStop 	= jo_Opts.getInt("noBetterStop");
-				if (jo_Opts.has("minBetter")) 	Opts.minBetter 		= jo_Opts.getDouble("minBetter");
-				if (jo_Opts.has("plotTimer")) 	Opts.plotTimer 		= jo_Opts.getInt("plotTimer");
-				if (jo_Opts.has("fixTrainSet")) Opts.fixTrainSet 	= jo_Opts.getBoolean("fixTrainSet");
-				if (jo_Opts.has("activation")) 	Opts.activation		= jo_Opts.getString("activation");
-				if (jo_Opts.has("dstType"))		Opts.dstType		= jo_Opts.getString("dstType");			//99
+				if (jo_Opts.has("normType")) 		Opts.normType 		= jo_Opts.getString("normType");
+				if (jo_Opts.has("numDims")) 		Opts.numDims 		= jo_Opts.getInt("numDims");
+				if (jo_Opts.has("trainRatio"))		Opts.trainRatio 	= jo_Opts.getDouble("trainRatio");
+				if (jo_Opts.has("numCycles")) 		Opts.numCycles 		= jo_Opts.getInt("numCycles");
+				if (jo_Opts.has("noBetterStop"))	Opts.noBetterStop 	= jo_Opts.getInt("noBetterStop");
+				if (jo_Opts.has("minBetter")) 		Opts.minBetter 		= jo_Opts.getDouble("minBetter");
+				if (jo_Opts.has("plotTimer")) 		Opts.plotTimer 		= jo_Opts.getInt("plotTimer");
+				if (jo_Opts.has("fixTrainSet")) 	Opts.fixTrainSet 	= jo_Opts.getBoolean("fixTrainSet");
+				if (jo_Opts.has("activation")) 		Opts.activation		= jo_Opts.getString("activation");
+				if (jo_Opts.has("dstType"))			Opts.dstType		= jo_Opts.getString("dstType");			//99
+				if (jo_Opts.has("maxTime"))			Opts.maxTime		= jo_Opts.getLong("maxTime");			//99
 	
 			  } catch (JSONException e) {
 			        return false;
@@ -521,6 +524,8 @@ public class UI {
 //				if ( jo_Opts.getInt("noBetterStop")<1 ) return false;
 			if (!jo_Opts.has("minBetter")) 	 return "minBetter";
 				if ( jo_Opts.getDouble("minBetter")<0 || jo_Opts.getDouble("minBetter")>1) return "minBetter";
+			if (!jo_Opts.has("maxTime")) 	 return "maxTime";
+				if ( jo_Opts.getLong("maxTime")<0 ) return "maxTime";	
 			//if (!jo_Opts.has("plotTimer")) 	 return "plotTimer";
 			if (!jo_Opts.has("fixTrainSet"))  return "fixTrainSet";
 				boolean tst = false;
@@ -605,7 +610,7 @@ public class UI {
 			noEns = true;
 			menuActionClassify.setEnabled(false);
 			menuFileSaveEnsemble.setEnabled(false);
-			menuExport.setEnabled(false);
+			
 			jbSaveEns.setEnabled(false);
 			jbClassify.setEnabled(false);
 		}
@@ -1358,6 +1363,13 @@ public class UI {
 			    g.setColor(tabPCA3D.getForeground());
 			    g.setFont(tabPCA3D.getFont());
 			    tabPCA3D.paintAll(g);
+			 }
+			if(maintabbed.getSelectedIndex()==tab_spMining ){
+				 img = new BufferedImage(Pan_Mining.scatterPlot.getWidth(), Pan_Mining.scatterPlot.getHeight(), BufferedImage.TYPE_INT_RGB);
+			    Graphics g = img.getGraphics();
+			    g.setColor(Pan_Mining.scatterPlot.getForeground());
+			    g.setFont(Pan_Mining.scatterPlot.getFont());
+			    Pan_Mining.scatterPlot.paintAll(g);
 			 }
 			 if(img!=null){
 				    ImageTransferable it = new ImageTransferable(img);

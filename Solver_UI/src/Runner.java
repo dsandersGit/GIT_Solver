@@ -56,10 +56,16 @@ public class Runner {
     int absCount =0 ;
     long startTime = 0;
     long minTime = 100;					// minimal Runner Time
+    long killTime = 3000;
 	
 	public Runner(int target, String tName, boolean activationIsDst) {
 		SolverStart.immediateSkip 	= false;
 		SolverStart.doShuffle		= false;
+		
+		
+		
+		killTime 					= (Opts.maxTime * 60 * 1000)/(DS.numClasses*Opts.numCycles);
+
 		absCount =0 ;														// Trial Counter
 		if ( mappedSigmoid == null) {
 			mappedSigmoid = new double[200];
@@ -195,9 +201,15 @@ public class Runner {
 	            notBetterCount ++;
 
 	       }
-	       if ( notBetterCount > Opts.noBetterStop && (System.currentTimeMillis()-startTime) > minTime) {
-	    	   if ( (dstLatestMax  >= distanceOld* Opts.minBetter )  ) {
+	       if ( (notBetterCount > Opts.noBetterStop && (System.currentTimeMillis()-startTime) > minTime) ||
+	       		(System.currentTimeMillis()-startTime) > killTime ) {
+	    	   if ( (dstLatestMax  >= distanceOld* Opts.minBetter )  || (System.currentTimeMillis()-startTime) > killTime) {
 //	    	   if ( (dstLatestMax  >= distanceOld* Opts.minBetter && dstLatestMax > 0)  ) {
+	    		   
+	    			accuracyTrain.add(0f);
+	    	        accuracyTest.add(0f);
+	    	        dstTrain.add(0f);
+	    		   
 	        		finish();
 	                return false;
 	            }
@@ -258,7 +270,12 @@ public class Runner {
 				//}
 			}
 		}
+		
+
+		
 		doStreamPlot(true);			// darw one last time
+		
+
 	}
 	
 	private void doStreamPlot(boolean doDraw){
@@ -294,7 +311,7 @@ public class Runner {
 		            float[] yOTrain = null;
 		            float[] xOTest = null;
 		            float[] yOTest = null;
-		            
+		       
 		            if ( numTrain < 0 ) {
 			            xTrain = new float[distances.length];
 			            yTrain = new float[distances.length];
@@ -317,6 +334,7 @@ public class Runner {
 			            yOTest = new float[numElseTest];
             		}
 		            int ttr = 0; int tte = 0;int oCTr = 0;int oCTe = 0;
+		            int pos = 0;
 		            for (int f=0;f<DS.numSamples;f++){
 		                if ( DS.classIndex[f] == targetColorIndex) {
 		                	if ( trainSet[f]) {
@@ -347,6 +365,7 @@ public class Runner {
 		            numElseTrain = oCTr;
 		            numElseTest = oCTe;
 		            UI.spDst.dats.clear();
+
 		            int pSize = 10;
 		            if ( DS.numSamples>1000)pSize = 6;
 		            
@@ -375,7 +394,8 @@ public class Runner {
 //		            UI.spDst.setXY(xSigmoid,ySigmoid, pSize, Color.black, null, false, true, false);
 		            UI.spDst.setXY(xSplit,ySplit, 3, Color.black, null, false, true, false);
 		            UI.spDst.refreshPlot();
-
+		            
+		     
 	            }
             	
 	            // Integral
@@ -465,6 +485,12 @@ public class Runner {
 //		double small = large*0.1;
 		double large = .13;
 		double small = large*0.1;
+		
+		if (notBetterCount > Opts.noBetterStop / 2) {
+			large = .013;
+			small = large*0.1;
+		}
+		
         int z0     = (int)Math.floor(Math.random()*11);                // zufi
         Random random = ThreadLocalRandom.current();
         int a = random.nextInt(DS.numVars);
