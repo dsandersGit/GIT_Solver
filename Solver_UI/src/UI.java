@@ -922,6 +922,8 @@ public class UI {
 		menuExport.add(menuExportTP_FP_TN_FN);
 		JMenuItem menuExportDistances = new JMenuItem(" 1D Scores"); 
 		menuExport.add(menuExportDistances);
+		JMenuItem menuExportAccuracies = new JMenuItem(" Accuracies");
+		menuExport.add(menuExportAccuracies);
 		JMenuItem menuExportNormData = new JMenuItem(" Normalized Data "); 
 		menuExport.add(menuExportNormData);
 		menuExport.addSeparator();
@@ -1262,6 +1264,71 @@ public class UI {
 				}
 				out.append("\n");
 			}
+			out.append("AccuracyTrain");
+			out.append("\tCN"+"\tCL"+"\tS");
+			for (int i=0;i<DS.freezs.size();i++) {
+				MC_Freeze mc = DS.freezs.get(i);
+				out.append("\t"+"#" + i + "|" + mc.targetLabel);
+			}
+			out.append("\n");
+			for (int j=0;j<DS.numSamples;j++) {
+				for (int i=0;i<DS.freezs.size();i++) {
+					if ( i== 0 ) out.append("\t"+DS.ClassNames[j]+"\t"+DS.classIndex[j]+"\t"+DS.SampleNames[j]);
+					MC_Freeze mc = DS.freezs.get(i);
+					out.append("\t"+mc.accuracyTrain);
+				}
+				out.append("\n");
+			}
+			out.append("AccuracyValidation");
+			out.append("\tCN"+"\tCL"+"\tS");
+			for (int i=0;i<DS.freezs.size();i++) {
+				MC_Freeze mc = DS.freezs.get(i);
+				out.append("\t"+"#" + i + "|" + mc.targetLabel);
+			}
+			out.append("\n");
+			for (int j=0;j<DS.numSamples;j++) {
+				for (int i=0;i<DS.freezs.size();i++) {
+					if ( i== 0 ) out.append("\t"+DS.ClassNames[j]+"\t"+DS.classIndex[j]+"\t"+DS.SampleNames[j]);
+					MC_Freeze mc = DS.freezs.get(i);
+					out.append("\t"+mc.accuracyTest);
+				}
+				out.append("\n");
+			}
+			StringSelection stringSelection = new StringSelection( out.toString() );
+		    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		    clipboard.setContents( stringSelection, stringSelection );
+		}});
+		menuExportAccuracies.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){
+			StringBuffer out = new StringBuffer();
+			
+			out.append("AccuracyTrain" + "\n");
+			for (int i=0;i<DS.freezs.size();i++) {
+				MC_Freeze mc = DS.freezs.get(i);
+				if ( i> 0 ) out.append("\t");
+				out.append("#" + i + "|" + mc.targetLabel);
+			}
+			out.append("\n");
+			for (int i=0;i<DS.freezs.size();i++) {
+				if ( i> 0 ) out.append("\t");
+				MC_Freeze mc = DS.freezs.get(i);
+				out.append(mc.accuracyTrain);
+			}
+			out.append("\n");
+
+			out.append("AccuracyValidation" + "\n");
+			for (int i=0;i<DS.freezs.size();i++) {
+				MC_Freeze mc = DS.freezs.get(i);
+				if ( i> 0 ) out.append("\t");
+				out.append("#" + i + "|" + mc.targetLabel);
+			}
+			out.append("\n");
+
+				for (int i=0;i<DS.freezs.size();i++) {
+					if ( i> 0 ) out.append("\t");
+					MC_Freeze mc = DS.freezs.get(i);
+					out.append(mc.accuracyTest);
+				}
+				out.append("\n");
 
 			StringSelection stringSelection = new StringSelection( out.toString() );
 		    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();

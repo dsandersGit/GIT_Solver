@@ -22,7 +22,7 @@ public class DS {
 	public static int[]			classAllIndPop	= null;					// [] Population of each Classes, index like classIndices
 	public static String[]		classAllIndNme	= null;					// [] Population of each Classes, index like classIndices
 	public static boolean[][]	fixedTrainSetOld	= null;					//
-	public static boolean[]	fixedTrainSet	= null;					//
+	public static boolean[]		fixedTrainSet	= null;					//
 	//public static boolean[]		noTrainingSet	= null;					//
 	
 	public static double[] timeIndex;									// timeIndex from sample if available

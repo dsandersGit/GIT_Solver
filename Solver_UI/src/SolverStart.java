@@ -149,12 +149,12 @@ public class SolverStart {
 	 * 145: zuFi > FAC smaller when notBetterCount / 2	>> leads to smaller Opts.notBetterCount
 	 * 146: OPTS.maxTime: [min] allowed time to create full ensemble, can be faster > see OPTS.noBetterStop
 	 * 147: ConfusionMatrix as JTable
-	 * 148: Text finish
+	 * 149: Accuracy Export
 	 * 	 */
  
 	public static String 		app 			= "solver [ISI]";
 	public static String 		appAdd 			= " 0.6";
-	public static String 		revision 		= " 148";
+	public static String 		revision 		= " 149";
 	
 	public static boolean 		isRunning 		= false;
 	public static boolean 		immediateStop 	= false;
