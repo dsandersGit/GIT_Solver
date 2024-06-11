@@ -693,7 +693,7 @@ public class UI {
 		tableConfusionMatrix.getTableHeader().setFont(fnt.deriveFont(Font.BOLD));
 		
 		tableConfusionMatrix.getTableHeader().setReorderingAllowed(false);
-		tableConfusionMatrix.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
+		tableConfusionMatrix.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		tableConfusionMatrix.setAutoCreateRowSorter(false);
 		
 		

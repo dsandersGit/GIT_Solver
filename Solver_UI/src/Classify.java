@@ -316,7 +316,7 @@ public class Classify {
 			for (int i=0;i<DS.numClasses;i++) {
 				txtOut.append( (DS.classAllIndNme[i])+"\t");
 			}
-			txtOut.append(Tools.txtLen ("RATIO [%]") + "\n");
+			txtOut.append(("RATIO [%]") + "\n");
 			for (int i=0;i<DS.numClasses;i++) {
 				txtOut.append( (DS.classAllIndNme[i])+"\t");
 				confMatrixout.append(DS.classAllIndNme[i]+"/");
